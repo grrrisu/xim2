@@ -17,6 +17,7 @@ defmodule Xim2Web.Router do
   scope "/", Xim2Web do
     pipe_through :browser
 
+    live "/grid", GridLive.Show, :show
     get "/", PageController, :home
   end
 
