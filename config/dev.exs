@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :xim2, Xim2.Repo,
-  #username: "postgres",
-  #password: "postgres",
+  # username: "postgres",
+  # password: "postgres",
   hostname: "localhost",
   database: "xim2_dev",
   stacktrace: true,

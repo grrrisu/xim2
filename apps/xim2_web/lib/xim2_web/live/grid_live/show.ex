@@ -4,21 +4,32 @@ defmodule Xim2Web.GridLive.Show do
   alias Ximula.Grid
 
   def mount(_params, _session, socket) do
-    grid = Grid.create(20, 10, fn x, y -> x + y end)
+    grid = Grid.create(50, 25, fn x, y -> x + y end)
     {:ok, assign(socket, grid: grid)}
+  end
+
+  def handle_event("update", _, socket) do
+    value = Grid.get(socket.assigns.grid, 0, 0)
+    socket = assign(socket, grid: Grid.put(socket.assigns.grid, 0, 0, value + 1))
+    {:noreply, socket}
   end
 
   def render(assigns) do
     ~H"""
     <h1>Grid</h1>
       <div class="overflow-x-auto border border-red-500 bg-red-100">
-        <div style="height: 50px">Some text before the grid</div>
+        <div class="m-2" style="height: 50px">
+          <p>Some text before the grid</p>
+          <.button phx-click="update">Update</.button>
+        </div>
         <.grid :let={{x, y, value}} grid={@grid} class="m-6" style="width: 200vmin; height: 100vmin">
           <.cell x={x} y={y} value={value} class="bg-green-300" />
         </.grid>
       </div>
     """
   end
+
+
 
   # attr :type, :string, default: ""
   def grid(assigns) do
@@ -40,15 +51,16 @@ defmodule Xim2Web.GridLive.Show do
   end
 
   def cell(assigns) do
+    assigns = assign(assigns, id: "cell-#{assigns.x}-#{assigns.y}")
     ~H"""
     <div
-      id={"cell-#{@x}-#{@y}"}
+      id={@id}
       class={["bg-gray-200 border-t border-r border-gray-900 cell", @class]}
       phx-click="toggle-cell"
       phx-value-x={@x}
       phx-value-y={@y}
     >
-      <%= "#{@x}:#{@y}" %>
+      <%=# "#{@x}:#{@y}" %>
       <%=# @value %>
     </div>
     """
