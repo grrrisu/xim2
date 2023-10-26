@@ -3,18 +3,15 @@ defmodule Xim2Web.GridLive.Show do
 
   alias Ximula.Grid
 
+  import Xim2Web.GridCompnent
+
   def mount(_params, _session, socket) do
     value = 1
-    grid = Grid.create(20, 10, fn x, y -> value end)
-
-    cells =
-      grid
-      |> Grid.map(&%{id: "#{&1}-#{&2}", x: &1, y: &2, value: &3})
-      |> Enum.sort_by(&{&1.y, &1.x})
+    grid = Grid.create(20, 10, fn _x, _y -> value end)
 
     {:ok,
      socket
-     |> stream(:grid, cells)
+     |> stream(:grid, streamify(grid))
      |> assign(grid_width: Grid.width(grid), grid_height: Grid.height(grid), value: value)}
   end
 
@@ -22,57 +19,47 @@ defmodule Xim2Web.GridLive.Show do
     value = socket.assigns.value
 
     {:noreply,
-     socket =
-       socket
-       |> assign(value: value + 1)
-       |> stream_insert(:grid, %{id: "0-0", x: 0, y: 0, value: value + 1})
-       |> stream_insert(:grid, %{id: "1-1", x: 1, y: 1, value: value + 1})
-       |> stream_insert(:grid, %{id: "2-2", x: 2, y: 2, value: value + 1})}
+     socket
+     |> assign(value: value + 1)
+     |> stream_insert(:grid, %{id: "0-0", x: 0, y: 0, value: value + 1})
+     |> stream_insert(:grid, %{id: "1-1", x: 1, y: 1, value: value + 1})
+     |> stream_insert(:grid, %{id: "2-2", x: 2, y: 2, value: value + 1})}
   end
 
   def handle_event("replace", _, socket) do
     value = socket.assigns.value
-
-    grid =
-      Grid.create(20, 10, fn x, y -> value + 10 end)
-      |> Grid.map(&%{id: "#{&1}-#{&2}", x: &1 + 10, y: &2 + 10, value: &3})
-      |> Enum.sort_by(&{&1.y, &1.x})
+    grid = Grid.create(20, 10, fn _x, _y -> value + 10 end)
 
     {:noreply,
-     socket =
-       socket
-       |> assign(value: value + 10)
-       |> stream(:grid, grid)}
+     socket
+     |> assign(value: value + 10)
+     |> stream(:grid, streamify(grid))}
   end
 
   def handle_event("bigger", _, socket) do
     value = socket.assigns.value
-
-    grid =
-      Grid.create(50, 25, fn x, y -> value + 10 end)
-      |> Grid.map(&%{id: "#{&1}-#{&2}", x: &1, y: &2, value: &3})
-      |> Enum.sort_by(&{&1.y, &1.x})
+    grid = Grid.create(50, 25, fn _x, _y -> value + 10 end)
 
     {:noreply,
-     socket =
-       socket
-       |> assign(grid_width: 50, grid_height: 25, value: value + 50)
-       |> stream(:grid, grid, reset: true)}
+     socket
+     |> assign(grid_width: 50, grid_height: 25, value: value + 50)
+     |> stream(:grid, streamify(grid), reset: true)}
   end
 
   def handle_event("smaller", _, socket) do
     value = socket.assigns.value
-
-    grid =
-      Grid.create(10, 5, fn x, y -> value + 10 end)
-      |> Grid.map(&%{id: "#{&1}-#{&2}", x: &1, y: &2, value: &3})
-      |> Enum.sort_by(&{&1.y, &1.x})
+    grid = Grid.create(10, 5, fn _x, _y -> value + 10 end)
 
     {:noreply,
-     socket =
-       socket
-       |> assign(grid_width: 10, grid_height: 5, value: value + 50)
-       |> stream(:grid, grid, reset: true)}
+     socket
+     |> assign(grid_width: 10, grid_height: 5, value: value + 50)
+     |> stream(:grid, streamify(grid), reset: true)}
+  end
+
+  defp streamify(grid) do
+    grid
+    |> Grid.sorted_list()
+    |> Enum.map(fn {x, y, v} -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
   end
 
   def render(assigns) do
@@ -97,42 +84,6 @@ defmodule Xim2Web.GridLive.Show do
       >
         <.cell id={dom_id} x={x} y={y} value={value} class="bg-green-300" />
       </.grid>
-    </div>
-    """
-  end
-
-  def grid(assigns) do
-    ~H"""
-    <div class="overflow-x-auto">
-      <.grid_container
-        :let={{dom_id, cell}}
-        grid={@grid}
-        class={@class}
-        grid_height={@grid_height}
-        grid_width={@grid_width}
-        style={"width: #{@width}; height: #{@height}"}
-      >
-        <%= render_slot(@inner_block, {dom_id, cell}) %>
-      </.grid_container>
-    </div>
-    """
-  end
-
-  # attr :type, :string, default: ""
-  def grid_container(assigns) do
-    ~H"""
-    <div
-      id="grid"
-      phx-update="stream"
-      class={["grid auto-rows-fr bg-gray-300 border-l border-b border-gray-900 h-full w-full", @class]}
-      style={[
-        "grid-template-columns: repeat(#{@grid_width},1fr); grid-template-rows: repeat(#{@grid_height},1fr);",
-        @style
-      ]}
-    >
-      <%= for {dom_id, cell} <- @grid do %>
-        <%= render_slot(@inner_block, {dom_id, cell}) %>
-      <% end %>
     </div>
     """
   end
