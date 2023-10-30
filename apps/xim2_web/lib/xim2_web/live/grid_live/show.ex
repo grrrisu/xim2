@@ -7,7 +7,7 @@ defmodule Xim2Web.GridLive.Show do
 
   def mount(_params, _session, socket) do
     value = 1
-    grid = Grid.create(20, 10, fn x, y -> value end)
+    grid = Grid.create(20, 10, fn _x, _y -> value end)
 
     {:ok,
      socket
@@ -19,45 +19,41 @@ defmodule Xim2Web.GridLive.Show do
     value = socket.assigns.value
 
     {:noreply,
-     socket =
-       socket
-       |> assign(value: value + 1)
-       |> stream_insert(:grid, %{id: "0-0", x: 0, y: 0, value: value + 1})
-       |> stream_insert(:grid, %{id: "1-1", x: 1, y: 1, value: value + 1})
-       |> stream_insert(:grid, %{id: "2-2", x: 2, y: 2, value: value + 1})}
+     socket
+     |> assign(value: value + 1)
+     |> stream_insert(:grid, %{id: "0-0", x: 0, y: 0, value: value + 1})
+     |> stream_insert(:grid, %{id: "1-1", x: 1, y: 1, value: value + 1})
+     |> stream_insert(:grid, %{id: "2-2", x: 2, y: 2, value: value + 1})}
   end
 
   def handle_event("replace", _, socket) do
     value = socket.assigns.value
-    grid = Grid.create(20, 10, fn x, y -> value + 10 end)
+    grid = Grid.create(20, 10, fn _x, _y -> value + 10 end)
 
     {:noreply,
-     socket =
-       socket
-       |> assign(value: value + 10)
-       |> stream(:grid, streamify(grid))}
+     socket
+     |> assign(value: value + 10)
+     |> stream(:grid, streamify(grid))}
   end
 
   def handle_event("bigger", _, socket) do
     value = socket.assigns.value
-    grid = Grid.create(50, 25, fn x, y -> value + 10 end)
+    grid = Grid.create(50, 25, fn _x, _y -> value + 10 end)
 
     {:noreply,
-     socket =
-       socket
-       |> assign(grid_width: 50, grid_height: 25, value: value + 50)
-       |> stream(:grid, streamify(grid), reset: true)}
+     socket
+     |> assign(grid_width: 50, grid_height: 25, value: value + 50)
+     |> stream(:grid, streamify(grid), reset: true)}
   end
 
   def handle_event("smaller", _, socket) do
     value = socket.assigns.value
-    grid = Grid.create(10, 5, fn x, y -> value + 10 end)
+    grid = Grid.create(10, 5, fn _x, _y -> value + 10 end)
 
     {:noreply,
-     socket =
-       socket
-       |> assign(grid_width: 10, grid_height: 5, value: value + 50)
-       |> stream(:grid, streamify(grid), reset: true)}
+     socket
+     |> assign(grid_width: 10, grid_height: 5, value: value + 50)
+     |> stream(:grid, streamify(grid), reset: true)}
   end
 
   defp streamify(grid) do
