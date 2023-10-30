@@ -12,20 +12,19 @@ defmodule Monsum do
   attr :small, :string, required: true, doc: "smaller 768px"
   attr :medium, :string, default: nil, doc: "min 768px"
   attr :large, :string, default: nil, doc: "min 1024px"
+  attr :class, :string, default: "w-full"
 
-  def header_visual(assigns) do
+  def picture(assigns) do
     ~H"""
-    <div class="overflow-y-hidden h-[50vh]">
-      <picture>
-        <%= if @medium do %>
-          <source srcset={@medium} media="(min-width: 768px)" />
-        <% end %>
-        <%= if @large do %>
-          <source srcset={@large} media="(min-width: 1024px)" />
-        <% end %>
-        <img src={@small} class="w-full" />
-      </picture>
-    </div>
+    <picture>
+      <%= if @medium do %>
+        <source srcset={@medium} media="(min-width: 768px)" />
+      <% end %>
+      <%= if @large do %>
+        <source srcset={@large} media="(min-width: 1024px)" />
+      <% end %>
+      <img src={@small} class={@class} />
+    </picture>
     """
   end
 

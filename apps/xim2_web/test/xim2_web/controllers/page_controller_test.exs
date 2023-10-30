@@ -3,6 +3,6 @@ defmodule Xim2Web.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Home"
+    assert html_response(conn, 200) =~ "Xim 2"
   end
 end
