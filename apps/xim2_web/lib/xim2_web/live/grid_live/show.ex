@@ -64,7 +64,8 @@ defmodule Xim2Web.GridLive.Show do
 
   def render(assigns) do
     ~H"""
-    <h1>Grid</h1>
+    <.main_title>Grid</.main_title>
+    <.back navigate={~p"/"}>Home</.back>
     <div class="border border-red-500 bg-red-100">
       <div class="m-2" style="height: 50px">
         <p>Some text before the grid</p>
