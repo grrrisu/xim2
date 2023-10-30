@@ -84,6 +84,7 @@ defmodule Xim2Web do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
+      import Monsum
       import Xim2Web.CoreComponents
       import Xim2Web.Gettext
 
