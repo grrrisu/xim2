@@ -9,6 +9,26 @@ defmodule Monsum do
     """
   end
 
+  attr :small, :string, required: true, doc: "smaller 768px"
+  attr :medium, :string, default: nil, doc: "min 768px"
+  attr :large, :string, default: nil, doc: "min 1024px"
+
+  def header_visual(assigns) do
+    ~H"""
+    <div class="overflow-y-hidden h-[50vh]">
+      <picture>
+        <%= if @medium do %>
+          <source srcset={@medium} media="(min-width: 768px)" />
+        <% end %>
+        <%= if @large do %>
+          <source srcset={@large} media="(min-width: 1024px)" />
+        <% end %>
+        <img src={@small} class="w-full" />
+      </picture>
+    </div>
+    """
+  end
+
   # --- core components modified colors ---
 
   @doc """
