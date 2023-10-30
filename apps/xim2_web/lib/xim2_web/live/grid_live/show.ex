@@ -66,7 +66,7 @@ defmodule Xim2Web.GridLive.Show do
     ~H"""
     <.main_title>Grid</.main_title>
     <.back navigate={~p"/"}>Home</.back>
-    <div class="border border-red-500 bg-red-100">
+    <div class="border border-red-500 text-slate-900 bg-red-100">
       <div class="m-2" style="height: 50px">
         <p>Some text before the grid</p>
         <.button phx-click="update">Update</.button>
@@ -93,10 +93,7 @@ defmodule Xim2Web.GridLive.Show do
     ~H"""
     <div
       id={@id}
-      class={["bg-gray-200 border-t border-r border-gray-900 cell", @class]}
-      phx-click="toggle-cell"
-      phx-value-x={@x}
-      phx-value-y={@y}
+      class={["text-slate-900 bg-gray-200 border-t border-r border-gray-900 cell", @class]}
     >
       <%= "#{@x}:#{@y}" %> | <%= @value %>
     </div>
