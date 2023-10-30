@@ -6,4 +6,8 @@ defmodule Xim2Web.PageController do
     # so skip the default app layout.
     render(conn, :home, layout: false)
   end
+
+  def colors(conn, _params) do
+    render(conn, :colors)
+  end
 end
