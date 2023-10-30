@@ -1,15 +1,17 @@
-<.header_visual
+<.picture
   small={~p"/images/blue-world-map-sm.jpg"}
   medium={~p"/images/blue-world-map-md.jpg"}
   large={~p"/images/blue-world-map-lg.jpg"}
 />
 
 <.flash_group flash={@flash} />
-<.main_title>Home</.main_title>
+<div class="min-h-[65vh] mx-auto p-6 rounded-t-lg w-11/12 drop-shadow-2xl bg-sky-950 border-2 border-sky-500 opacity-95 absolute left-[4.1666666667%] top-[30vh]">
+  <.main_title>Xim 2</.main_title>
 
-<p>
-  <ul>
-    <li><.link class="text-sky-200" navigate={~p"/grid"}>Grid</.link></li>
-    <li><.link class="text-sky-200" navigate={~p"/colors"}>Colors</.link></li>
-  </ul>
-</p>
+  <p>
+    <ul>
+      <li><.link class="text-sky-200" navigate={~p"/grid"}>Grid</.link></li>
+      <li><.link class="text-sky-200" navigate={~p"/colors"}>Colors</.link></li>
+    </ul>
+  </p>
+</div>
