@@ -3,8 +3,8 @@ defmodule Xim2Web.GridLive.ShowTest do
   import Phoenix.LiveViewTest
 
   test "render a grid", %{conn: conn} do
-    {:ok, view, html} = live(conn, "/grid")
-    assert html =~ "<h1>Grid</h1>"
+    {:ok, view, _html} = live(conn, "/grid")
+    assert has_element?(view, "h1", "Grid")
     assert has_element?(view, "#grid.grid")
   end
 end
