@@ -2,4 +2,8 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-/* This file is for your main application CSS */
+@layer utilities {
+  a {
+    @apply text-sky-300 hover:text-sky-500;
+  }
+}

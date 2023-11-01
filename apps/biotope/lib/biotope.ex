@@ -1,18 +1,17 @@
 defmodule Biotope do
   @moduledoc """
-  Documentation for `Biotope`.
+  Context for `Biotope`.
   """
 
-  @doc """
-  Hello world.
+  alias Biotope.Data
 
-  ## Examples
+  @proxy Biotope.AccessProxy.Data
 
-      iex> Biotope.hello()
-      :world
+  def get() do
+    Data.get(@proxy)
+  end
 
-  """
-  def hello do
-    :world
+  def create(width, height) do
+    Data.create(width, height, @proxy)
   end
 end

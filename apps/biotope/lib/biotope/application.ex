@@ -5,11 +5,13 @@ defmodule Biotope.Application do
 
   use Application
 
+  alias Ximula.AccessProxy
+
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Biotope.Worker.start_link(arg)
-      # {Biotope.Worker, arg}
+      {Biotope.Data, name: Biotope.Data},
+      {AccessProxy, name: Biotope.AccessProxy.Data, agent: Biotope.Data}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
