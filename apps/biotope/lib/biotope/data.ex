@@ -15,7 +15,8 @@ defmodule Biotope.Data do
   def create(width, height, proxy) do
     case AccessProxy.exclusive_get(proxy) do
       nil ->
-        AccessProxy.update(proxy, fn -> create_grid(width, height) end)
+        :ok = AccessProxy.update(proxy, fn _ -> create_grid(width, height) end)
+        {:ok, AccessProxy.get(proxy)}
 
       _ ->
         AccessProxy.release(proxy)
