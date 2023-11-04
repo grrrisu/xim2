@@ -18,13 +18,17 @@ defmodule Xim2Web.BiotopeLive.Index do
     {:noreply, assign_biotope(socket, biotope)}
   end
 
-  def render(assigns) do
+  def render(%{new: true} = assigns) do
     ~H"""
-    <.main_title>Biotope</.main_title>
-    <.back navigate={~p"/"}>Home</.back>
-    <%= if @new do %>
+    <.main_section>
       <.live_component id="biotope-form" module={Form} />
-    <% else %>
+    </.main_section>
+    """
+  end
+
+  def render(%{new: false} = assigns) do
+    ~H"""
+    <.main_section>
       <.grid
         :let={{dom_id, %{x: x, y: y, value: value}}}
         grid={@streams.grid}
@@ -35,7 +39,15 @@ defmodule Xim2Web.BiotopeLive.Index do
           Position [<%= x %>,<%= y %>]: <%= value.vegetation.size %>
         </div>
       </.grid>
-    <% end %>
+    </.main_section>
+    """
+  end
+
+  def main_section(assigns) do
+    ~H"""
+    <.main_title>Biotope</.main_title>
+    <.back navigate={~p"/"}>Home</.back>
+    <%= render_slot(@inner_block) %>
     """
   end
 
@@ -46,8 +58,6 @@ defmodule Xim2Web.BiotopeLive.Index do
     |> assign(width: Grid.width(grid), height: Grid.height(grid), new: false)
     |> stream(:grid, streamify(grid))
   end
-
-  defp streamify(nil), do: nil
 
   defp streamify(grid) do
     grid

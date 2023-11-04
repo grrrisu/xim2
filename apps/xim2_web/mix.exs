@@ -50,7 +50,8 @@ defmodule Xim2Web.MixProject do
       {:gettext, "~> 0.20"},
       {:xim2, in_umbrella: true},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5"},
+      {:biotope, in_umbrella: true}
     ]
   end
 
