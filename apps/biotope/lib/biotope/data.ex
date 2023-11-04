@@ -24,6 +24,11 @@ defmodule Biotope.Data do
     end
   end
 
+  def clear(proxy) do
+    AccessProxy.exclusive_get(proxy)
+    AccessProxy.update(proxy, nil)
+  end
+
   defp create_grid(width, height) do
     Grid.create(width, height, %{vegetation: %{size: 10}})
   end

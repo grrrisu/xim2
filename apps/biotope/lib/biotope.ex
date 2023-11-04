@@ -14,4 +14,8 @@ defmodule Biotope do
   def create(width, height) do
     Data.create(width, height, @proxy)
   end
+
+  def clear() do
+    Data.clear(@proxy)
+  end
 end
