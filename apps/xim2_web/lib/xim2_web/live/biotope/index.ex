@@ -45,9 +45,11 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def main_section(assigns) do
     ~H"""
-    <.main_title>Biotope</.main_title>
-    <.back navigate={~p"/"}>Home</.back>
-    <%= render_slot(@inner_block) %>
+    <section>
+      <.main_title>Biotope</.main_title>
+      <.back navigate={~p"/"}>Home</.back>
+      <%= render_slot(@inner_block) %>
+    </section>
     """
   end
 
