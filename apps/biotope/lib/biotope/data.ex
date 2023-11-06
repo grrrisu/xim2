@@ -34,6 +34,12 @@ defmodule Biotope.Data do
     end
   end
 
+  def update(changes, proxy) do
+    AccessProxy.update(proxy, fn %{vegetation: grid} = data ->
+      %{data | vegetation: Grid.apply_changes(grid, changes)}
+    end)
+  end
+
   def clear(proxy) do
     AccessProxy.exclusive_get(proxy)
     AccessProxy.update(proxy, nil)

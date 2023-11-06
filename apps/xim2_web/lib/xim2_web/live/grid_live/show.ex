@@ -59,7 +59,7 @@ defmodule Xim2Web.GridLive.Show do
   defp streamify(grid) do
     grid
     |> Grid.sorted_list()
-    |> Enum.map(fn {x, y, v} -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
+    |> Enum.map(fn {{x, y}, v} -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
   end
 
   def render(assigns) do
