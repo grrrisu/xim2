@@ -9,13 +9,23 @@ defmodule Biotope.Data do
   end
 
   def get(proxy) do
-    AccessProxy.get(proxy)
+    case AccessProxy.get(proxy) do
+      nil -> nil
+      biotope -> Map.fetch!(biotope, :vegetation)
+    end
+  end
+
+  def exclusive_get(proxy) do
+    case AccessProxy.exclusive_get(proxy) do
+      nil -> nil
+      biotope -> Map.fetch!(biotope, :vegetation)
+    end
   end
 
   def create(width, height, proxy) do
     case AccessProxy.exclusive_get(proxy) do
       nil ->
-        :ok = AccessProxy.update(proxy, fn _ -> create_grid(width, height) end)
+        :ok = AccessProxy.update(proxy, fn _ -> create_biotope(width, height) end)
         {:ok, AccessProxy.get(proxy)}
 
       _ ->
@@ -29,7 +39,7 @@ defmodule Biotope.Data do
     AccessProxy.update(proxy, nil)
   end
 
-  defp create_grid(width, height) do
-    Grid.create(width, height, %{vegetation: %{size: 10}})
+  defp create_biotope(width, height) do
+    %{vegetation: Grid.create(width, height, %{size: 10})}
   end
 end
