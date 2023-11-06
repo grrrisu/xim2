@@ -8,21 +8,21 @@
 <div class="min-h-[65vh] mx-auto p-6 rounded-t-lg w-11/12 drop-shadow-2xl bg-sky-950 border-2 border-sky-500 opacity-95 absolute left-[4.1666666667%] top-[30vh]">
   <.main_title>Xim 2</.main_title>
 
-  <p>
-    <ul>
-      <li>
-        <.link class="text-sky-200" navigate={~p"/grid"}>Grid <.icon name="la-th" /></.link>
-      </li>
-      <li>
-        <.link class="text-sky-200" navigate={~p"/biotope"}>
-          Biotope <.icon name="la-leaf" />
-        </.link>
-      </li>
-      <li>
-        <.link class="text-sky-200" navigate={~p"/colors"}>
-          Colors <.icon name="la-palette" />
-        </.link>
-      </li>
-    </ul>
-  </p>
+  <div class="flex space-x-3">
+    <.hero_card link={~p"/grid"} class="basis-1/3">
+      <:icon><.icon name="la-th" class="la-2x" /></:icon>
+      <:title>Grid</:title>
+      A simple Grid with overlay
+    </.hero_card>
+    <.hero_card link={~p"/biotope"} class="basis-1/3">
+      <:icon><.icon name="la-leaf" class="la-2x" /></:icon>
+      <:title>Biotope</:title>
+      The Biotope, Vegetation
+    </.hero_card>
+    <.hero_card link={~p"/colors"} class="basis-1/3">
+      <:icon><.icon name="la-palette" class="la-2x" /></:icon>
+      <:title>Colors</:title>
+      The colors and mood pictures
+    </.hero_card>
+  </div>
 </div>
