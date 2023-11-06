@@ -3,12 +3,18 @@ defmodule Biotope do
   Context for `Biotope`.
   """
 
-  alias Biotope.Data
+  alias Biotope.{Data, Simulation}
+  alias Ximula.Sim.{Loop, Queue}
 
   @proxy Biotope.AccessProxy.Data
+  @loop Biotope.Sim.Loop
 
   def get() do
     Data.get(@proxy)
+  end
+
+  def exclusive_get() do
+    Data.exclusive_get(@proxy)
   end
 
   def create(width, height) do
