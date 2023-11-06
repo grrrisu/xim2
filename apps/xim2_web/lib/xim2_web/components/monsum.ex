@@ -32,6 +32,30 @@ defmodule Monsum do
     """
   end
 
+  attr :link, :string, required: true
+  attr :class, :string, doc: "class "
+  slot :icon
+  slot :title
+  slot :inner_block, required: true
+
+  def hero_card(assigns) do
+    ~H"""
+    <.link navigate={@link} class={@class}>
+      <div class="flex flex-col opacity-100 items-center p-6 space-y-3 text-center bg-sky-800 hover:bg-sky-700 rounded-xl border border-sky-600">
+        <span class="inline-block p-3 text-white bg-sky-600 rounded-full">
+          <%= render_slot(@icon) %>
+        </span>
+        <h2 class="text-xl font-semibold text-sky-300 capitalize">
+          <%= render_slot(@title) %>
+        </h2>
+        <p class="text-sky-100">
+          <%= render_slot(@inner_block) %>
+        </p>
+      </div>
+    </.link>
+    """
+  end
+
   # --- core components modified colors ---
 
   @doc """
