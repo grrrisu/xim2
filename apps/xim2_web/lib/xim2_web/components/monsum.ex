@@ -56,6 +56,20 @@ defmodule Monsum do
     """
   end
 
+  attr :running, :boolean, required: true
+
+  def start_button(%{running: false} = assigns) do
+    ~H"""
+    <.button phx-click="start"><.icon name="hero-play" />Start</.button>
+    """
+  end
+
+  def start_button(%{running: true} = assigns) do
+    ~H"""
+    <.button phx-click="stop"><.icon name="hero-pause" />Stop</.button>
+    """
+  end
+
   # --- core components modified colors ---
 
   @doc """

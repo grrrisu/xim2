@@ -3,25 +3,49 @@ defmodule Biotope do
   Context for `Biotope`.
   """
 
-  alias Biotope.{Data, Simulation}
+  alias Biotope.Data
   alias Ximula.Sim.{Loop, Queue}
 
   @proxy Biotope.AccessProxy.Data
   @loop Biotope.Sim.Loop
 
-  def get() do
-    Data.get(@proxy)
+  def get(proxy \\ @proxy) do
+    Data.get(proxy)
   end
 
-  def exclusive_get() do
-    Data.exclusive_get(@proxy)
+  def exclusive_get(proxy \\ @proxy) do
+    Data.exclusive_get(proxy)
   end
 
-  def create(width, height) do
-    Data.create(width, height, @proxy)
+  def create(width, height, proxy \\ @proxy) do
+    Data.create(width, height, proxy)
   end
 
-  def clear() do
-    Data.clear(@proxy)
+  # [{x, y, %{size: size}}, ...]
+  def update(changes, proxy \\ @proxy) do
+    Data.update(changes, proxy)
+  end
+
+  def clear(proxy \\ @proxy) do
+    Data.clear(proxy)
+  end
+
+  def prepare_sim_queues(loop \\ @loop, proxy \\ @proxy) do
+    Loop.add_queue(loop, %Queue{
+      name: :normal,
+      func: {Biotope.Simulation, :sim, [data: proxy]},
+      interval: 1_000
+    })
+  end
+
+  def start(loop \\ @loop) do
+    case get() do
+      nil -> {:error, "no data available"}
+      _ -> Loop.start_sim(loop)
+    end
+  end
+
+  def stop(loop \\ @loop) do
+    Loop.stop_sim(loop)
   end
 end

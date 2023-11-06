@@ -6,16 +6,27 @@ defmodule Xim2Web.BiotopeLive.Index do
   import Xim2Web.GridCompnent
 
   def mount(_params, _session, socket) do
+    Biotope.prepare_sim_queues()
     {:ok, socket}
   end
 
   def handle_params(_params, _uri, socket) do
-    {:noreply, assign_biotope(socket, Biotope.get())}
+    {:noreply, assign_biotope(socket, Biotope.get()) |> assign(running: false)}
+  end
+
+  def handle_event("start", _, socket) do
+    :ok = Biotope.start()
+    {:noreply, assign(socket, running: true)}
+  end
+
+  def handle_event("stop", _, socket) do
+    :ok = Biotope.stop()
+    {:noreply, assign(socket, running: false)}
   end
 
   def handle_info({:form_submitted, %{width: width, height: height}}, socket) do
     {:ok, biotope} = Biotope.create(width, height)
-    {:noreply, assign_biotope(socket, biotope)}
+    {:noreply, assign_biotope(socket, biotope.vegetation)}
   end
 
   def render(%{new: true} = assigns) do
@@ -29,6 +40,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   def render(%{new: false} = assigns) do
     ~H"""
     <.main_section>
+      <.start_button running={@running} />
       <.grid
         :let={{dom_id, %{x: x, y: y, value: value}}}
         grid={@streams.grid}
@@ -36,7 +48,7 @@ defmodule Xim2Web.BiotopeLive.Index do
         grid_height={@height}
       >
         <div id={dom_id} class="bg-emerald-800">
-          Position [<%= x %>,<%= y %>]: <%= value.vegetation.size %>
+          Position [<%= x %>,<%= y %>]: <%= value.size %>
         </div>
       </.grid>
     </.main_section>
@@ -64,6 +76,6 @@ defmodule Xim2Web.BiotopeLive.Index do
   defp streamify(grid) do
     grid
     |> Grid.sorted_list()
-    |> Enum.map(fn {x, y, v} -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
+    |> Enum.map(fn {{x, y}, v} -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
   end
 end
