@@ -1,11 +1,14 @@
 defmodule Xim2Web.BiotopeLive.Index do
   use Xim2Web, :live_view
 
+  alias Phoenix.PubSub
+
   alias Ximula.Grid
   alias Xim2Web.BiotopeLive.Form
   import Xim2Web.GridCompnent
 
   def mount(_params, _session, socket) do
+    if connected?(socket), do: PubSub.subscribe(Xim2.PubSub, "Biotope:simulation")
     Biotope.prepare_sim_queues()
     {:ok, socket}
   end
@@ -27,6 +30,10 @@ defmodule Xim2Web.BiotopeLive.Index do
   def handle_info({:form_submitted, %{width: width, height: height}}, socket) do
     {:ok, biotope} = Biotope.create(width, height)
     {:noreply, assign_biotope(socket, biotope.vegetation)}
+  end
+
+  def handle_info(%{simulation: Biotope.Sim.Vegetation, changed: _}, socket) do
+    {:noreply, stream(socket, :grid, Biotope.get() |> streamify())}
   end
 
   def render(%{new: true} = assigns) do
