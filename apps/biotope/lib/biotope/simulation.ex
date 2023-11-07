@@ -1,4 +1,6 @@
 defmodule Biotope.Simulation do
+  alias Phoenix.PubSub
+
   alias Ximula.Simulator
   alias Ximula.Sim.Queue
   alias Ximula.Grid
@@ -75,10 +77,13 @@ defmodule Biotope.Simulation do
     dbg(results)
   end
 
-  def notify(%{error: _error, ok: _ok, simulation: _simulation} = result) do
-    # %{simulation: simulation, changed: ok} |> dbg()
-    # %{simulation: simulation, failed: error} |> dbg()
-    # PubSub.broadcast(topic, change) | GenStage.cast(stage, {:receive, change})
+  def notify(%{error: _error, ok: ok, simulation: simulation} = result) do
+    :ok =
+      PubSub.broadcast(Xim2.PubSub, "Biotope:simulation", %{
+        simulation: simulation,
+        changed: ok
+      })
+
     result
   end
 end
