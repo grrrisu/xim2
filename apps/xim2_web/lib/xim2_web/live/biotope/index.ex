@@ -8,8 +8,10 @@ defmodule Xim2Web.BiotopeLive.Index do
   import Xim2Web.GridCompnent
 
   def mount(_params, _session, socket) do
-    if connected?(socket), do: PubSub.subscribe(Xim2.PubSub, "Biotope:simulation")
-    Biotope.prepare_sim_queues()
+    if connected?(socket) do
+      PubSub.subscribe(Xim2.PubSub, "Biotope:simulation")
+      Biotope.prepare_sim_queues()
+    end
     {:ok, socket}
   end
 
@@ -67,6 +69,7 @@ defmodule Xim2Web.BiotopeLive.Index do
     <section>
       <.main_title>Biotope</.main_title>
       <.back navigate={~p"/"}>Home</.back>
+      <p><%= Biotope.get_queues() |> Enum.count() %></p>
       <%= render_slot(@inner_block) %>
     </section>
     """
