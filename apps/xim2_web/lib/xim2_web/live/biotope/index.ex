@@ -12,6 +12,7 @@ defmodule Xim2Web.BiotopeLive.Index do
       PubSub.subscribe(Xim2.PubSub, "Biotope:simulation")
       Biotope.prepare_sim_queues()
     end
+
     {:ok, socket}
   end
 
