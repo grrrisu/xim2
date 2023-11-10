@@ -60,13 +60,13 @@ defmodule Monsum do
 
   def start_button(%{running: false} = assigns) do
     ~H"""
-    <.button phx-click="start"><.icon name="hero-play" />Start</.button>
+    <.button phx-click="start" phx-disable-with="Starting..."><.icon name="hero-play" />Start</.button>
     """
   end
 
   def start_button(%{running: true} = assigns) do
     ~H"""
-    <.button phx-click="stop"><.icon name="hero-pause" />Stop</.button>
+    <.button phx-click="stop" phx-disable-with="Stopping..."><.icon name="hero-pause" />Stop</.button>
     """
   end
 
