@@ -30,12 +30,19 @@ defmodule Xim2Web.BiotopeLive.Index do
     {:noreply, assign(socket, running: false)}
   end
 
+  def handle_event("reset", _, socket) do
+    :ok = Biotope.stop()
+    :ok = Biotope.clear()
+    {:noreply, assign_biotope(socket, Biotope.get()) |> assign(running: false)}
+  end
+
   def handle_info({:form_submitted, %{width: width, height: height}}, socket) do
     {:ok, biotope} = Biotope.create(width, height)
     {:noreply, assign_biotope(socket, biotope.vegetation)}
   end
 
   def handle_info(%{simulation: Biotope.Sim.Vegetation, changed: _}, socket) do
+    # TODO we might get events from previous sim, after we resetted the grid for example
     {:noreply, stream(socket, :grid, Biotope.get() |> streamify())}
   end
 
@@ -50,16 +57,17 @@ defmodule Xim2Web.BiotopeLive.Index do
   def render(%{new: false} = assigns) do
     ~H"""
     <.main_section>
-      <.start_button running={@running} />
+      <.action_box class="mb-2">
+        <.start_button running={@running} />
+        <.button phx-click="reset"><.icon name="hero-arrow-uturn-left" />&nbsp;Reset</.button>
+      </.action_box>
       <.grid
         :let={{dom_id, %{x: x, y: y, value: value}}}
         grid={@streams.grid}
         grid_width={@width}
         grid_height={@height}
       >
-        <div id={dom_id} class="bg-emerald-800">
-          Position [<%= x %>,<%= y %>]: <%= value.size %>
-        </div>
+        <.field id={dom_id} x={x} y={y} value={value} />
       </.grid>
     </.main_section>
     """
@@ -73,6 +81,14 @@ defmodule Xim2Web.BiotopeLive.Index do
       <p><%= Biotope.get_queues() |> Enum.count() %></p>
       <%= render_slot(@inner_block) %>
     </section>
+    """
+  end
+
+  def field(assigns) do
+    ~H"""
+    <div id={@id} class="bg-emerald-800">
+      <%= @value.size |> round() %>
+    </div>
     """
   end
 
