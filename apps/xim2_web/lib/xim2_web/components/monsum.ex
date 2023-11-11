@@ -56,17 +56,32 @@ defmodule Monsum do
     """
   end
 
+  attr :class, :string, default: ""
+  slot :inner_block, required: true
+
+  def action_box(assigns) do
+    ~H"""
+    <div class={["rounded-md border border-sky-500 py-2 px-4 bg-sky-950", @class]}>
+      <%= render_slot(@inner_block) %>
+    </div>
+    """
+  end
+
   attr :running, :boolean, required: true
 
   def start_button(%{running: false} = assigns) do
     ~H"""
-    <.button phx-click="start" phx-disable-with="Starting..."><.icon name="hero-play" />Start</.button>
+    <.button phx-click="start" phx-disable-with="Starting...">
+      <.icon name="hero-play" />&nbsp;Start
+    </.button>
     """
   end
 
   def start_button(%{running: true} = assigns) do
     ~H"""
-    <.button phx-click="stop" phx-disable-with="Stopping..."><.icon name="hero-pause" />Stop</.button>
+    <.button phx-click="stop" phx-disable-with="Stopping...">
+      <.icon name="hero-pause" />&nbsp;Stop
+    </.button>
     """
   end
 

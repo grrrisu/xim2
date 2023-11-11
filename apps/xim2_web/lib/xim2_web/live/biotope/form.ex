@@ -50,5 +50,7 @@ defmodule Xim2Web.BiotopeLive.Form do
     {%{}, types}
     |> Changeset.cast(params, Map.keys(types))
     |> Changeset.validate_required([:width, :height])
+    |> Changeset.validate_number(:width, greater_than: 0, less_than_or_equal_to: 100)
+    |> Changeset.validate_number(:height, greater_than: 0, less_than_or_equal_to: 50)
   end
 end

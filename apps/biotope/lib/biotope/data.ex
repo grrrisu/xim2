@@ -4,6 +4,8 @@ defmodule Biotope.Data do
   alias Ximula.Grid
   alias Ximula.AccessProxy
 
+  alias Biotope.Sim.Vegetation
+
   def start_link(opts) do
     Agent.start_link(fn -> nil end, name: opts[:name] || __MODULE__)
   end
@@ -46,6 +48,6 @@ defmodule Biotope.Data do
   end
 
   defp create_biotope(width, height) do
-    %{vegetation: Grid.create(width, height, %{size: 10})}
+    %{vegetation: Grid.create(width, height, %Vegetation{})}
   end
 end
