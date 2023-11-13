@@ -30,7 +30,14 @@ defmodule Xim2Web.BiotopeLive.Form do
     ~H"""
     <div>
       <h3>Create new Biotope</h3>
-      <.form :let={f} for={@form} phx-change="validate" phx-submit="create" phx-target={@myself}>
+      <.form
+        :let={f}
+        id="biotope-form"
+        for={@form}
+        phx-change="validate"
+        phx-submit="create"
+        phx-target={@myself}
+      >
         <div class="flex items-start mt-4 space-x-8 ">
           <.input field={@form[:width]} label="Width" errors={f.errors} />
           <.input field={@form[:height]} label="Height" errors={f.errors} />
