@@ -59,7 +59,7 @@ defmodule Xim2Web.BiotopeLive.Index do
     <.main_section>
       <.action_box class="mb-2">
         <.start_button running={@running} />
-        <.button phx-click="reset"><.icon name="hero-arrow-uturn-left" />&nbsp;Reset</.button>
+        <.reset_button />
       </.action_box>
       <.grid
         :let={{dom_id, %{x: x, y: y, value: value}}}

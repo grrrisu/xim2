@@ -71,7 +71,7 @@ defmodule Monsum do
 
   def start_button(%{running: false} = assigns) do
     ~H"""
-    <.button phx-click="start" phx-disable-with="Starting...">
+    <.button id="start-button" phx-click="start" phx-disable-with="Starting...">
       <.icon name="hero-play" />&nbsp;Start
     </.button>
     """
@@ -79,8 +79,16 @@ defmodule Monsum do
 
   def start_button(%{running: true} = assigns) do
     ~H"""
-    <.button phx-click="stop" phx-disable-with="Stopping...">
+    <.button id="stop-button" phx-click="stop" phx-disable-with="Stopping...">
       <.icon name="hero-pause" />&nbsp;Stop
+    </.button>
+    """
+  end
+
+  def reset_button(assigns) do
+    ~H"""
+    <.button id="reset-button" phx-click="reset">
+      <.icon name="hero-arrow-uturn-left" />&nbsp;Reset
     </.button>
     """
   end
