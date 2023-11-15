@@ -9,12 +9,12 @@ defmodule Biotope do
   @proxy Biotope.AccessProxy.Data
   @loop Biotope.Sim.Loop
 
-  def get(proxy \\ @proxy) do
-    Data.get(proxy)
+  def get(layer, proxy \\ @proxy) do
+    Data.get(layer, proxy)
   end
 
-  def exclusive_get(proxy \\ @proxy) do
-    Data.exclusive_get(proxy)
+  def exclusive_get(layer, proxy \\ @proxy) do
+    Data.exclusive_get(layer, proxy)
   end
 
   def create(width, height, proxy \\ @proxy) do

@@ -5,22 +5,23 @@ defmodule Biotope.Data do
   alias Ximula.AccessProxy
 
   alias Biotope.Sim.Vegetation
+  alias Biotope.Sim.Animal.{Herbivore, Predator}
 
   def start_link(opts) do
     Agent.start_link(fn -> nil end, name: opts[:name] || __MODULE__)
   end
 
-  def get(proxy) do
+  def get(layer, proxy) do
     case AccessProxy.get(proxy) do
       nil -> nil
-      biotope -> Map.fetch!(biotope, :vegetation)
+      biotope -> Map.fetch!(biotope, layer)
     end
   end
 
-  def exclusive_get(proxy) do
+  def exclusive_get(layer, proxy) do
     case AccessProxy.exclusive_get(proxy) do
       nil -> nil
-      biotope -> Map.fetch!(biotope, :vegetation)
+      biotope -> Map.fetch!(biotope, layer)
     end
   end
 
@@ -48,6 +49,28 @@ defmodule Biotope.Data do
   end
 
   defp create_biotope(width, height) do
-    %{vegetation: Grid.create(width, height, %Vegetation{})}
+    %{
+      vegetation: Grid.create(width, height, %Vegetation{}),
+      herbivores:
+        create_animal(width, height, 0.1, fn position -> %Herbivore{position: position} end),
+      predators:
+        create_animal(width, height, 0.02, fn position -> %Predator{position: position} end)
+    }
+  end
+
+  defp create_animal(width, height, percent, create_func) do
+    amount = round(width * height * percent)
+
+    positions =
+      Enum.map(0..(height - 1), fn y -> Enum.map(0..(width - 1), fn x -> {x, y} end) end)
+      |> List.flatten()
+
+    Enum.reduce(0..amount, {positions, []}, fn {remaining, animals}, _ ->
+      index = Enum.random(0..(Enum.count(remaining) - 1))
+      {position, remaining} = List.pop_at(remaining, index)
+      {remaining, [create_func.(position) | animals]}
+    end)
+    |> Tuple.to_list()
+    |> List.last()
   end
 end
