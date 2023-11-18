@@ -68,14 +68,11 @@ defmodule Xim2Web.BiotopeLive.Index do
         <.start_button running={@running} />
         <.reset_button />
       </.action_box>
-      <.grid
-        :let={{dom_id, %{x: x, y: y, value: value}}}
-        id="vegatation"
-        grid={@streams.vegetation}
-        grid_width={@width}
-        grid_height={@height}
-      >
-        <.field id={dom_id} x={x} y={y} value={value} />
+      <.grid id="vegatation" grid={@streams.vegetation} grid_width={@width} grid_height={@height}>
+        <:fields :let={{dom_id, %{x: x, y: y, value: value}}}>
+          <.field id={dom_id} x={x} y={y} value={value} />
+        </:fields>
+        <:after_grid></:after_grid>
       </.grid>
     </.main_section>
     """

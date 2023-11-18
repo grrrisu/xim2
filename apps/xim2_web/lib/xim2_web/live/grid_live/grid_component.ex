@@ -22,7 +22,8 @@ defmodule Xim2Web.GridCompnent do
   attr :grid, :any, required: true, doc: "stream of cells"
   attr :grid_width, :integer, required: true, doc: "Grid.width(grid)"
   attr :grid_height, :integer, required: true, doc: "Grid.height(grid)"
-  slot :inner_block, required: true, doc: "cells in positioned order"
+  slot :fields, required: true, doc: "cells in positioned order"
+  slot :after_grid, required: false, doc: "after the grid within overflow container"
 
   def grid(assigns) do
     ~H"""
@@ -36,8 +37,9 @@ defmodule Xim2Web.GridCompnent do
         grid_height={@grid_height}
         grid_width={@grid_width}
       >
-        <%= render_slot(@inner_block, {dom_id, cell}) %>
+        <%= render_slot(@fields, {dom_id, cell}) %>
       </.grid_container>
+      <%= render_slot(@after_grid) %>
     </div>
     """
   end

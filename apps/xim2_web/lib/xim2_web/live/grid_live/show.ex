@@ -75,7 +75,6 @@ defmodule Xim2Web.GridLive.Show do
         <.button phx-click="smaller">Smaller</.button>
       </div>
       <.grid
-        :let={{dom_id, %{x: x, y: y, value: value}}}
         grid={@streams.grid}
         grid_height={@grid_height}
         grid_width={@grid_width}
@@ -83,13 +82,15 @@ defmodule Xim2Web.GridLive.Show do
         height="100vmin"
         class="m-6"
       >
-        <.cell id={dom_id} x={x} y={y} value={value} class="bg-green-300" />
+        <:fields :let={{dom_id, %{x: x, y: y, value: value}}}>
+          <.field id={dom_id} x={x} y={y} value={value} class="bg-green-300" />
+        </:fields>
       </.grid>
     </div>
     """
   end
 
-  def cell(assigns) do
+  def field(assigns) do
     ~H"""
     <div
       id={@id}
