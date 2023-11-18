@@ -11,6 +11,10 @@ defmodule Biotope.Data do
     Agent.start_link(fn -> nil end, name: opts[:name] || __MODULE__)
   end
 
+  def all(proxy) do
+    AccessProxy.get(proxy)
+  end
+
   def get(layer, proxy) do
     case AccessProxy.get(proxy) do
       nil -> nil
@@ -37,7 +41,7 @@ defmodule Biotope.Data do
     end
   end
 
-  def update(changes, proxy) do
+  def update(:vegetation, changes, proxy) do
     AccessProxy.update(proxy, fn %{vegetation: grid} = data ->
       %{data | vegetation: Grid.apply_changes(grid, changes)}
     end)
@@ -52,20 +56,20 @@ defmodule Biotope.Data do
     %{
       vegetation: Grid.create(width, height, %Vegetation{}),
       herbivores:
-        create_animal(width, height, 0.1, fn position -> %Herbivore{position: position} end),
+        create_animals(width, height, 0.1, fn position -> %Herbivore{position: position} end),
       predators:
-        create_animal(width, height, 0.02, fn position -> %Predator{position: position} end)
+        create_animals(width, height, 0.02, fn position -> %Predator{position: position} end)
     }
   end
 
-  defp create_animal(width, height, percent, create_func) do
+  defp create_animals(width, height, percent, create_func) do
     amount = round(width * height * percent)
 
     positions =
       Enum.map(0..(height - 1), fn y -> Enum.map(0..(width - 1), fn x -> {x, y} end) end)
       |> List.flatten()
 
-    Enum.reduce(0..amount, {positions, []}, fn {remaining, animals}, _ ->
+    Enum.reduce(0..amount, {positions, []}, fn _, {remaining, animals} ->
       index = Enum.random(0..(Enum.count(remaining) - 1))
       {position, remaining} = List.pop_at(remaining, index)
       {remaining, [create_func.(position) | animals]}

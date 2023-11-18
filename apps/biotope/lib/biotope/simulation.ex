@@ -30,11 +30,11 @@ defmodule Biotope.Simulation do
   end
 
   def get_data(data) do
-    Biotope.exclusive_get(data) |> Grid.positions_and_values()
+    Biotope.exclusive_get(:vegetation, data) |> Grid.positions_and_values()
   end
 
   def set_data(fields, data) do
-    Biotope.update(fields, data)
+    Biotope.update(:vegetation, fields, data)
   end
 
   def handle_success(%{ok: fields} = results, data) do

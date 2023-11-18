@@ -1,4 +1,5 @@
 defmodule Xim2Web.BiotopeLive.Index do
+  require Logger
   use Xim2Web, :live_view
 
   alias Phoenix.PubSub
@@ -17,7 +18,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   end
 
   def handle_params(_params, _uri, socket) do
-    {:noreply, assign_biotope(socket, Biotope.get()) |> assign(running: false)}
+    {:noreply, assign_biotope(socket, Biotope.all()) |> assign(running: false)}
   end
 
   def handle_event("start", _, socket) do
@@ -33,17 +34,23 @@ defmodule Xim2Web.BiotopeLive.Index do
   def handle_event("reset", _, socket) do
     :ok = Biotope.stop()
     :ok = Biotope.clear()
-    {:noreply, assign_biotope(socket, Biotope.get()) |> assign(running: false)}
+    {:noreply, assign_biotope(socket, Biotope.all()) |> assign(running: false)}
   end
 
   def handle_info({:form_submitted, %{width: width, height: height}}, socket) do
     {:ok, biotope} = Biotope.create(width, height)
-    {:noreply, assign_biotope(socket, biotope.vegetation)}
+    {:noreply, assign_biotope(socket, biotope)}
+  end
+
+  # we might get events from the previous simulation, after the biotope was reset
+  # in this case the event is ignored
+  def handle_info(%{simulation: _, changed: _}, %{assigns: %{new: true}} = socket) do
+    Logger.warning("received simulation event, but biotope is empty")
+    {:noreply, socket}
   end
 
   def handle_info(%{simulation: Biotope.Sim.Vegetation, changed: _}, socket) do
-    # TODO we might get events from previous sim, after we resetted the grid for example
-    {:noreply, stream(socket, :grid, Biotope.get() |> streamify())}
+    {:noreply, stream(socket, :vegetation, Biotope.get(:vegetation) |> streamify())}
   end
 
   def render(%{new: true} = assigns) do
@@ -63,7 +70,8 @@ defmodule Xim2Web.BiotopeLive.Index do
       </.action_box>
       <.grid
         :let={{dom_id, %{x: x, y: y, value: value}}}
-        grid={@streams.grid}
+        id="vegatation"
+        grid={@streams.vegetation}
         grid_width={@width}
         grid_height={@height}
       >
@@ -84,20 +92,28 @@ defmodule Xim2Web.BiotopeLive.Index do
     """
   end
 
+  @spec field(any()) :: Phoenix.LiveView.Rendered.t()
   def field(assigns) do
+    assigns = assign(assigns, size: assigns.value.size |> round())
+
     ~H"""
     <div id={@id} class="bg-emerald-800">
-      <%= @value.size |> round() %>
+      <%= @size %>
     </div>
     """
   end
 
   defp assign_biotope(socket, nil), do: assign(socket, new: true)
 
-  defp assign_biotope(socket, grid) do
+  defp assign_biotope(socket, %{vegetation: grid}) do
+    socket
+    |> assign_vegetation(grid)
+  end
+
+  defp assign_vegetation(socket, grid) do
     socket
     |> assign(width: Grid.width(grid), height: Grid.height(grid), new: false)
-    |> stream(:grid, streamify(grid))
+    |> stream(:vegetation, streamify(grid))
   end
 
   defp streamify(grid) do
