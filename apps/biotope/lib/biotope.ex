@@ -9,6 +9,10 @@ defmodule Biotope do
   @proxy Biotope.AccessProxy.Data
   @loop Biotope.Sim.Loop
 
+  def all(proxy \\ @proxy) do
+    Data.all(proxy)
+  end
+
   def get(layer, proxy \\ @proxy) do
     Data.get(layer, proxy)
   end
@@ -22,8 +26,8 @@ defmodule Biotope do
   end
 
   # [{x, y, %{size: size}}, ...]
-  def update(changes, proxy \\ @proxy) do
-    Data.update(changes, proxy)
+  def update(layer, changes, proxy \\ @proxy) do
+    Data.update(layer, changes, proxy)
   end
 
   def clear(proxy \\ @proxy) do
@@ -43,7 +47,7 @@ defmodule Biotope do
   end
 
   def start(loop \\ @loop) do
-    case get() do
+    case all() do
       nil -> {:error, "no data available"}
       _ -> Loop.start_sim(loop)
     end
