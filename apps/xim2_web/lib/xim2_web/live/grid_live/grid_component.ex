@@ -7,12 +7,14 @@ defmodule Xim2Web.GridCompnent do
   ## Examples
 
       <.grid
-        :let={{dom_id, %{x: x, y: y, value: value}}}
         grid={@streams.grid}
         grid_width={20}
         grid_height={10}
       >
-        <div>Position [<%= @x %>,<%= y %>]: <%= value %></div>
+        <:fields :let={{dom_id, %{x: x, y: y, value: value}}}>
+          <div>Position [<%= @x %>,<%= y %>]: <%= value %></div>
+        </:fields>
+        <:layer></:layer>
       </.grid>
   """
   attr :id, :string, default: "grid"
@@ -23,23 +25,33 @@ defmodule Xim2Web.GridCompnent do
   attr :grid_width, :integer, required: true, doc: "Grid.width(grid)"
   attr :grid_height, :integer, required: true, doc: "Grid.height(grid)"
   slot :fields, required: true, doc: "cells in positioned order"
-  slot :after_grid, required: false, doc: "after the grid within overflow container"
+
+  slot :layer, required: false, doc: "after the grid within overflow container" do
+    attr :name, :string, required: true
+    attr :items, :list, required: true
+  end
 
   def grid(assigns) do
     ~H"""
     <div class="overflow-x-auto">
-      <.grid_container
-        :let={{dom_id, cell}}
-        id={@id}
-        class={@class}
-        style={"width: #{@width}; height: #{@height}"}
-        grid={@grid}
-        grid_height={@grid_height}
-        grid_width={@grid_width}
-      >
-        <%= render_slot(@fields, {dom_id, cell}) %>
-      </.grid_container>
-      <%= render_slot(@after_grid) %>
+      <div class={["relative", @class]} style={"width: #{@width}; height: #{@height}"}>
+        <.grid_container
+          :let={{dom_id, cell}}
+          id={@id}
+          grid={@grid}
+          grid_height={@grid_height}
+          grid_width={@grid_width}
+        >
+          <%= render_slot(@fields, {dom_id, cell}) %>
+        </.grid_container>
+        <%= for layer <- @layer do %>
+          <div id={layer.id} phx-update="stream" class="absolute top-0 h-full w-full">
+            <%= for {dom_id, item} <- layer.items do %>
+              <%= render_slot(layer, {dom_id, item}) %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
     </div>
     """
   end
@@ -59,8 +71,6 @@ defmodule Xim2Web.GridCompnent do
   """
   attr :id, :string, default: "grid"
   attr :grid, :any, required: true, doc: "stream of cells"
-  attr :class, :string, default: ""
-  attr :style, :string, default: "", doc: "mainly to set the height and width"
   attr :grid_height, :integer, required: true
   attr :grid_width, :integer, required: true
   slot :inner_block, required: true
@@ -70,11 +80,8 @@ defmodule Xim2Web.GridCompnent do
     <div
       id={@id}
       phx-update="stream"
-      class={["grid auto-rows-fr bg-gray-300 border-l border-b border-gray-900 h-full w-full", @class]}
-      style={[
-        "grid-template-columns: repeat(#{@grid_width},1fr); grid-template-rows: repeat(#{@grid_height},1fr);",
-        @style
-      ]}
+      class="grid auto-rows-fr bg-gray-300 border-l border-b border-gray-900 h-full w-full"
+      style={"grid-template-columns: repeat(#{@grid_width},1fr); grid-template-rows: repeat(#{@grid_height},1fr);"}
     >
       <%= for {dom_id, cell} <- @grid do %>
         <%= render_slot(@inner_block, {dom_id, cell}) %>
