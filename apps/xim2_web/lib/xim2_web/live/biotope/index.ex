@@ -68,11 +68,21 @@ defmodule Xim2Web.BiotopeLive.Index do
         <.start_button running={@running} />
         <.reset_button />
       </.action_box>
-      <.grid id="vegatation" grid={@streams.vegetation} grid_width={@width} grid_height={@height}>
+      <.grid
+        id="vegatation"
+        grid={@streams.vegetation}
+        grid_width={@width}
+        grid_height={@height}
+        width="1600px"
+        height="800px"
+        class="mx-auto"
+      >
         <:fields :let={{dom_id, %{x: x, y: y, value: value}}}>
           <.field id={dom_id} x={x} y={y} value={value} />
         </:fields>
-        <:after_grid></:after_grid>
+        <:layer :let={{dom_id, %{value: herbivore}}} id="herbivores" items={@streams.herbivores}>
+          <.herbivore id={dom_id} herbivore={herbivore} step={160} />
+        </:layer>
       </.grid>
     </.main_section>
     """
@@ -89,28 +99,58 @@ defmodule Xim2Web.BiotopeLive.Index do
     """
   end
 
-  @spec field(any()) :: Phoenix.LiveView.Rendered.t()
   def field(assigns) do
     assigns = assign(assigns, size: assigns.value.size |> round())
 
     ~H"""
-    <div id={@id} class="bg-emerald-800">
+    <div id={@id} class="bg-emerald-700 border border-emerald-950">
       <%= @size %>
+    </div>
+    """
+  end
+
+  def herbivore(assigns) do
+    {x, y} = assigns.herbivore.position
+    assigns = assign(assigns, x: x * assigns.step, y: y * assigns.step)
+
+    ~H"""
+    <div
+      id={@id}
+      class="absolute flex justify-center items-center"
+      style={"left: #{@x}px; top: #{@y}px; width: #{@step}px; height: #{@step}px"}
+    >
+      <span class="bg-sky-500 p-2">
+        <%= @herbivore.size %>
+      </span>
     </div>
     """
   end
 
   defp assign_biotope(socket, nil), do: assign(socket, new: true)
 
-  defp assign_biotope(socket, %{vegetation: grid}) do
+  defp assign_biotope(socket, %{vegetation: grid, herbivores: herbivores}) do
     socket
     |> assign_vegetation(grid)
+    |> assign_herbivores(herbivores)
   end
 
   defp assign_vegetation(socket, grid) do
     socket
     |> assign(width: Grid.width(grid), height: Grid.height(grid), new: false)
     |> stream(:vegetation, streamify(grid))
+  end
+
+  defp assign_herbivores(socket, nil), do: stream(socket, :herbivores, [])
+
+  defp assign_herbivores(socket, herbivores) do
+    stream(
+      socket,
+      :herbivores,
+      herbivores
+      |> Enum.map(fn %{position: {x, y}} = herbivore ->
+        %{id: "#{x}-#{y}", value: herbivore}
+      end)
+    )
   end
 
   defp streamify(grid) do
