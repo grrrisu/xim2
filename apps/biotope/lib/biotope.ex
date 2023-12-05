@@ -17,6 +17,10 @@ defmodule Biotope do
     Data.get(layer, proxy)
   end
 
+  def get_field(position, layer, proxy \\ @proxy) do
+    Data.get_field(position, layer, proxy)
+  end
+
   def exclusive_get(layer, proxy \\ @proxy) do
     Data.exclusive_get(layer, proxy)
   end
