@@ -1,7 +1,7 @@
 defmodule Biotope.Data do
   use Agent
 
-  alias Ximula.Grid
+  alias Ximula.{Grid, Torus}
   alias Ximula.AccessProxy
 
   alias Biotope.Sim.Vegetation
@@ -20,6 +20,10 @@ defmodule Biotope.Data do
       nil -> nil
       biotope -> Map.fetch!(biotope, layer)
     end
+  end
+
+  def get_field({x, y}, layer, proxy) do
+    AccessProxy.get(proxy, fn biotope -> biotope |> Map.fetch!(layer) |> Torus.get(x, y) end)
   end
 
   def exclusive_get(layer, proxy) do

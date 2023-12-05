@@ -5,12 +5,18 @@ defmodule Biotope.Simulation do
   alias Ximula.Sim.Queue
   alias Ximula.Grid
 
-  alias Biotope.Sim.Vegetation
+  alias Biotope.Sim.{Vegetation, Animal}
   alias Biotope.Simulator.Task.Supervisor
 
   @simulations [
-    Vegetation
+    Vegetation,
+    Animal
   ]
+
+  @simulations %{
+    vegetation: Vegetation,
+    herbivore: Animal
+  }
 
   def sim(%Queue{} = queue, opts) do
     Enum.map(@simulations, &sim_simulation(&1, opts))
@@ -18,26 +24,48 @@ defmodule Biotope.Simulation do
     |> notify_sum()
   end
 
-  def sim_simulation(simulation, opts) do
+  def sim_simulation({layer, simulation}, opts) do
     Simulator.benchmark(fn ->
-      get_data(opts[:data])
-      |> Simulator.sim({simulation, :sim, []}, Supervisor)
-      |> handle_success(opts[:data])
+      get_data(layer, opts[:data])
+      |> sim_items(simulation, opts[:data])
+      |> handle_success(layer, opts[:data])
       |> handle_failed(opts[:data])
       |> summarize(simulation)
       |> notify()
     end)
   end
 
-  def get_data(data) do
+  defp sim_items(items, Vegetation, data) do
+    Simulator.sim(
+      items,
+      {Vegetation, :sim, []},
+      fn {position, _v} -> position end,
+      Supervisor
+    )
+  end
+
+  defp sim_items(items, simulation, data) do
+    Simulator.sim(
+      items,
+      {simulation, :sim, [data: data]},
+      & &1.position,
+      Supervisor
+    )
+  end
+
+  def get_data(:vegetation, data) do
     Biotope.exclusive_get(:vegetation, data) |> Grid.positions_and_values()
+  end
+
+  def get_data(layer, data) do
+    Biotope.exclusive_get(layer, data)
   end
 
   def set_data(fields, data) do
     Biotope.update(:vegetation, fields, data)
   end
 
-  def handle_success(%{ok: fields} = results, data) do
+  def handle_success(%{ok: fields} = results, _layer, data) do
     :ok = set_data(fields, data)
     results
   end

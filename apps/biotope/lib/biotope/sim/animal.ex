@@ -38,9 +38,20 @@ defmodule Biotope.Sim.Animal do
   # Δs = s (b - a ------  - d)
   #                 v
 
-  def sim(producer, nil), do: {producer, nil}
+  def sim(%Herbivore{} = animal, data: data) do
+    vegetation_position = animal.position
+    vegetation = Biotope.get_field(vegetation_position, :vegetation, data)
+    {vegatation, animal} = grow(vegetation, animal)
+    # move(animal)
+    {{vegetation_position, vegatation}, animal}
+  end
 
-  def sim(%{size: producer_size} = producer, %{size: size} = animal, step \\ 1) do
+  def sim(%Predator{} = animal, data: data) do
+  end
+
+  def grow(producer, nil), do: {producer, nil}
+
+  def grow(%{size: producer_size} = producer, %{size: size} = animal, step \\ 1) do
     producer_size = producer_size - delta_producer(animal, producer_size) * step
     animal_size = size + delta_animal(animal, producer_size) * step
 
