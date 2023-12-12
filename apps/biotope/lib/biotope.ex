@@ -9,12 +9,20 @@ defmodule Biotope do
   @proxy Biotope.AccessProxy.Data
   @loop Biotope.Sim.Loop
 
-  def get(proxy \\ @proxy) do
-    Data.get(proxy)
+  def all(proxy \\ @proxy) do
+    Data.all(proxy)
   end
 
-  def exclusive_get(proxy \\ @proxy) do
-    Data.exclusive_get(proxy)
+  def get(layer, proxy \\ @proxy) do
+    Data.get(layer, proxy)
+  end
+
+  def get_field(position, layer, proxy \\ @proxy) do
+    Data.get_field(position, layer, proxy)
+  end
+
+  def exclusive_get(layer, proxy \\ @proxy) do
+    Data.exclusive_get(layer, proxy)
   end
 
   def create(width, height, proxy \\ @proxy) do
@@ -22,8 +30,8 @@ defmodule Biotope do
   end
 
   # [{x, y, %{size: size}}, ...]
-  def update(changes, proxy \\ @proxy) do
-    Data.update(changes, proxy)
+  def update(layer, changes, proxy \\ @proxy) do
+    Data.update(layer, changes, proxy)
   end
 
   def clear(proxy \\ @proxy) do
@@ -43,7 +51,7 @@ defmodule Biotope do
   end
 
   def start(loop \\ @loop) do
-    case get() do
+    case all() do
       nil -> {:error, "no data available"}
       _ -> Loop.start_sim(loop)
     end
