@@ -10,9 +10,9 @@ defmodule Xim2.Application do
     children = [
       Xim2.Repo,
       {DNSCluster, query: Application.get_env(:xim2, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Xim2.PubSub},
+      {Phoenix.PubSub, name: Xim2.PubSub}
       # Start the Finch HTTP client for sending emails
-      {Finch, name: Xim2.Finch}
+      # {Finch, name: Xim2.Finch}
       # Start a worker by calling: Xim2.Worker.start_link(arg)
       # {Xim2.Worker, arg}
     ]

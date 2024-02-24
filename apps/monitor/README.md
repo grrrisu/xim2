@@ -1,6 +1,6 @@
 # Sim.Monitor
 
-**TODO: Add description**
+Provides data and queues to be monitored
 
 ## Installation
 
