@@ -9,7 +9,7 @@ defmodule Sim.Monitor.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {AccessData, data: data, name: Sim.Monitor.Data},
+      {AccessData, data: nil, name: Sim.Monitor.Data},
       {Task.Supervisor, name: Sim.Monitor.Simulator.Task.Supervisor},
       {Task.Supervisor, name: Sim.Monitor.Loop.Task.Supervisor},
       # sim_args: [proxy: :sim_data])
