@@ -1,15 +1,19 @@
 defmodule Sim.Monitor.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
 
+  alias Ximula.AccessData
+  alias Ximula.Sim.Loop
+
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Sim.Monitor.Worker.start_link(arg)
-      # {Sim.Monitor.Worker, arg}
+      {AccessData, data: data, name: Sim.Monitor.Data},
+      {Task.Supervisor, name: Sim.Monitor.Simulator.Task.Supervisor},
+      {Task.Supervisor, name: Sim.Monitor.Loop.Task.Supervisor},
+      # sim_args: [proxy: :sim_data])
+      {Loop, name: Sim.Monitor.Loop}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
