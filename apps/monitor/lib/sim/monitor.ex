@@ -12,4 +12,12 @@ defmodule Sim.Monitor do
   def get_data(key) do
     Data.get(Sim.Monitor.Data, key)
   end
+
+  def start() do
+    :ok
+  end
+
+  def stop() do
+    :ok
+  end
 end
