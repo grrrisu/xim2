@@ -8,7 +8,7 @@ defmodule Xim2Web.MonitorLive.Index do
   def mount(_params, _session, socket) do
     if connected?(socket) do
       PubSub.subscribe(Xim2.PubSub, "Monitor:data")
-      prepare_sim_queues()
+      prepare()
     end
 
     {:ok, socket |> assign(:running, false)}
@@ -48,6 +48,8 @@ defmodule Xim2Web.MonitorLive.Index do
     {:noreply, assign(socket, running: false)}
   end
 
-  defp prepare_sim_queues() do
+  defp prepare() do
+    Monitor.create_data(100)
+    Monitor.prepare_queues()
   end
 end
