@@ -9,11 +9,10 @@ defmodule Sim.Monitor.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {AccessData, data: nil, name: Sim.Monitor.Data},
+      {AccessData, name: Sim.Monitor.Data, data: nil},
       {Task.Supervisor, name: Sim.Monitor.Simulator.Task.Supervisor},
       {Task.Supervisor, name: Sim.Monitor.Loop.Task.Supervisor},
-      # sim_args: [proxy: :sim_data])
-      {Loop, name: Sim.Monitor.Loop}
+      {Loop, name: Sim.Monitor.Loop, supervisor: Sim.Monitor.Loop.Task.Supervisor}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
