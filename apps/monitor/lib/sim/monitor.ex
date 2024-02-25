@@ -27,8 +27,6 @@ defmodule Sim.Monitor do
   end
 
   def start() do
-    dbg("start sim")
-
     if Data.created?(@data_server) do
       :ok = Loop.start_sim(@loop_server)
     else
@@ -37,7 +35,6 @@ defmodule Sim.Monitor do
   end
 
   def stop() do
-    dbg("stop sim")
     :ok = Loop.stop_sim(@loop_server)
   end
 end

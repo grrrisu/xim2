@@ -1,6 +1,8 @@
 defmodule Xim2Web.MonitorLive.Index do
   use Xim2Web, :live_view
 
+  require Logger
+
   alias Phoenix.PubSub
 
   alias Sim.Monitor
@@ -39,13 +41,15 @@ defmodule Xim2Web.MonitorLive.Index do
   end
 
   def handle_event("start", _, socket) do
+    Logger.info("start sim")
     :ok = Monitor.start()
-    {:noreply, assign(socket, running: true)}
+    {:noreply, socket |> assign(running: true) |> put_flash(:info, "sim queue started")}
   end
 
   def handle_event("stop", _, socket) do
+    Logger.info("stop sim")
     :ok = Monitor.stop()
-    {:noreply, assign(socket, running: false)}
+    {:noreply, socket |> assign(running: false) |> put_flash(:info, "sim queue stopped")}
   end
 
   defp prepare() do
