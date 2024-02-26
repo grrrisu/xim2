@@ -19,6 +19,9 @@ defmodule Xim2Web.MonitorLive.Index do
   def render(assigns) do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
+      <div>
+        <canvas id="duration-chart" phx-hook="Monitor"></canvas>
+      </div>
       <.duration_table durations={@streams.durations} />
       <.action_box class="mb-2">
         <.start_button running={@running} />
