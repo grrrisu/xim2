@@ -48,9 +48,9 @@ defmodule Xim2Web.MixProject do
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},
-      {:xim2, in_umbrella: true},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
+      {:xim2, in_umbrella: true},
       {:biotope, in_umbrella: true},
       {:monitor, in_umbrella: true}
     ]
