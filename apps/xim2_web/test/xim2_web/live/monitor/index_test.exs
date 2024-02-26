@@ -14,4 +14,19 @@ defmodule Xim2Web.MonitorLive.IndexTest do
     assert view |> element("#stop-button") |> render_click() =~ "id=\"start-button\""
     assert has_element?(view, "div[role=\"alert\"]", "stopped")
   end
+
+  test "receive queue results", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/monitor")
+
+    result = %{
+      queue: :test,
+      time: DateTime.utc_now(),
+      duration: 500,
+      ok: 100,
+      errors: 0
+    }
+
+    send(view.pid, {:queue_summary, result})
+    assert has_element?(view, "tr", "500 µm")
+  end
 end

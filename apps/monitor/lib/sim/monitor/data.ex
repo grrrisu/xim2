@@ -3,6 +3,8 @@ defmodule Sim.Monitor.Data do
   the simulation dummy data
   """
 
+  alias Phoenix.PubSub
+
   alias Ximula.AccessData
   alias Ximula.Simulator
 
@@ -53,17 +55,17 @@ defmodule Sim.Monitor.Data do
     0..(size - 1)
   end
 
-  defp aggregate_results({time, %{exit: error, ok: ok}}, queue) do
+  defp aggregate_results({duration, %{exit: error, ok: ok}}, queue) do
     %{
       queue: queue,
-      time: time,
+      time: DateTime.utc_now(),
+      duration: duration,
       ok: Enum.count(ok),
       errors: Enum.count(error)
     }
   end
 
   defp notify_sum(results) do
-    # PubSub.broadcast(topic, queue_result) | GenStage.cast(stage, {:receive, queue_result})
-    dbg(results)
+    PubSub.broadcast(Xim2.PubSub, "Monitor:data", {:queue_summary, results})
   end
 end
