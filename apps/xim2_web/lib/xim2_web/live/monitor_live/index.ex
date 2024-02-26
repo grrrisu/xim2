@@ -13,12 +13,13 @@ defmodule Xim2Web.MonitorLive.Index do
       prepare()
     end
 
-    {:ok, socket |> assign(:running, false)}
+    {:ok, socket |> assign(:running, false) |> stream(:durations, [])}
   end
 
   def render(assigns) do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
+      <.duration_table durations={@streams.durations} />
       <.action_box class="mb-2">
         <.start_button running={@running} />
       </.action_box>
@@ -40,6 +41,23 @@ defmodule Xim2Web.MonitorLive.Index do
     """
   end
 
+  def duration_table(assigns) do
+    ~H"""
+    <table>
+      <thead>
+        <th>Time</th>
+        <th>Duration</th>
+      </thead>
+      <tbody id="durations" phx-update="stream">
+        <tr :for={{dom_id, item} <- @durations} id={dom_id}>
+          <td><%= item.time %></td>
+          <td><%= item.duration %> µm</td>
+        </tr>
+      </tbody>
+    </table>
+    """
+  end
+
   def handle_event("start", _, socket) do
     Logger.info("start sim")
     :ok = Monitor.start()
@@ -50,6 +68,16 @@ defmodule Xim2Web.MonitorLive.Index do
     Logger.info("stop sim")
     :ok = Monitor.stop()
     {:noreply, socket |> assign(running: false) |> put_flash(:info, "sim queue stopped")}
+  end
+
+  def handle_info({:queue_summary, result}, socket) do
+    {:noreply,
+     stream_insert(
+       socket,
+       :durations,
+       Map.put_new(result, :id, System.unique_integer([:positive])),
+       limit: -10
+     )}
   end
 
   defp prepare() do
