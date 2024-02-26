@@ -19,10 +19,12 @@ defmodule Xim2Web.MonitorLive.Index do
   def render(assigns) do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
-      <div>
+      <div class="relative">
         <canvas id="duration-chart" phx-hook="Monitor"></canvas>
       </div>
-      <.duration_table durations={@streams.durations} />
+      <div style="height: 30vh">
+        <.duration_table durations={@streams.durations} />
+      </div>
       <.action_box class="mb-2">
         <.start_button running={@running} />
       </.action_box>
@@ -34,6 +36,7 @@ defmodule Xim2Web.MonitorLive.Index do
   attr :back, :string
   slot :inner_block, required: true
 
+  @spec main_section(map()) :: Phoenix.LiveView.Rendered.t()
   def main_section(assigns) do
     ~H"""
     <section>
@@ -75,12 +78,13 @@ defmodule Xim2Web.MonitorLive.Index do
 
   def handle_info({:queue_summary, result}, socket) do
     {:noreply,
-     stream_insert(
-       socket,
+     socket
+     |> stream_insert(
        :durations,
        Map.put_new(result, :id, System.unique_integer([:positive])),
        limit: -10
-     )}
+     )
+     |> push_event("update-duration-chart", %{x_axis: result.time, duration: result.duration})}
   end
 
   defp prepare() do
