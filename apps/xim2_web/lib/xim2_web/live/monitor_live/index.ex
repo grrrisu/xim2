@@ -19,11 +19,13 @@ defmodule Xim2Web.MonitorLive.Index do
   def render(assigns) do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
-      <div class="relative">
-        <canvas id="duration-chart" phx-hook="Monitor"></canvas>
-      </div>
-      <div style="height: 30vh">
-        <.duration_table durations={@streams.durations} />
+      <div class="flex flex-row">
+        <div id="duration-chart" phx-update="ignore" class="relative flex-auto w-1/2">
+          <canvas id="duration-chart-canvas" phx-hook="Monitor"></canvas>
+        </div>
+        <div class="flex-auto w-1/2" style="height: 30vh">
+          <.duration_table durations={@streams.durations} />
+        </div>
       </div>
       <.action_box class="mb-2">
         <.start_button running={@running} />
@@ -84,7 +86,10 @@ defmodule Xim2Web.MonitorLive.Index do
        Map.put_new(result, :id, System.unique_integer([:positive])),
        limit: -10
      )
-     |> push_event("update-duration-chart", %{x_axis: result.time, duration: result.duration})}
+     |> push_event("update-duration-chart", %{
+       x_axis: DateTime.to_iso8601(result.time),
+       duration: result.duration
+     })}
   end
 
   defp prepare() do

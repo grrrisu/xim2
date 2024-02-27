@@ -1,4 +1,6 @@
 import Chart from "chart.js/auto";
+import 'chartjs-adapter-moment';
+import moment from 'moment';
 
 MonitorHook = {
   mounted() {
@@ -10,7 +12,6 @@ MonitorHook = {
           label: 'Duration',
           borderColor: "rgb(6, 182, 212, 0.8)",
           backgroundColor: "rgb(14, 116, 144, 0.8)",
-          //fill: true,
           lineTension: 0,
           borderWidth: 2
         }]
@@ -18,15 +19,21 @@ MonitorHook = {
       options: {
         responsive: true,
         scales: {
-          // xAxis: {
-          //   type: 'time'
-          // },
           x: {
             display: true,
+            type: 'timeseries',
+            min: moment().toISOString(),
+            ticks: {
+              color: "rgb(14, 165, 233, 0.8)",
+            },
+            
           },
           y: {
             display: true,
-            beginAtZero: false
+            beginAtZero: false,
+            ticks: {
+              color: "rgb(14, 165, 233, 0.8)",
+            },
           }
         }
       }
