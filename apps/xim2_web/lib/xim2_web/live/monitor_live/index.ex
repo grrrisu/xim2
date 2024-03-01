@@ -13,23 +13,34 @@ defmodule Xim2Web.MonitorLive.Index do
       prepare()
     end
 
-    {:ok, socket |> assign(:running, false) |> stream(:durations, [])}
+    {:ok,
+     socket
+     |> assign(running: false, schedulers: System.schedulers_online(), items: 100)
+     |> stream(:durations, [])}
   end
 
   def render(assigns) do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
-      <div class="flex flex-row">
-        <div id="duration-chart" phx-update="ignore" class="relative flex-auto w-1/2">
-          <canvas id="duration-chart-canvas" phx-hook="Monitor"></canvas>
-        </div>
-        <div class="flex-auto w-1/2" style="height: 30vh">
-          <.duration_table durations={@streams.durations} />
-        </div>
-      </div>
-      <.action_box class="mb-2">
-        <.start_button running={@running} />
-      </.action_box>
+      <.boxes>
+        <:box>
+          <span class="align-super"><%= @schedulers %></span>
+          <.icon name="la-microchip" class="la-2x" />
+        </:box>
+        <:box>
+          <span class="align-super"><%= @items %></span>
+          <.icon name="la-hashtag" class="la-2x" />
+        </:box>
+      </.boxes>
+      <.boxes>
+        <:box><.duration_chart /></:box>
+        <:box><.duration_table durations={@streams.durations} /></:box>
+      </.boxes>
+      <:footer>
+        <.action_box class="mb-2">
+          <.start_button running={@running} />
+        </.action_box>
+      </:footer>
     </.main_section>
     """
   end
@@ -38,23 +49,45 @@ defmodule Xim2Web.MonitorLive.Index do
   attr :back, :string
   slot :inner_block, required: true
 
-  @spec main_section(map()) :: Phoenix.LiveView.Rendered.t()
   def main_section(assigns) do
     ~H"""
-    <section>
-      <.main_title><%= @title %></.main_title>
-      <.back navigate={@back}>Home</.back>
-      <%= render_slot(@inner_block) %>
+    <section class="flex flex-col">
+      <div>
+        <.main_title><%= @title %></.main_title>
+        <.back navigate={@back}>Home</.back>
+      </div>
+      <div>
+        <%= render_slot(@inner_block) %>
+      </div>
+      <div><%= render_slot(@footer) %></div>
     </section>
+    """
+  end
+
+  def boxes(assigns) do
+    ~H"""
+    <div class="flex flex-row flex-wrap p-2">
+      <div :for={box <- @box} class="flex-auto w-1/2">
+        <%= render_slot(box) %>
+      </div>
+    </div>
+    """
+  end
+
+  def duration_chart(assigns) do
+    ~H"""
+    <div id="duration-chart" phx-update="ignore" class="relative">
+      <canvas id="duration-chart-canvas" phx-hook="Monitor"></canvas>
+    </div>
     """
   end
 
   def duration_table(assigns) do
     ~H"""
-    <table>
+    <table class="table-auto w-full">
       <thead>
         <th>Time</th>
-        <th>Duration</th>
+        <th>Duration (µm)</th>
       </thead>
       <tbody id="durations" phx-update="stream">
         <tr :for={{dom_id, item} <- @durations} id={dom_id}>
