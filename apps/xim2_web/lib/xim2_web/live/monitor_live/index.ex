@@ -15,7 +15,12 @@ defmodule Xim2Web.MonitorLive.Index do
 
     {:ok,
      socket
-     |> assign(running: false, schedulers: System.schedulers_online(), items: 100)
+     |> assign(
+       running: false,
+       schedulers: System.schedulers_online(),
+       items: 100,
+       timeout: 50_000
+     )
      |> stream(:durations, [])}
   end
 
@@ -34,7 +39,14 @@ defmodule Xim2Web.MonitorLive.Index do
       </.boxes>
       <.boxes>
         <:box><.duration_chart /></:box>
-        <:box><.duration_table durations={@streams.durations} /></:box>
+        <:box>
+          <.duration_table
+            durations={@streams.durations}
+            items={@items}
+            schedulers={@schedulers}
+            timeout={@timeout}
+          />
+        </:box>
       </.boxes>
       <:footer>
         <.action_box class="mb-2">
@@ -88,11 +100,17 @@ defmodule Xim2Web.MonitorLive.Index do
       <thead>
         <th>Time</th>
         <th>Duration (µm)</th>
+        <th>Overhead Queue</th>
+        <th>Overhead/Item</th>
       </thead>
       <tbody id="durations" phx-update="stream">
         <tr :for={{dom_id, item} <- @durations} id={dom_id}>
           <td><%= item.time %></td>
           <td><%= item.duration %> µm</td>
+          <td><%= Float.round(item.duration - @timeout * @items / @schedulers, 2) %> µm</td>
+          <td>
+            <%= Float.round((item.duration - @timeout * @items / @schedulers) / @items, 2) %> µm
+          </td>
         </tr>
       </tbody>
     </table>
