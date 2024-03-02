@@ -59,6 +59,13 @@ config :tailwind,
     cd: Path.expand("../apps/xim2_web/assets", __DIR__)
   ]
 
+config :number,
+  delimit: [
+    precision: 3,
+    delimiter: "'",
+    separator: "."
+  ]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

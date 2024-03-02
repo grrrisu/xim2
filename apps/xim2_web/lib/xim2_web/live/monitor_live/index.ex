@@ -60,6 +60,7 @@ defmodule Xim2Web.MonitorLive.Index do
   attr :title, :string
   attr :back, :string
   slot :inner_block, required: true
+  slot :footer
 
   def main_section(assigns) do
     ~H"""
@@ -97,19 +98,25 @@ defmodule Xim2Web.MonitorLive.Index do
   def duration_table(assigns) do
     ~H"""
     <table class="table-auto w-full">
-      <thead>
+      <thead class="text-sky-400">
         <th>Time</th>
         <th>Duration (µm)</th>
-        <th>Overhead Queue</th>
-        <th>Overhead/Item</th>
+        <th>Overhead Queue (µm)</th>
+        <th>Overhead/Item (µm)</th>
       </thead>
-      <tbody id="durations" phx-update="stream">
+      <tbody
+        id="durations"
+        phx-update="stream"
+        class="divide-y divide-sky-800 border-t border-sky-600 text-sm leading-6 text-sky-300"
+      >
         <tr :for={{dom_id, item} <- @durations} id={dom_id}>
-          <td><%= item.time %></td>
-          <td><%= item.duration %> µm</td>
-          <td><%= Float.round(item.duration - @timeout * @items / @schedulers, 2) %> µm</td>
-          <td>
-            <%= Float.round((item.duration - @timeout * @items / @schedulers) / @items, 2) %> µm
+          <td class="text-right"><%= Calendar.strftime(item.time, "%H:%M:%S:%f") %></td>
+          <td class="text-right"><%= item.duration |> number_format(0) %></td>
+          <td class="text-right">
+            <%= (item.duration - @timeout * @items / @schedulers) |> number_format(2) %>
+          </td>
+          <td class="text-right">
+            <%= ((item.duration - @timeout * @items / @schedulers) / @items) |> number_format(2) %>
           </td>
         </tr>
       </tbody>
@@ -135,12 +142,16 @@ defmodule Xim2Web.MonitorLive.Index do
      |> stream_insert(
        :durations,
        Map.put_new(result, :id, System.unique_integer([:positive])),
-       limit: -10
+       limit: -12
      )
      |> push_event("update-duration-chart", %{
        x_axis: DateTime.to_iso8601(result.time),
        duration: result.duration
      })}
+  end
+
+  defp number_format(number, precision) do
+    Number.Delimit.number_to_delimited(number, precision: precision)
   end
 
   defp prepare() do
