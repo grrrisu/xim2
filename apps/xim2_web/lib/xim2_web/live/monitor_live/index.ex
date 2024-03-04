@@ -7,6 +7,10 @@ defmodule Xim2Web.MonitorLive.Index do
 
   alias Sim.Monitor
 
+  @items 500
+  @timeout 50_000
+  @tasks 500
+
   def mount(_params, _session, socket) do
     if connected?(socket) do
       PubSub.subscribe(Xim2.PubSub, "Monitor:data")
@@ -18,8 +22,9 @@ defmodule Xim2Web.MonitorLive.Index do
      |> assign(
        running: false,
        schedulers: System.schedulers_online(),
-       items: 100,
-       timeout: 50_000
+       tasks: @tasks,
+       items: @items,
+       timeout: @timeout
      )
      |> stream(:durations, [])}
   end
@@ -27,23 +32,27 @@ defmodule Xim2Web.MonitorLive.Index do
   def render(assigns) do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
-      <.boxes>
+      <.boxes width="w-1/4">
         <:box>
-          <span class="align-super"><%= @schedulers %></span>
-          <.icon name="la-microchip" class="la-2x" />
+          <.info_card value={@schedulers} icon="la-microchip" />
         </:box>
         <:box>
-          <span class="align-super"><%= @items %></span>
-          <.icon name="la-hashtag" class="la-2x" />
+          <.info_card value={number_format(@items)} icon="la-cubes" />
+        </:box>
+        <:box>
+          <.info_card value={number_format(@timeout)} icon="la-hourglass-half" />
+        </:box>
+        <:box>
+          <.info_card value={number_format(@tasks)} icon="la-cogs" />
         </:box>
       </.boxes>
-      <.boxes>
+      <.boxes width="w-1/2">
         <:box><.duration_chart /></:box>
         <:box>
           <.duration_table
             durations={@streams.durations}
             items={@items}
-            schedulers={@schedulers}
+            tasks={@tasks}
             timeout={@timeout}
           />
         </:box>
@@ -80,9 +89,18 @@ defmodule Xim2Web.MonitorLive.Index do
   def boxes(assigns) do
     ~H"""
     <div class="flex flex-row flex-wrap p-2">
-      <div :for={box <- @box} class="flex-auto w-1/2">
+      <div :for={box <- @box} class={["flex-auto", @width]}>
         <%= render_slot(box) %>
       </div>
+    </div>
+    """
+  end
+
+  def info_card(assigns) do
+    ~H"""
+    <div>
+      <span class="align-super"><%= @value %></span>
+      <.icon name={@icon} class="la-2x" />
     </div>
     """
   end
@@ -102,7 +120,6 @@ defmodule Xim2Web.MonitorLive.Index do
         <th>Time</th>
         <th>Duration (µm)</th>
         <th>Overhead Queue (µm)</th>
-        <th>Overhead/Item (µm)</th>
       </thead>
       <tbody
         id="durations"
@@ -111,12 +128,9 @@ defmodule Xim2Web.MonitorLive.Index do
       >
         <tr :for={{dom_id, item} <- @durations} id={dom_id}>
           <td class="text-right"><%= Calendar.strftime(item.time, "%H:%M:%S:%f") %></td>
-          <td class="text-right"><%= item.duration |> number_format(0) %></td>
+          <td class="text-right"><%= item.duration |> number_format() %></td>
           <td class="text-right">
-            <%= (item.duration - @timeout * @items / @schedulers) |> number_format(2) %>
-          </td>
-          <td class="text-right">
-            <%= ((item.duration - @timeout * @items / @schedulers) / @items) |> number_format(2) %>
+            <%= (item.duration - @items * @timeout / @tasks) |> number_format() %>
           </td>
         </tr>
       </tbody>
@@ -150,12 +164,12 @@ defmodule Xim2Web.MonitorLive.Index do
      })}
   end
 
-  defp number_format(number, precision) do
+  defp number_format(number, precision \\ 0) do
     Number.Delimit.number_to_delimited(number, precision: precision)
   end
 
   defp prepare() do
-    Monitor.create_data(100)
-    Monitor.prepare_queues()
+    Monitor.create_data(@items)
+    Monitor.prepare_queues(@timeout, @tasks)
   end
 end

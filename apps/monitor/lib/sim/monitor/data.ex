@@ -22,10 +22,10 @@ defmodule Sim.Monitor.Data do
     AccessData.get_by(server, &Map.get(&1, key))
   end
 
-  def change(key, {:data, data}) do
+  def change(key, {:data, data}, {:timeout, timeout}) do
     value = AccessData.lock(key, data, fn data, key -> get_in(data, [key, :value]) end)
 
-    Process.sleep(50)
+    timeout |> div(1000) |> Process.sleep()
 
     AccessData.update(key, value, data, fn data, key, value ->
       put_in(data, [key, :value], value + 1)
@@ -36,10 +36,12 @@ defmodule Sim.Monitor.Data do
 
   def change(one, two), do: raise(inspect([one, two]))
 
-  def run_queue(queue, data: data, supervisor: supervisor) do
+  def run_queue(queue, timeout: timeout, tasks: tasks, data: data, supervisor: supervisor) do
     Simulator.benchmark(fn ->
       get_items(data)
-      |> Simulator.sim({__MODULE__, :change, data: data}, & &1, supervisor)
+      |> Simulator.sim({__MODULE__, :change, data: data, timeout: timeout}, supervisor,
+        max_concurrency: tasks
+      )
 
       # |> handle_success()
       # |> handle_failed()
