@@ -21,7 +21,7 @@ defmodule Biotope.Simulation do
   def sim_simulation(simulation, opts) do
     Simulator.benchmark(fn ->
       get_data(opts[:data])
-      |> Simulator.sim({simulation, :sim, []}, fn {position, _v} -> position end, Supervisor)
+      |> Simulator.sim({simulation, :sim, []}, Supervisor)
       |> handle_success(opts[:data])
       |> handle_failed(opts[:data])
       |> summarize(simulation)
