@@ -21,12 +21,12 @@ defmodule Xim2Web.MonitorLive.IndexTest do
     result = %{
       queue: :test,
       time: DateTime.utc_now(),
-      duration: 500,
+      duration: 15000,
       ok: 100,
       errors: 0
     }
 
     send(view.pid, {:queue_summary, result})
-    assert has_element?(view, "tr", "500 µm")
+    assert has_element?(view, "tr", "15'00")
   end
 end

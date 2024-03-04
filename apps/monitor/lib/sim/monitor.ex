@@ -18,10 +18,17 @@ defmodule Sim.Monitor do
     Data.get(@data_server, key)
   end
 
-  def prepare_queues() do
+  def prepare_queues(timeout, tasks) do
     Loop.add_queue(@loop_server, %Queue{
       name: :one,
-      func: {Data, :run_queue, [data: @data_server, supervisor: @simulator_task_supervisor]},
+      func:
+        {Data, :run_queue,
+         [
+           timeout: timeout,
+           tasks: tasks,
+           data: @data_server,
+           supervisor: @simulator_task_supervisor
+         ]},
       interval: 1_000
     })
   end
