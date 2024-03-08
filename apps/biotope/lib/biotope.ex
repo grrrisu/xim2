@@ -6,7 +6,7 @@ defmodule Biotope do
   alias Biotope.Data
   alias Ximula.Sim.{Loop, Queue}
 
-  @proxy Biotope.AccessProxy.Data
+  @proxy Biotope.Data
   @loop Biotope.Sim.Loop
 
   def all(proxy \\ @proxy) do

@@ -1,4 +1,6 @@
 defmodule Biotope.Sim.Vegetation do
+  alias Biotope.Data
+
   alias Biotope.Sim.Vegetation
 
   defstruct capacity: 6000,
@@ -6,8 +8,12 @@ defmodule Biotope.Sim.Vegetation do
             death_rate: 0.05,
             size: 650
 
-  def sim({position, %Vegetation{} = vegetation}) do
-    {position, grow(vegetation)}
+  def sim(position, data: data) do
+    position
+    |> Data.get_field(:vegetation, data)
+    |> grow()
+    |> Data.update(position, data)
+    |> tap(fn vegetation -> {position, vegetation.size} end)
   end
 
   # vegetation grows by birth rate (alias grow rate) and shrinks by natural deaths (age),
