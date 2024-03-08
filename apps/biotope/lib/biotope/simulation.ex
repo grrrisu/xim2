@@ -3,43 +3,37 @@ defmodule Biotope.Simulation do
 
   alias Ximula.Simulator
   alias Ximula.Sim.Queue
-  alias Ximula.Grid
 
+  alias Biotope.Data
   alias Biotope.Sim.{Vegetation, Animal}
   alias Biotope.Simulator.Task.Supervisor
 
-  @simulations [
-    Vegetation,
-    Animal
-  ]
-
   @simulations %{
-    vegetation: Vegetation,
-    herbivore: Animal
+    vegetation: Vegetation
+    # herbivore: Animal
   }
 
   def sim(%Queue{} = queue, opts) do
     Enum.map(@simulations, &sim_simulation(&1, opts))
     |> aggregate_results(queue)
-    |> notify_sum()
+    |> notify_queue_summary()
   end
 
-  def sim_simulation({layer, simulation}, opts) do
+  def sim_simulation({sim_key, simulation}, opts) do
     Simulator.benchmark(fn ->
-      get_data(layer, opts[:data])
+      get_data(sim_key, opts[:data])
       |> sim_items(simulation, opts[:data])
-      |> handle_success(layer, opts[:data])
-      |> handle_failed(opts[:data])
-      |> summarize(simulation)
-      |> notify()
+      |> handle_success(sim_key)
+      |> handle_failed(sim_key)
+      |> summarize(sim_key)
+      |> notify_simulation_summary()
     end)
   end
 
   defp sim_items(items, Vegetation, data) do
     Simulator.sim(
       items,
-      {Vegetation, :sim, []},
-      fn {position, _v} -> position end,
+      {Vegetation, :sim, [data: data]},
       Supervisor
     )
   end
@@ -48,33 +42,26 @@ defmodule Biotope.Simulation do
     Simulator.sim(
       items,
       {simulation, :sim, [data: data]},
-      & &1.position,
       Supervisor
     )
   end
 
   def get_data(:vegetation, data) do
-    Biotope.exclusive_get(:vegetation, data) |> Grid.positions_and_values()
+    Data.get_grid_dimensions(data)
+    |> Data.get_grid_positions()
   end
 
   def get_data(layer, data) do
-    Biotope.exclusive_get(layer, data)
+    # Biotope.exclusive_get(layer, data)
   end
 
-  def set_data(fields, data) do
-    Biotope.update(:vegetation, fields, data)
-  end
-
-  def handle_success(%{ok: fields} = results, _layer, data) do
-    :ok = set_data(fields, data)
+  def handle_success(%{ok: fields} = results, sim_key) do
+    :ok = notify(:simulation_results, {sim_key, fields})
     results
   end
 
-  def handle_failed(%{exit: failed} = results, _proxy) do
-    Enum.each(failed, fn reason ->
-      IO.puts("failed simulations: #{Exception.format_exit(reason)}")
-    end)
-
+  def handle_failed(%{exit: failed} = results, sim_key) do
+    :ok = notify(:simulation_errors, {sim_key, failed})
     results
   end
 
@@ -89,6 +76,11 @@ defmodule Biotope.Simulation do
     }
   end
 
+  def notify_simulation_summary(result) do
+    :ok = notify(:simulation_summary, result)
+    result
+  end
+
   # [{1097, %{error: [], ok: [], simulation: Sim.Vegetation}}]
   def aggregate_results(results, queue) do
     %{
@@ -100,18 +92,13 @@ defmodule Biotope.Simulation do
     }
   end
 
-  def notify_sum(results) do
-    # PubSub.broadcast(topic, queue_result) | GenStage.cast(stage, {:receive, queue_result})
-    dbg(results)
+  def notify_queue_summary(results) do
+    :ok = notify(:queue_summary, results)
+    results
   end
 
-  def notify(%{error: _error, ok: ok, simulation: simulation} = result) do
+  defp notify(topic, payload) do
     :ok =
-      PubSub.broadcast(Xim2.PubSub, "Biotope:simulation", %{
-        simulation: simulation,
-        changed: ok
-      })
-
-    result
+      PubSub.broadcast(Xim2.PubSub, "Simulation:biotope", {:simulation_biotope, topic, payload})
   end
 end

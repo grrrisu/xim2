@@ -1,8 +1,6 @@
 defmodule Biotope.Data do
-  use Agent
-
   alias Ximula.{Grid, Torus}
-  alias Ximula.AccessProxy
+  alias Ximula.AccessData
 
   alias Biotope.Sim.Vegetation
   alias Biotope.Sim.Animal.{Herbivore, Predator}
@@ -11,49 +9,64 @@ defmodule Biotope.Data do
     Agent.start_link(fn -> nil end, name: opts[:name] || __MODULE__)
   end
 
-  def all(proxy) do
-    AccessProxy.get(proxy)
+  def all(data) do
+    AccessData.get_by(data, & &1)
   end
 
-  def get(layer, proxy) do
-    case AccessProxy.get(proxy) do
+  def get(layer, data) do
+    case all(data) do
       nil -> nil
       biotope -> Map.fetch!(biotope, layer)
     end
   end
 
-  def get_field({x, y}, layer, proxy) do
-    AccessProxy.get(proxy, fn biotope -> biotope |> Map.fetch!(layer) |> Torus.get(x, y) end)
+  def get_grid_dimensions(data) do
+    AccessData.get_by(data, fn biotope ->
+      biotope
+      |> Map.get(:vegetation)
+      |> tap(fn grid -> {Grid.width(grid), Grid.height(grid)} end)
+    end)
   end
 
-  def exclusive_get(layer, proxy) do
-    case AccessProxy.exclusive_get(proxy) do
+  def get_grid_positions({width, height}) do
+    Enum.map(0..(width - 1), fn x -> Enum.map(0..(height - 1), fn y -> {x, y} end) end)
+    |> List.flatten()
+  end
+
+  def get_field({x, y}, layer, data) do
+    AccessData.get_by(data, fn biotope -> biotope |> Map.fetch!(layer) |> Torus.get(x, y) end)
+  end
+
+  def exclusive_get(layer, data) do
+    case AccessData.lock(:all, data, fn data, _ -> data end) do
       nil -> nil
       biotope -> Map.fetch!(biotope, layer)
     end
   end
 
-  def create(width, height, proxy) do
-    case AccessProxy.exclusive_get(proxy) do
+  def create(width, height, data) do
+    case AccessData.lock(:all, data, fn data, _ -> data end) do
       nil ->
-        :ok = AccessProxy.update(proxy, fn _ -> create_biotope(width, height) end)
-        {:ok, AccessProxy.get(proxy)}
+        :ok = AccessData.update(:all, nil, data, fn _, _, _ -> create_biotope(width, height) end)
+        {:ok, all(data)}
 
       _ ->
-        AccessProxy.release(proxy)
+        AccessData.release([:all], data)
         {:error, "already exists"}
     end
   end
 
-  def update(:vegetation, changes, proxy) do
-    AccessProxy.update(proxy, fn %{vegetation: grid} = data ->
-      %{data | vegetation: Grid.apply_changes(grid, changes)}
+  def update(%Vegetation{} = vegetation, position, data) do
+    AccessData.update(position, data, fn %{vegetation: grid} = data, _pos, _veg ->
+      %{data | vegetation: Grid.put(grid, position, vegetation)}
     end)
+
+    vegetation
   end
 
-  def clear(proxy) do
-    AccessProxy.exclusive_get(proxy)
-    AccessProxy.update(proxy, nil)
+  def clear(data) do
+    :ok = AccessData.lock(:all, data)
+    AccessData.update(:all, data, fn _, _, _ -> nil end)
   end
 
   defp create_biotope(width, height) do
@@ -68,10 +81,7 @@ defmodule Biotope.Data do
 
   defp create_animals(width, height, percent, create_func) do
     amount = round(width * height * percent)
-
-    positions =
-      Enum.map(0..(height - 1), fn y -> Enum.map(0..(width - 1), fn x -> {x, y} end) end)
-      |> List.flatten()
+    positions = get_grid_positions({width, height})
 
     Enum.reduce(0..amount, {positions, []}, fn _, {remaining, animals} ->
       index = Enum.random(0..(Enum.count(remaining) - 1))

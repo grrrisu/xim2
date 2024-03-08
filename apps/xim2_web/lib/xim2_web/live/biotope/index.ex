@@ -44,13 +44,18 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   # we might get events from the previous simulation, after the biotope was reset
   # in this case the event is ignored
-  def handle_info(%{simulation: _, changed: _}, %{assigns: %{new: true}} = socket) do
+  def handle_info({:simulation_biotope, _topic, _payload}, %{assigns: %{new: true}} = socket) do
     Logger.warning("received simulation event, but biotope is empty")
     {:noreply, socket}
   end
 
-  def handle_info(%{simulation: Biotope.Sim.Vegetation, changed: _}, socket) do
-    {:noreply, stream(socket, :vegetation, Biotope.get(:vegetation) |> streamify())}
+  def handle_info({:simulation_biotope, :simulation_results, {:vegetation, fields}}, socket) do
+    {:noreply, stream(socket, :vegetation, fields |> streamify())}
+  end
+
+  def handle_info({:simulation_biotope, topic, _payload}, socket) do
+    Logger.info("received simulation biotop topic #{topic}")
+    {:noreply, socket}
   end
 
   def render(%{new: true} = assigns) do
