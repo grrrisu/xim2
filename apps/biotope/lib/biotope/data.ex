@@ -10,7 +10,7 @@ defmodule Biotope.Data do
   end
 
   def all(data) do
-    AccessData.get_by(data, & &1)
+    AccessData.get(data, & &1)
   end
 
   def get(layer, data) do
@@ -21,7 +21,7 @@ defmodule Biotope.Data do
   end
 
   def get_grid_dimensions(data) do
-    AccessData.get_by(data, fn biotope ->
+    AccessData.get(data, fn biotope ->
       biotope
       |> Map.get(:vegetation)
       |> tap(fn grid -> {Grid.width(grid), Grid.height(grid)} end)
@@ -34,7 +34,7 @@ defmodule Biotope.Data do
   end
 
   def get_field({x, y}, layer, data) do
-    AccessData.get_by(data, fn biotope -> biotope |> Map.fetch!(layer) |> Torus.get(x, y) end)
+    AccessData.get(data, fn biotope -> biotope |> Map.fetch!(layer) |> Torus.get(x, y) end)
   end
 
   def exclusive_get(layer, data) do
@@ -45,19 +45,18 @@ defmodule Biotope.Data do
   end
 
   def create(width, height, data) do
-    case AccessData.lock(:all, data, fn data, _ -> data end) do
+    case AccessData.get(data, & &1) do
       nil ->
-        :ok = AccessData.update(:all, nil, data, fn _, _, _ -> create_biotope(width, height) end)
+        :ok = AccessData.set(data, fn _ -> create_biotope(width, height) end)
         {:ok, all(data)}
 
       _ ->
-        AccessData.release([:all], data)
         {:error, "already exists"}
     end
   end
 
   def update(%Vegetation{} = vegetation, position, data) do
-    AccessData.update(position, data, fn %{vegetation: grid} = data, _pos, _veg ->
+    AccessData.update(position, data, fn %{vegetation: grid} = data ->
       %{data | vegetation: Grid.put(grid, position, vegetation)}
     end)
 
@@ -66,7 +65,7 @@ defmodule Biotope.Data do
 
   def clear(data) do
     :ok = AccessData.lock(:all, data)
-    AccessData.update(:all, data, fn _, _, _ -> nil end)
+    AccessData.set(data, fn _ -> nil end)
   end
 
   defp create_biotope(width, height) do
