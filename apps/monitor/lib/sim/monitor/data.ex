@@ -9,25 +9,24 @@ defmodule Sim.Monitor.Data do
   alias Ximula.Simulator
 
   def create(server, size) do
-    :ok = AccessData.lock(:all, server)
     data = 0..(size - 1) |> Enum.reduce(%{}, &Map.put_new(&2, &1, %{value: 0}))
-    AccessData.update(:all, data, server, fn _data, _key, _value -> data end)
+    :ok = AccessData.set(server, fn _data -> data end)
   end
 
   def created?(server) do
-    AccessData.get_by(server, fn data -> !is_nil(data) end)
+    AccessData.get(server, fn data -> !is_nil(data) end)
   end
 
   def get(server, key) do
-    AccessData.get_by(server, &Map.get(&1, key))
+    AccessData.get(server, &Map.get(&1, key))
   end
 
   def change(key, {:data, data}, {:timeout, timeout}) do
-    value = AccessData.lock(key, data, fn data, key -> get_in(data, [key, :value]) end)
+    value = AccessData.lock(key, data, fn data -> get_in(data, [key, :value]) end)
 
     timeout |> div(1000) |> Process.sleep()
 
-    AccessData.update(key, value, data, fn data, key, value ->
+    AccessData.update(key, data, fn data ->
       put_in(data, [key, :value], value + 1)
     end)
 
@@ -53,7 +52,7 @@ defmodule Sim.Monitor.Data do
   end
 
   defp get_items(server) do
-    size = AccessData.get_by(server, &Enum.count(&1))
+    size = AccessData.get(server, &Enum.count(&1))
     0..(size - 1)
   end
 
