@@ -10,10 +10,10 @@ defmodule Biotope.Sim.Vegetation do
 
   def sim(position, data: data) do
     position
-    |> Data.get_field(:vegetation, data)
+    |> Data.lock_field(:vegetation, data)
     |> grow()
     |> Data.update(position, data)
-    |> tap(fn vegetation -> {position, vegetation.size} end)
+    |> then(fn vegetation -> {position, %{size: vegetation.size}} end)
   end
 
   # vegetation grows by birth rate (alias grow rate) and shrinks by natural deaths (age),

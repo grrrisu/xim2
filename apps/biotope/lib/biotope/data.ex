@@ -24,7 +24,7 @@ defmodule Biotope.Data do
     AccessData.get(data, fn biotope ->
       biotope
       |> Map.get(:vegetation)
-      |> tap(fn grid -> {Grid.width(grid), Grid.height(grid)} end)
+      |> then(fn grid -> {Grid.width(grid), Grid.height(grid)} end)
     end)
   end
 
@@ -34,7 +34,15 @@ defmodule Biotope.Data do
   end
 
   def get_field({x, y}, layer, data) do
-    AccessData.get(data, fn biotope -> biotope |> Map.fetch!(layer) |> Torus.get(x, y) end)
+    AccessData.get(data, fn biotope -> field({x, y}, layer, biotope) end)
+  end
+
+  def lock_field({x, y}, layer, data) do
+    AccessData.lock({x, y}, data, fn biotope -> field({x, y}, layer, biotope) end)
+  end
+
+  def field({x, y}, layer, biotope) do
+    biotope |> Map.fetch!(layer) |> Torus.get(x, y)
   end
 
   def exclusive_get(layer, data) do
@@ -44,27 +52,29 @@ defmodule Biotope.Data do
     end
   end
 
-  def create(width, height, data) do
-    case AccessData.get(data, & &1) do
-      nil ->
-        :ok = AccessData.set(data, fn _ -> create_biotope(width, height) end)
-        {:ok, all(data)}
+  def created?(data) do
+    AccessData.get(data, &(!is_nil(&1)))
+  end
 
-      _ ->
-        {:error, "already exists"}
+  def create(width, height, data) do
+    unless created?(data) do
+      :ok = AccessData.set(data, fn _ -> create_biotope(width, height) end)
+      {:ok, all(data)}
+    else
+      {:error, "already exists"}
     end
   end
 
   def update(%Vegetation{} = vegetation, position, data) do
-    AccessData.update(position, data, fn %{vegetation: grid} = data ->
-      %{data | vegetation: Grid.put(grid, position, vegetation)}
-    end)
+    :ok =
+      AccessData.update(position, data, fn %{vegetation: grid} = data ->
+        %{data | vegetation: Grid.put(grid, position, vegetation)}
+      end)
 
     vegetation
   end
 
   def clear(data) do
-    :ok = AccessData.lock(:all, data)
     AccessData.set(data, fn _ -> nil end)
   end
 
