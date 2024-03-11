@@ -53,6 +53,10 @@ defmodule Xim2Web.BiotopeLive.Index do
     {:noreply, stream(socket, :vegetation, fields |> streamify())}
   end
 
+  def handle_info({:simulation_biotope, :simulation_errors, {:vegetation, failed}}, socket) do
+    {:noreply, socket}
+  end
+
   def handle_info({:simulation_biotope, topic, _payload}, socket) do
     Logger.info("received simulation biotop topic #{topic}")
     {:noreply, socket}

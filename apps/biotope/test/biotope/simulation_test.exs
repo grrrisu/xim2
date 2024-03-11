@@ -4,7 +4,6 @@ defmodule Biotope.SimulationTest do
   alias Phoenix.PubSub
 
   alias Ximula.AccessData
-  alias Biotope.Data
   alias Biotope.Simulation
   alias Biotope.Sim.Vegetation
 

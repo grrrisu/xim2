@@ -63,7 +63,7 @@ defmodule Biotope.Simulation do
       ok: Enum.map(success, fn {position, _v} -> position end),
       error:
         Enum.map(failed, fn {id, {exception, stacktrace}} ->
-          {id, Exception.normalize(:exit, exception, stacktrace) |> Exception.message()}
+          {id, Exception.normalize(:exit, exception, stacktrace)}
         end)
     }
   end
