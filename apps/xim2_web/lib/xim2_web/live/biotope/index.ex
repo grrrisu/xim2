@@ -10,7 +10,7 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      PubSub.subscribe(Xim2.PubSub, "Biotope:simulation")
+      PubSub.subscribe(Xim2.PubSub, "Simulation:biotope")
       Biotope.prepare_sim_queues()
     end
 
@@ -74,7 +74,7 @@ defmodule Xim2Web.BiotopeLive.Index do
         <.reset_button />
       </.action_box>
       <.grid
-        id="vegatation"
+        id="vegetation"
         grid={@streams.vegetation}
         grid_width={@width}
         grid_height={@height}
@@ -142,7 +142,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   defp assign_vegetation(socket, grid) do
     socket
     |> assign(width: Grid.width(grid), height: Grid.height(grid), new: false)
-    |> stream(:vegetation, streamify(grid))
+    |> stream(:vegetation, streamify(Grid.sorted_list(grid)))
   end
 
   defp assign_herbivores(socket, nil), do: stream(socket, :herbivores, [])
@@ -158,9 +158,7 @@ defmodule Xim2Web.BiotopeLive.Index do
     )
   end
 
-  defp streamify(grid) do
-    grid
-    |> Grid.sorted_list()
-    |> Enum.map(fn {{x, y}, v} -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
+  defp streamify(fields) do
+    Enum.map(fields, fn {{x, y}, v} -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
   end
 end

@@ -4,6 +4,7 @@ defmodule Xim2Web.BiotopeLive.IndexTest do
 
   setup do
     Biotope.clear()
+    :ok
   end
 
   test "render a grid", %{conn: conn} do
@@ -11,14 +12,26 @@ defmodule Xim2Web.BiotopeLive.IndexTest do
     assert has_element?(view, "h1", "Biotope")
     # =~ "Grid created"
     assert view |> element("form") |> render_submit(%{grid: %{width: 10, height: 5}})
-    assert has_element?(view, "#grid.grid")
+    assert has_element?(view, "#vegetation.grid")
   end
 
   test "reset grid", %{conn: conn} do
     Biotope.create(2, 2)
     {:ok, view, _html} = live(conn, "/biotope")
-    assert has_element?(view, "#grid.grid")
+    assert has_element?(view, "#vegetation.grid")
     assert view |> element("#reset-button") |> render_click()
     assert has_element?(view, "#biotope-form")
+  end
+
+  test "update grid", %{conn: conn} do
+    Biotope.create(2, 2)
+    {:ok, view, _html} = live(conn, "/biotope")
+
+    send(
+      view.pid,
+      {:simulation_biotope, :simulation_results, {:vegetation, [{{0, 0}, %{size: 800}}]}}
+    )
+
+    assert view |> has_element?("#vegetation-0-0", ~r/800/)
   end
 end

@@ -30,18 +30,10 @@ defmodule Biotope.Simulation do
     end)
   end
 
-  defp sim_items(items, Vegetation, data) do
+  def sim_items(items, simulation, data) do
     Simulator.sim(
       items,
-      {Vegetation, :sim, [data: data]},
-      Supervisor
-    )
-  end
-
-  defp sim_items(items, simulation, data) do
-    Simulator.sim(
-      items,
-      {simulation, :sim, [data: data]},
+      {simulation, :sim, [[data: data]]},
       Supervisor
     )
   end
@@ -51,9 +43,9 @@ defmodule Biotope.Simulation do
     |> Data.get_grid_positions()
   end
 
-  def get_data(layer, data) do
-    # Biotope.exclusive_get(layer, data)
-  end
+  # def get_data(layer, data) do
+  #   # Biotope.exclusive_get(layer, data)
+  # end
 
   def handle_success(%{ok: fields} = results, sim_key) do
     :ok = notify(:simulation_results, {sim_key, fields})

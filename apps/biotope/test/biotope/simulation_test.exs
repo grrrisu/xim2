@@ -3,28 +3,51 @@ defmodule Biotope.SimulationTest do
 
   alias Phoenix.PubSub
 
-  alias Ximula.AccessProxy
+  alias Ximula.AccessData
   alias Biotope.Data
   alias Biotope.Simulation
   alias Biotope.Sim.Vegetation
 
   setup do
-    data = start_link_supervised!({Data, name: Biotope.SimulationTest})
-
-    proxy =
-      start_link_supervised!(
-        {AccessProxy, name: Biotope.SimulationTest.Proxy, agent: Biotope.SimulationTest}
-      )
-
-    PubSub.subscribe(Xim2.PubSub, "Biotope:simulation")
-    Biotope.create(4, 2, proxy)
-    %{data: data, proxy: proxy}
+    data = start_link_supervised!(AccessData)
+    Biotope.create(1, 2, data)
+    %{data: data}
   end
 
-  test "sim vegetation", %{proxy: proxy} do
-    {_time, result} = Simulation.sim_simulation(Vegetation, data: proxy)
-    assert %{error: [], ok: [{_x, _y} | _], simulation: Vegetation} = result
-    ok = result.ok
-    assert_received(%{changed: ^ok, simulation: Vegetation})
+  test "sim_items", %{data: data} do
+    %{exit: failed, ok: success} = Simulation.sim_items([{0, 0}, {0, 1}], Vegetation, data)
+    assert [] == failed
+    assert 2 == Enum.count(success)
+    assert {{_x, _y}, %{size: _size}} = List.first(success)
+  end
+
+  test "sim_simulation", %{data: data} do
+    {_time, result} = Simulation.sim_simulation({:vegetation, Vegetation}, data: data)
+    assert %{error: [], ok: success, simulation: :vegetation} = result
+    assert {_x, _y} = List.first(success)
+  end
+
+  describe "notify listener" do
+    setup %{data: data} do
+      PubSub.subscribe(Xim2.PubSub, "Simulation:biotope")
+      Simulation.sim_simulation({:vegetation, Vegetation}, data: data)
+      :ok
+    end
+
+    test "receives simulation results" do
+      assert_received {:simulation_biotope, :simulation_results, {:vegetation, results}}
+      assert {{_x, _y}, %{size: _size}} = List.first(results)
+    end
+
+    test "receives simulation errors" do
+      assert_received {:simulation_biotope, :simulation_errors, {:vegetation, []}}
+    end
+
+    test "receives simulation summary" do
+      assert_received {:simulation_biotope, :simulation_summary,
+                       %{error: [], ok: success, simulation: :vegetation}}
+
+      assert {_x, _y} = List.first(success)
+    end
   end
 end
