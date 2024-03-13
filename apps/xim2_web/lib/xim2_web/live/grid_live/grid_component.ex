@@ -27,8 +27,8 @@ defmodule Xim2Web.GridCompnent do
   slot :fields, required: true, doc: "cells in positioned order"
 
   slot :layer, required: false, doc: "after the grid within overflow container" do
-    attr :name, :string, required: true
     attr :items, :list, required: true
+    attr :id, :string, required: true
   end
 
   def grid(assigns) do

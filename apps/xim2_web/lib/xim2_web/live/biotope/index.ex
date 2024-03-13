@@ -44,8 +44,8 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   # we might get events from the previous simulation, after the biotope was reset
   # in this case the event is ignored
-  def handle_info({:simulation_biotope, _topic, _payload}, %{assigns: %{new: true}} = socket) do
-    Logger.warning("received simulation event, but biotope is empty")
+  def handle_info({:simulation_biotope, topic, _payload}, %{assigns: %{new: true}} = socket) do
+    Logger.warning("received simulation event '#{topic}', but biotope is empty")
     {:noreply, socket}
   end
 
@@ -53,11 +53,26 @@ defmodule Xim2Web.BiotopeLive.Index do
     {:noreply, stream(socket, :vegetation, fields |> streamify())}
   end
 
-  def handle_info({:simulation_biotope, :simulation_errors, {:vegetation, failed}}, socket) do
+  def handle_info({:simulation_biotope, :simulation_results, {:herbivore, fields}}, socket) do
+    {:noreply,
+     socket
+     |> stream(
+       :vegetation,
+       Enum.map(fields, fn {_, change} -> change.vegetation end) |> streamify()
+     )
+     |> stream(
+       :herbivore,
+       Enum.map(fields, fn {_, change} -> change.herbivore end) |> streamify()
+     )}
+  end
+
+  def handle_info({:simulation_biotope, :simulation_errors, {_topic, failed}}, socket) do
+    dbg(failed)
     {:noreply, socket}
   end
 
   def handle_info({:simulation_biotope, topic, _payload}, socket) do
+    # dbg(payload)
     Logger.info("received simulation biotop topic #{topic}")
     {:noreply, socket}
   end
@@ -89,7 +104,7 @@ defmodule Xim2Web.BiotopeLive.Index do
         <:fields :let={{dom_id, %{x: x, y: y, value: value}}}>
           <.field id={dom_id} x={x} y={y} value={value} />
         </:fields>
-        <:layer :let={{dom_id, %{value: herbivore}}} id="herbivores" items={@streams.herbivores}>
+        <:layer :let={{dom_id, %{value: herbivore}}} id="herbivore" items={@streams.herbivore}>
           <.herbivore id={dom_id} herbivore={herbivore} step={160} />
         </:layer>
       </.grid>
@@ -137,10 +152,10 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   defp assign_biotope(socket, nil), do: assign(socket, new: true)
 
-  defp assign_biotope(socket, %{vegetation: grid, herbivores: herbivores}) do
+  defp assign_biotope(socket, %{vegetation: grid, herbivore: herbivore}) do
     socket
     |> assign_vegetation(grid)
-    |> assign_herbivores(herbivores)
+    |> assign_herbivore(herbivore)
   end
 
   defp assign_vegetation(socket, grid) do
@@ -149,14 +164,14 @@ defmodule Xim2Web.BiotopeLive.Index do
     |> stream(:vegetation, streamify(Grid.sorted_list(grid)))
   end
 
-  defp assign_herbivores(socket, nil), do: stream(socket, :herbivores, [])
+  defp assign_herbivore(socket, nil), do: stream(socket, :herbivore, [])
 
-  defp assign_herbivores(socket, herbivores) do
+  defp assign_herbivore(socket, herbivore) do
     stream(
       socket,
-      :herbivores,
-      herbivores
-      |> Enum.map(fn %{position: {x, y}} = herbivore ->
+      :herbivore,
+      herbivore
+      |> Enum.map(fn {{x, y}, herbivore} ->
         %{id: "#{x}-#{y}", value: herbivore}
       end)
     )
