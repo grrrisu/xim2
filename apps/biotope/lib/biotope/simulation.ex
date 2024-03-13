@@ -9,8 +9,8 @@ defmodule Biotope.Simulation do
   alias Biotope.Simulator.Task.Supervisor
 
   @simulations %{
-    vegetation: Vegetation
-    # herbivore: Animal
+    vegetation: Vegetation,
+    herbivore: Animal
   }
 
   def sim(%Queue{} = queue, opts) do
@@ -43,9 +43,9 @@ defmodule Biotope.Simulation do
     |> Data.get_grid_positions()
   end
 
-  # def get_data(layer, data) do
-  #   # Biotope.exclusive_get(layer, data)
-  # end
+  def get_data(layer, data) do
+    Data.get_layer_positions(layer, data)
+  end
 
   def handle_success(%{ok: fields} = results, sim_key) do
     :ok = notify(:simulation_results, {sim_key, fields})
@@ -53,18 +53,24 @@ defmodule Biotope.Simulation do
   end
 
   def handle_failed(%{exit: failed} = results, sim_key) do
-    :ok = notify(:simulation_errors, {sim_key, failed})
-    results
+    failed =
+      Enum.map(failed, fn {id, {exception, stacktrace}} ->
+        {id, Exception.normalize(:error, exception, stacktrace) |> Exception.message()}
+        {id, Exception.format(:error, exception, stacktrace)}
+      end)
+
+    if Enum.any?(failed) do
+      :ok = notify(:simulation_errors, {sim_key, failed})
+    end
+
+    Map.put(results, :exit, failed)
   end
 
   def summarize(%{ok: success, exit: failed}, simulation) do
     %{
       simulation: simulation,
       ok: Enum.map(success, fn {position, _v} -> position end),
-      error:
-        Enum.map(failed, fn {id, {exception, stacktrace}} ->
-          {id, Exception.normalize(:exit, exception, stacktrace)}
-        end)
+      error: failed
     }
   end
 

@@ -41,15 +41,27 @@ defmodule Biotope.Data do
     AccessData.lock({x, y}, data, fn biotope -> field({x, y}, layer, biotope) end)
   end
 
+  def lock_herbivore(position, data) do
+    AccessData.lock(position, data, fn biotope ->
+      %{
+        vegetation: field(position, :vegetation, biotope),
+        herbivore: entity(position, :herbivore, biotope)
+      }
+    end)
+  end
+
   def field({x, y}, layer, biotope) do
     biotope |> Map.fetch!(layer) |> Torus.get(x, y)
   end
 
-  def exclusive_get(layer, data) do
-    case AccessData.lock(:all, data, fn data, _ -> data end) do
-      nil -> nil
-      biotope -> Map.fetch!(biotope, layer)
-    end
+  def entity(position, layer, biotope) do
+    get_in(biotope, [layer, position])
+  end
+
+  def get_layer_positions(layer, data) do
+    AccessData.get(data, fn biotope ->
+      biotope |> Map.fetch!(layer) |> Map.keys()
+    end)
   end
 
   def created?(data) do
@@ -74,6 +86,15 @@ defmodule Biotope.Data do
     vegetation
   end
 
+  def update({%Vegetation{} = vegetation, %Herbivore{} = herbivore}, position, data) do
+    :ok =
+      AccessData.update(position, data, fn %{vegetation: grid} = biotope ->
+        biotope
+        |> Map.put(:vegetation, Grid.put(grid, position, vegetation))
+        |> put_in([:herbivore, position], herbivore)
+      end)
+  end
+
   def clear(data) do
     AccessData.set(data, fn _ -> nil end)
   end
@@ -81,9 +102,9 @@ defmodule Biotope.Data do
   defp create_biotope(width, height) do
     %{
       vegetation: Grid.create(width, height, %Vegetation{}),
-      herbivores:
+      herbivore:
         create_animals(width, height, 0.1, fn position -> %Herbivore{position: position} end),
-      predators:
+      predator:
         create_animals(width, height, 0.02, fn position -> %Predator{position: position} end)
     }
   end
@@ -92,10 +113,10 @@ defmodule Biotope.Data do
     amount = round(width * height * percent)
     positions = get_grid_positions({width, height})
 
-    Enum.reduce(0..amount, {positions, []}, fn _, {remaining, animals} ->
+    Enum.reduce(0..amount, {positions, %{}}, fn _, {remaining, animals} ->
       index = Enum.random(0..(Enum.count(remaining) - 1))
       {position, remaining} = List.pop_at(remaining, index)
-      {remaining, [create_func.(position) | animals]}
+      {remaining, Map.put_new(animals, position, create_func.(position))}
     end)
     |> Tuple.to_list()
     |> List.last()
