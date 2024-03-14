@@ -10,7 +10,8 @@ defmodule Biotope.Simulation do
 
   @simulations %{
     vegetation: Vegetation,
-    herbivore: Animal
+    herbivore: Animal.Herbivore,
+    predator: Animal.Predator
   }
 
   def sim(%Queue{} = queue, opts) do

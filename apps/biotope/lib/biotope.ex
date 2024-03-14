@@ -21,17 +21,8 @@ defmodule Biotope do
     Data.get_field(position, layer, proxy)
   end
 
-  def exclusive_get(layer, proxy \\ @proxy) do
-    Data.exclusive_get(layer, proxy)
-  end
-
   def create(width, height, proxy \\ @proxy) do
     Data.create(width, height, proxy)
-  end
-
-  # [{x, y, %{size: size}}, ...]
-  def update(layer, changes, proxy \\ @proxy) do
-    Data.update(layer, changes, proxy)
   end
 
   def clear(proxy \\ @proxy) do
