@@ -33,16 +33,16 @@ defmodule Biotope.SimulationTest do
       :ok
     end
 
-    test "receives simulation results" do
+    test "received simulation results" do
       assert_received {:simulation_biotope, :simulation_results, {:vegetation, results}}
       assert {{_x, _y}, %{size: _size}} = List.first(results)
     end
 
-    test "receives simulation errors" do
-      assert_received {:simulation_biotope, :simulation_errors, {:vegetation, []}}
+    test "no simulation errors received" do
+      refute_received {:simulation_biotope, :simulation_errors, _}
     end
 
-    test "receives simulation summary" do
+    test "received simulation summary" do
       assert_received {:simulation_biotope, :simulation_summary,
                        %{error: [], ok: success, simulation: :vegetation}}
 

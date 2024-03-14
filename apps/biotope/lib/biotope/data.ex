@@ -50,6 +50,15 @@ defmodule Biotope.Data do
     end)
   end
 
+  def lock_predator(position, data) do
+    AccessData.lock(position, data, fn biotope ->
+      %{
+        herbivore: entity(position, :herbivore, biotope),
+        predator: entity(position, :predator, biotope)
+      }
+    end)
+  end
+
   def field({x, y}, layer, biotope) do
     biotope |> Map.fetch!(layer) |> Torus.get(x, y)
   end
@@ -92,6 +101,15 @@ defmodule Biotope.Data do
         biotope
         |> Map.put(:vegetation, Grid.put(grid, position, vegetation))
         |> put_in([:herbivore, position], herbivore)
+      end)
+  end
+
+  def update({%Herbivore{} = herbivore, %Predator{} = predator}, position, data) do
+    :ok =
+      AccessData.update(position, data, fn biotope ->
+        biotope
+        |> put_in([:herbivore, position], herbivore)
+        |> put_in([:predator, position], predator)
       end)
   end
 

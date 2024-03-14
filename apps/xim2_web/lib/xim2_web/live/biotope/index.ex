@@ -66,6 +66,17 @@ defmodule Xim2Web.BiotopeLive.Index do
      )}
   end
 
+  def handle_info({:simulation_biotope, :simulation_results, {:predator, fields}}, socket) do
+    dbg(fields)
+
+    {:noreply,
+     socket
+     |> stream(
+       :herbivore,
+       Enum.map(fields, fn {_, change} -> change.herbivore end) |> streamify()
+     )}
+  end
+
   def handle_info({:simulation_biotope, :simulation_errors, {_topic, failed}}, socket) do
     dbg(failed)
     {:noreply, socket}
