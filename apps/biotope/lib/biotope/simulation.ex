@@ -4,7 +4,7 @@ defmodule Biotope.Simulation do
   alias Ximula.Simulator
   alias Ximula.Sim.Queue
 
-  alias Biotope.Data
+  alias Biotope.{Aggregator, Data}
   alias Biotope.Sim.{Vegetation, Animal}
   alias Biotope.Simulator.Task.Supervisor
 
@@ -15,7 +15,10 @@ defmodule Biotope.Simulation do
   }
 
   def sim(%Queue{} = queue, opts) do
-    Enum.map(@simulations, &sim_simulation(&1, opts))
+    aggregate = %{vegetation: %{}, herbivore: %{}, predator: %{}}
+
+    Enum.reduce(@simulations, aggregate, &{sim_simulation(&1, opts), &2})
+    |> Aggregator.aggregate_results(queue)
     |> aggregate_results(queue)
     |> notify_queue_summary()
   end
@@ -70,7 +73,7 @@ defmodule Biotope.Simulation do
   def summarize(%{ok: success, exit: failed}, simulation) do
     %{
       simulation: simulation,
-      ok: Enum.map(success, fn {position, _v} -> position end),
+      ok: success,
       error: failed
     }
   end
