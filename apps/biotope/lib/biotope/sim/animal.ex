@@ -16,7 +16,7 @@ defmodule Biotope.Sim.Animal do
       %{key: position, data: data}
       |> Map.put_new(:origin, Data.lock_herbivore(position, data))
       |> then(&Map.put_new(&1, :change, Animal.grow(&1.origin.vegetation, &1.origin.herbivore)))
-      |> Animal.round_size()
+      |> Animal.set_position(position)
       |> update_data()
       |> result()
     end
@@ -34,12 +34,14 @@ defmodule Biotope.Sim.Animal do
       changeset
     end
 
-    def result(%{change: %{producer: vegetation, consumer: herbivore}, key: position}) do
-      {position,
-       %{
-         vegetation: {position, %{size: vegetation.display_size}},
-         herbivore: {position, %{size: herbivore.display_size, position: position}}
-       }}
+    def result(%{
+          change: %{producer: vegetation, consumer: herbivore},
+          origin: origin
+        }) do
+      %{
+        vegetation: %{change: vegetation, origin: origin.vegetation},
+        herbivore: %{change: herbivore, origin: origin.herbivore}
+      }
     end
   end
 
@@ -83,6 +85,12 @@ defmodule Biotope.Sim.Animal do
          predator: {position, %{size: predator.display_size, position: position}}
        }}
     end
+  end
+
+  def set_position(changeset, position) do
+    changeset
+    |> put_in([:change, :producer, :position], position)
+    |> put_in([:change, :consumer, :position], position)
   end
 
   def round_size(

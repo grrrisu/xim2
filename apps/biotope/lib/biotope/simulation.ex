@@ -16,6 +16,7 @@ defmodule Biotope.Simulation do
 
   def sim(%Queue{} = queue, opts) do
     Enum.map(@simulations, &sim_simulation(&1, opts))
+    |> Enum.map(fn {time, results} -> Map.put_new(results, :time, time) end)
     |> aggregate_simulations(queue)
     |> count_results(queue)
     |> notify_queue_summary()
@@ -58,7 +59,6 @@ defmodule Biotope.Simulation do
     failed =
       Enum.map(failed, fn {id, {exception, stacktrace}} ->
         {id, Exception.normalize(:error, exception, stacktrace) |> Exception.message()}
-        {id, Exception.format(:error, exception, stacktrace)}
       end)
 
     if Enum.any?(failed) do
@@ -83,7 +83,7 @@ defmodule Biotope.Simulation do
 
   def aggregate_simulations(results, queue) do
     summary = Aggregator.aggregate_simulations(results, queue)
-    :ok = notify(:simulation_aggregate, summary)
+    :ok = notify(:simulation_aggregated, summary)
     results
   end
 
@@ -92,7 +92,7 @@ defmodule Biotope.Simulation do
     %{
       queue: queue.name,
       results:
-        Enum.map(results, fn {time, %{error: error, ok: ok, simulation: simulation}} ->
+        Enum.map(results, fn %{error: error, ok: ok, simulation: simulation, time: time} ->
           %{simulation: simulation, time: time, errors: Enum.count(error), ok: Enum.count(ok)}
         end)
     }

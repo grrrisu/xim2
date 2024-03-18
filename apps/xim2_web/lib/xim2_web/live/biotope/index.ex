@@ -49,32 +49,16 @@ defmodule Xim2Web.BiotopeLive.Index do
     {:noreply, socket}
   end
 
-  def handle_info({:simulation_biotope, :simulation_results, {:vegetation, fields}}, socket) do
-    {:noreply, stream(socket, :vegetation, fields |> streamify())}
-  end
-
-  def handle_info({:simulation_biotope, :simulation_results, {:herbivore, fields}}, socket) do
+  def handle_info(
+        {:simulation_biotope, :simulation_aggregated,
+         %{vegetation: vegetation, herbivore: herbivore, predator: predator}},
+        socket
+      ) do
     {:noreply,
      socket
-     |> stream(
-       :vegetation,
-       Enum.map(fields, fn {_, change} -> change.vegetation end) |> streamify()
-     )
-     |> stream(
-       :herbivore,
-       Enum.map(fields, fn {_, change} -> change.herbivore end) |> streamify()
-     )}
-  end
-
-  def handle_info({:simulation_biotope, :simulation_results, {:predator, fields}}, socket) do
-    dbg(fields)
-
-    {:noreply,
-     socket
-     |> stream(
-       :herbivore,
-       Enum.map(fields, fn {_, change} -> change.herbivore end) |> streamify()
-     )}
+     |> stream(:vegetation, vegetation |> streamify())
+     |> stream(:herbivore, herbivore |> streamify())
+     |> stream(:predator, predator |> streamify())}
   end
 
   def handle_info({:simulation_biotope, :simulation_errors, {_topic, failed}}, socket) do
@@ -83,8 +67,8 @@ defmodule Xim2Web.BiotopeLive.Index do
   end
 
   def handle_info({:simulation_biotope, topic, _payload}, socket) do
-    # dbg(payload)
     Logger.info("received simulation biotop topic #{topic}")
+    # dbg(payload)
     {:noreply, socket}
   end
 
@@ -172,7 +156,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   defp assign_vegetation(socket, grid) do
     socket
     |> assign(width: Grid.width(grid), height: Grid.height(grid), new: false)
-    |> stream(:vegetation, streamify(Grid.sorted_list(grid)))
+    |> stream(:vegetation, streamify(Grid.sorted_list(grid) |> Enum.map(&elem(&1, 1))))
   end
 
   defp assign_herbivore(socket, nil), do: stream(socket, :herbivore, [])
@@ -189,6 +173,6 @@ defmodule Xim2Web.BiotopeLive.Index do
   end
 
   defp streamify(fields) do
-    Enum.map(fields, fn {{x, y}, v} -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
+    Enum.map(fields, fn %{position: {x, y}} = v -> %{id: "#{x}-#{y}", x: x, y: y, value: v} end)
   end
 end
