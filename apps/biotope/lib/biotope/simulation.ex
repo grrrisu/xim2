@@ -15,11 +15,9 @@ defmodule Biotope.Simulation do
   }
 
   def sim(%Queue{} = queue, opts) do
-    aggregate = %{vegetation: %{}, herbivore: %{}, predator: %{}}
-
-    Enum.reduce(@simulations, aggregate, &{sim_simulation(&1, opts), &2})
-    |> Aggregator.aggregate_results(queue)
-    |> aggregate_results(queue)
+    Enum.map(@simulations, &sim_simulation(&1, opts))
+    |> aggregate_simulations(queue)
+    |> count_results(queue)
     |> notify_queue_summary()
   end
 
@@ -83,8 +81,14 @@ defmodule Biotope.Simulation do
     result
   end
 
+  def aggregate_simulations(results, queue) do
+    summary = Aggregator.aggregate_simulations(results, queue)
+    :ok = notify(:simulation_aggregate, summary)
+    results
+  end
+
   # [{1097, %{error: [], ok: [], simulation: Sim.Vegetation}}]
-  def aggregate_results(results, queue) do
+  def count_results(results, queue) do
     %{
       queue: queue.name,
       results:
