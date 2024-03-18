@@ -69,7 +69,10 @@ defmodule Biotope.Data do
 
   def get_layer_positions(layer, data) do
     AccessData.get(data, fn biotope ->
-      biotope |> Map.fetch!(layer) |> Map.keys()
+      case Map.get(biotope, layer) do
+        nil -> []
+        entities -> Map.keys(entities)
+      end
     end)
   end
 
@@ -119,11 +122,11 @@ defmodule Biotope.Data do
 
   defp create_biotope(width, height) do
     %{
-      vegetation: Grid.create(width, height, %Vegetation{}),
+      vegetation: Grid.create(width, height, fn x, y -> %Vegetation{position: {x, y}} end),
       herbivore:
-        create_animals(width, height, 0.1, fn position -> %Herbivore{position: position} end),
-      predator:
-        create_animals(width, height, 0.02, fn position -> %Predator{position: position} end)
+        create_animals(width, height, 0.1, fn position -> %Herbivore{position: position} end)
+      # predator:
+      #  create_animals(width, height, 0.02, fn position -> %Predator{position: position} end)
     }
   end
 
@@ -136,7 +139,6 @@ defmodule Biotope.Data do
       {position, remaining} = List.pop_at(remaining, index)
       {remaining, Map.put_new(animals, position, create_func.(position))}
     end)
-    |> Tuple.to_list()
-    |> List.last()
+    |> elem(1)
   end
 end

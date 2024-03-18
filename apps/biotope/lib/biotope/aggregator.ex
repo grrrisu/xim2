@@ -19,25 +19,21 @@ defmodule Biotope.Aggregator do
   end
 
   def aggregate_results(results, summary) do
-    Enum.reduce(results, summary, fn %{change: change, origin: origin}, sum ->
-      merge(sum, change, origin)
+    Enum.reduce(results, summary, fn result, sum ->
+      sum
+      |> merge_layer(:vegetation, result)
+      |> merge_layer(:herbivore, result)
+      |> merge_layer(:predator, result)
     end)
   end
 
-  def merge(sum, change, origin) do
-    sum
-    |> merge_layer(:vegetation, change, origin)
-    |> merge_layer(:herbivore, change, origin)
-    |> merge_layer(:predator, change, origin)
+  def merge_layer(summary, layer, result) do
+    merge_change(summary, layer, Map.get(result, layer))
   end
 
-  def merge_layer(summary, layer, change, origin) do
-    merge_change(summary, layer, Map.get(change, layer), Map.get(origin, layer))
-  end
+  def merge_change(summary, _layer, nil), do: summary
 
-  def merge_change(summary, _layer, nil, _origin), do: summary
-
-  def merge_change(summary, layer, change, origin) do
+  def merge_change(summary, layer, %{change: change, origin: origin}) do
     get_and_update_in(summary, [layer, change.position], fn previous ->
       case previous do
         nil -> may_replace(change, origin)

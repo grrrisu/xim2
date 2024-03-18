@@ -8,33 +8,41 @@ defmodule Biotope.Sim.AggregatorTest do
     vegetation_results =
       [
         %{
-          change: %{vegetation: %{size: 306.0, position: {0, 0}}},
-          origin: %{vegetation: %Vegetation{size: 300.0}}
+          vegetation: %{
+            change: %{size: 306.0, position: {0, 0}},
+            origin: %Vegetation{size: 300.0}
+          }
         },
         %{
-          change: %{vegetation: %{size: 5999.9, position: {0, 1}}},
-          origin: %{vegetation: %Vegetation{size: 5999.8}}
+          vegetation: %{
+            change: %{size: 5999.9, position: {0, 1}},
+            origin: %Vegetation{size: 5999.8}
+          }
         },
         %{
-          change: %{vegetation: %{size: 5900.6, position: {0, 2}}},
-          origin: %{vegetation: %Vegetation{size: 5900.4}}
+          vegetation: %{
+            change: %{size: 5900.6, position: {0, 2}},
+            origin: %Vegetation{size: 5900.4}
+          }
         },
         %{
-          change: %{vegetation: %{size: 4200.0, position: {0, 3}}},
-          origin: %{vegetation: %Vegetation{size: 4000.0}}
+          vegetation: %{
+            change: %{size: 4200.0, position: {0, 3}},
+            origin: %Vegetation{size: 4000.0}
+          }
         }
       ]
 
     herbivore_results =
       [
         %{
-          change: %{
-            vegetation: %{size: 4000.0, position: {0, 3}},
-            herbivore: %{size: 550.0, position: {0, 3}}
+          vegetation: %{
+            change: %{size: 4000.0, position: {0, 3}},
+            origin: %Vegetation{size: 4200.0}
           },
-          origin: %{
-            vegetation: %Vegetation{size: 4200.0},
-            herbivore: %Animal.Herbivore{size: 500.0, position: {0, 3}}
+          herbivore: %{
+            change: %{size: 550.0, position: {0, 3}},
+            origin: %Animal.Herbivore{size: 500.0, position: {0, 3}}
           }
         }
       ]

@@ -3,7 +3,8 @@ defmodule Biotope.Sim.Vegetation do
 
   alias Biotope.Sim.Vegetation
 
-  defstruct capacity: 6000,
+  defstruct position: {0, 0},
+            capacity: 6000,
             birth_rate: 0.15,
             death_rate: 0.05,
             size: 650.0,
@@ -14,11 +15,13 @@ defmodule Biotope.Sim.Vegetation do
     %{key: position, data: data}
     |> Map.put_new(:origin, Data.lock_field(position, :vegetation, data))
     |> then(&Map.put_new(&1, :change, grow(&1.origin)))
-    |> then(&Map.put(&1, :change, round_size(&1.change)))
-    |> then(&Map.put_new(&1, :changed, has_changed?(&1)))
-    |> set_queue()
+    |> then(&Map.put(&1, :change, set_position(&1.change, position)))
     |> update_data()
     |> result()
+  end
+
+  def set_position(change, position) do
+    Map.put_new(change, :position, position)
   end
 
   def round_size(%{size: size} = change) do
@@ -43,11 +46,9 @@ defmodule Biotope.Sim.Vegetation do
     changeset
   end
 
-  def result(%{changed: true, change: vegetation, key: position}) do
-    {position, %{size: vegetation.display_size}}
+  def result(%{change: change, origin: origin}) do
+    %{vegetation: %{change: change, origin: origin}}
   end
-
-  def result(%{changed: false}), do: :no_change
 
   # vegetation grows by birth rate (alias grow rate) and shrinks by natural deaths (age),
   # the vegetation size is limited by the capacity (available room, sun energy)
