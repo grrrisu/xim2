@@ -1,23 +1,44 @@
 defmodule Biotope.Aggregator do
-  alias Biotope.Sim.Vegetation
-
   @doc """
-  summary = %{vegetation: %{position => vegetation}, herbivore: %{position => herbivore}}
+  returns
+  %{
+    vegetation: [%{position: {0, 0}, size: 306}, %{position: {0, 2}, size: 5901}],
+    herbivore: [%{position: {0, 3}, size: 550}],
+    predator: []
+  }
   """
-  def aggregate_results({%{simulation: _, ok: ok, error: _}, summary}, _queue) do
-    Enum.reduce(ok, summary, &aggregate(&1, &2))
+  def aggregate_simulations([%{simulation: _, ok: _, error: _} | _] = results, _queue) do
+    aggregate = %{vegetation: %{}, herbivore: %{}, predator: %{}}
+
+    results
+    |> Enum.map(& &1.ok)
+    |> Enum.reduce(aggregate, &aggregate_results(&1, &2))
+    |> Enum.reduce(%{}, fn {simulation, summary}, sum ->
+      Map.put_new(sum, simulation, Map.values(summary) |> Enum.map(&elem(&1, 0)))
+    end)
   end
 
-  def aggregate(%{change: change, origin: origin}, summary) do
-    merge(summary, change, origin)
+  def aggregate_results(results, summary) do
+    Enum.reduce(results, summary, fn %{change: change, origin: origin}, sum ->
+      merge(sum, change, origin)
+    end)
   end
 
-  def merge(
-        summary,
-        %{vegetation: %{position: position} = change},
-        %{vegetation: %Vegetation{} = origin}
-      ) do
-    get_and_update_in(summary, [:vegetation, position], fn previous ->
+  def merge(sum, change, origin) do
+    sum
+    |> merge_layer(:vegetation, change, origin)
+    |> merge_layer(:herbivore, change, origin)
+    |> merge_layer(:predator, change, origin)
+  end
+
+  def merge_layer(summary, layer, change, origin) do
+    merge_change(summary, layer, Map.get(change, layer), Map.get(origin, layer))
+  end
+
+  def merge_change(summary, _layer, nil, _origin), do: summary
+
+  def merge_change(summary, layer, change, origin) do
+    get_and_update_in(summary, [layer, change.position], fn previous ->
       case previous do
         nil -> may_replace(change, origin)
         {_prev, ori} -> may_replace(change, ori)

@@ -1,13 +1,11 @@
 defmodule Biotope.Sim.AggregatorTest do
   use ExUnit.Case, async: true
 
-  alias Biotope.Sim.Vegetation
+  alias Biotope.Sim.{Vegetation, Animal}
   alias Biotope.Aggregator
 
   setup do
-    summary = %{vegetation: %{}, herbivore: %{}, predator: %{}}
-
-    results =
+    vegetation_results =
       [
         %{
           change: %{vegetation: %{size: 306.0, position: {0, 0}}},
@@ -24,35 +22,54 @@ defmodule Biotope.Sim.AggregatorTest do
         %{
           change: %{vegetation: %{size: 4200.0, position: {0, 3}}},
           origin: %{vegetation: %Vegetation{size: 4000.0}}
-        },
+        }
+      ]
+
+    herbivore_results =
+      [
         %{
-          change: %{vegetation: %{size: 4000.0, position: {0, 3}}},
-          origin: %{vegetation: %Vegetation{size: 4200.0}}
+          change: %{
+            vegetation: %{size: 4000.0, position: {0, 3}},
+            herbivore: %{size: 550.0, position: {0, 3}}
+          },
+          origin: %{
+            vegetation: %Vegetation{size: 4200.0},
+            herbivore: %Animal.Herbivore{size: 500.0, position: {0, 3}}
+          }
         }
       ]
 
     %{
-      summary: Enum.reduce(results, summary, &Aggregator.aggregate(&1, &2))
+      summary:
+        Aggregator.aggregate_simulations(
+          [
+            %{ok: vegetation_results, error: [], simulation: :vegetation},
+            %{ok: herbivore_results, error: [], simulation: :herbivore}
+          ],
+          nil
+        )
     }
   end
 
   test "vegetation grows", %{summary: summary} do
-    assert {change, origin} = get_in(summary, [:vegetation, {0, 0}])
+    change = Enum.find(summary.vegetation, &(&1.position == {0, 0}))
     assert 306 == change.size
-    assert 300 == origin.size
   end
 
   test "vegetation stops growing", %{summary: summary} do
-    assert nil == get_in(summary, [:vegetation, {0, 1}])
+    change = Enum.find(summary.vegetation, &(&1.position == {0, 1}))
+    assert nil == change
   end
 
   test "vegetation slowly grows", %{summary: summary} do
-    assert {change, origin} = get_in(summary, [:vegetation, {0, 2}])
+    change = Enum.find(summary.vegetation, &(&1.position == {0, 2}))
     assert 5901 == change.size
-    assert 5900.4 == origin.size
   end
 
-  test "herbivore consume vegetation grow", %{summary: summary} do
-    assert nil == get_in(summary, [:vegetation, {0, 3}])
+  test "herbivore consumes grown vegetation", %{summary: summary} do
+    change = Enum.find(summary.vegetation, &(&1.position == {0, 3}))
+    assert nil == change
+    change = Enum.find(summary.herbivore, &(&1.position == {0, 3}))
+    assert 550 == change.size
   end
 end
