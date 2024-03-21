@@ -11,10 +11,10 @@ defmodule Xim2Web.BiotopeLive.Index do
   def mount(_params, _session, socket) do
     if connected?(socket) do
       PubSub.subscribe(Xim2.PubSub, "Simulation:biotope")
-      Biotope.prepare_sim_queues()
+      {:ok, prepare_queues(socket)}
+    else
+      {:ok, socket}
     end
-
-    {:ok, socket}
   end
 
   def handle_params(_params, _uri, socket) do
@@ -143,6 +143,13 @@ defmodule Xim2Web.BiotopeLive.Index do
       </span>
     </div>
     """
+  end
+
+  defp prepare_queues(socket) do
+    case Biotope.prepare_sim_queues() do
+      :ok -> socket
+      {:error, msg} -> put_flash(socket, :error, msg)
+    end
   end
 
   defp assign_biotope(socket, nil), do: assign(socket, new: true)
