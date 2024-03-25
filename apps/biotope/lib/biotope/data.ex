@@ -81,11 +81,11 @@ defmodule Biotope.Data do
   end
 
   def create(width, height, data) do
-    unless created?(data) do
+    if created?(data) do
+      {:error, "already exists"}
+    else
       :ok = AccessData.set(data, fn _ -> create_biotope(width, height) end)
       {:ok, all(data)}
-    else
-      {:error, "already exists"}
     end
   end
 

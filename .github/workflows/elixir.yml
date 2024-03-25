@@ -19,12 +19,24 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
 
+    services:
+      db:
+        image: postgres:16.2-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: xim2_test
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: "1.16.0" # [Required] Define the Elixir version
+          elixir-version: "1.16.2" # [Required] Define the Elixir version
           otp-version: "26.0" # [Required] Define the Erlang/OTP version
       - name: Restore dependencies cache
         uses: actions/cache@v4
@@ -36,6 +48,11 @@ jobs:
         run: mix deps.get
       - name: Run tests
         run: mix test --exclude ci:skip
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          #POSTGRES_HOST: db
+          #POSTGRES_PORT: ${{ job.services.db.ports[5432] }}
       - name: Check Formatting
         run: mix format --check-formatted
       - name: Check Credo Warnings

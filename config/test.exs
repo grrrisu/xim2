@@ -5,13 +5,27 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
-config :xim2, Xim2.Repo,
-  # username: "postgres",
-  # password: "postgres",
-  hostname: "localhost",
+
+db_config = [
+  hostname: System.get_env("POSTGRES_HOST", "localhost"),
   database: "xim2_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
+]
+
+db_config =
+  case System.get_env("POSTGRES_USER") do
+    nil ->
+      db_config
+
+    _ ->
+      Keyword.merge(db_config,
+        username: System.get_env("POSTGRES_USER"),
+        password: System.get_env("POSTGRES_PASSWORD")
+      )
+  end
+
+config :xim2, Xim2.Repo, db_config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
