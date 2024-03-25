@@ -13,7 +13,10 @@ defmodule Biotope.Sim.VegetationTest do
   test "sim" do
     data = start_supervised!(AccessData)
     {:ok, _biotope} = Data.create(1, 1, data)
-    assert {{0, 0}, %{size: size}} = Vegetation.sim({0, 0}, data: data)
+
+    assert %{vegetation: %{change: %{position: {0, 0}, size: size}}} =
+             Vegetation.sim({0, 0}, data: data)
+
     assert 650 < size
   end
 end
