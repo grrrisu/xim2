@@ -17,13 +17,13 @@ defmodule Biotope.SimulationTest do
     %{exit: failed, ok: success} = Simulation.sim_items([{0, 0}, {0, 1}], Vegetation, data)
     assert [] == failed
     assert 2 == Enum.count(success)
-    assert {{_x, _y}, %{size: _size}} = List.first(success)
+    assert %{vegetation: %{change: %{position: {_x, _y}, size: _size}}} = List.first(success)
   end
 
   test "sim_simulation", %{data: data} do
     {_time, result} = Simulation.sim_simulation({:vegetation, Vegetation}, data: data)
     assert %{error: [], ok: success, simulation: :vegetation} = result
-    assert {_x, _y} = List.first(success)
+    assert %{vegetation: %{change: %{position: {_x, _y}, size: _size}}} = List.first(success)
   end
 
   describe "notify listener" do
@@ -35,7 +35,7 @@ defmodule Biotope.SimulationTest do
 
     test "received simulation results" do
       assert_received {:simulation_biotope, :simulation_results, {:vegetation, results}}
-      assert {{_x, _y}, %{size: _size}} = List.first(results)
+      assert %{vegetation: %{change: %{position: {_x, _y}, size: _size}}} = List.first(results)
     end
 
     test "no simulation errors received" do
@@ -46,7 +46,7 @@ defmodule Biotope.SimulationTest do
       assert_received {:simulation_biotope, :simulation_summary,
                        %{error: [], ok: success, simulation: :vegetation}}
 
-      assert {_x, _y} = List.first(success)
+      assert %{vegetation: %{change: %{position: {_x, _y}, size: _size}}} = List.first(success)
     end
   end
 end

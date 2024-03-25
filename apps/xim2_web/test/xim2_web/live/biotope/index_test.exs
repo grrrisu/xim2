@@ -29,9 +29,15 @@ defmodule Xim2Web.BiotopeLive.IndexTest do
 
     send(
       view.pid,
-      {:simulation_biotope, :simulation_results, {:vegetation, [{{0, 0}, %{size: 800}}]}}
+      {:simulation_biotope, :simulation_aggregated,
+       %{
+         vegetation: [%{position: {0, 0}, size: 800}],
+         herbivore: [%{position: {0, 1}, size: 200}],
+         predator: []
+       }}
     )
 
     assert view |> has_element?("#vegetation-0-0", ~r/800/)
+    assert view |> has_element?("#herbivore-0-1", ~r/200/)
   end
 end
