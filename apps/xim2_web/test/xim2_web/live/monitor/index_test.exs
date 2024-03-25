@@ -21,7 +21,7 @@ defmodule Xim2Web.MonitorLive.IndexTest do
     result = %{
       queue: :test,
       time: DateTime.utc_now(),
-      duration: 15000,
+      duration: 15_000,
       ok: 100,
       errors: 0
     }

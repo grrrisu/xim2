@@ -61,8 +61,8 @@ defmodule Xim2Web.BiotopeLive.Index do
      |> stream(:predator, predator |> streamify())}
   end
 
-  def handle_info({:simulation_biotope, :simulation_errors, {_topic, failed}}, socket) do
-    dbg(failed)
+  def handle_info({:simulation_biotope, :simulation_errors, {_topic, _failed}}, socket) do
+    # dbg(failed)
     {:noreply, socket}
   end
 
