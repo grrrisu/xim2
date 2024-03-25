@@ -43,6 +43,7 @@ defmodule Xim2.MixProject do
       {:jason, "~> 1.2"},
       {:swoosh, "~> 1.3"},
       {:finch, "~> 0.13"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ximula, git: "https://github.com/grrrisu/ximula.git", override: true, app: false}
       # {:ximula, path: "../../../ximula"}
     ]
