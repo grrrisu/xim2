@@ -86,6 +86,9 @@ defmodule Xim2Web.BiotopeLive.Index do
       <.action_box class="mb-2">
         <.start_button running={@running} />
         <.reset_button />
+        <.link class="button" navigate={~p"/monitor/simulation/biotope"}>
+          <.icon name="hero-eye" />&nbsp;Monitor
+        </.link>
       </.action_box>
       <.grid
         id="vegetation"
