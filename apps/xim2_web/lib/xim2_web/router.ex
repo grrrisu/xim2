@@ -21,6 +21,7 @@ defmodule Xim2Web.Router do
     get "/colors", PageController, :colors
     live "/grid", GridLive.Show, :show
     live "/monitor", MonitorLive.Index, :index
+    live "/monitor/:topic/:data", MonitorLive.Index, :index
     live "/biotope", BiotopeLive.Index, :index
     # live "/biotope/new", BiotopeLive.Index, :new
   end

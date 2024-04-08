@@ -11,14 +11,10 @@ defmodule Xim2Web.MonitorLive.Index do
   @timeout 50_000
   @tasks 500
 
-  def mount(_params, _session, socket) do
-    if connected?(socket) do
-      PubSub.subscribe(Xim2.PubSub, "Monitor:data")
-      prepare()
-    end
-
+  def mount(params, _session, socket) do
     {:ok,
      socket
+     |> prepare(params)
      |> assign(
        running: false,
        schedulers: System.schedulers_online(),
@@ -150,7 +146,7 @@ defmodule Xim2Web.MonitorLive.Index do
     {:noreply, socket |> assign(running: false) |> put_flash(:info, "sim queue stopped")}
   end
 
-  def handle_info({:queue_summary, result}, socket) do
+  def handle_info({:monitor_data, :queue_summary, result}, socket) do
     {:noreply,
      socket
      |> stream_insert(
@@ -164,12 +160,50 @@ defmodule Xim2Web.MonitorLive.Index do
      })}
   end
 
+  def handle_info({namespace, topic, _payload}, %{private: %{pubsub_topic: namespace}} = socket) do
+    Logger.info("received simulation #{namespace} topic #{topic}")
+    # dbg(payload)
+    {:noreply, socket}
+  end
+
+  def handle_info(msg, socket) do
+    dbg(msg)
+    {:noreply, socket}
+  end
+
   defp number_format(number, precision \\ 0) do
     Number.Delimit.number_to_delimited(number, precision: precision)
   end
 
-  defp prepare() do
+  defp prepare(socket, params, connnected \\ nil) do
+    case connnected do
+      nil -> prepare(socket, params, connected?(socket))
+      false -> socket
+      true -> socket |> subscribe(params) |> prepare_data()
+    end
+  end
+
+  defp prepare_data(%{private: %{pubsub_topic: :monitor_data}} = socket) do
     Monitor.create_data(@items)
     Monitor.prepare_queues(@timeout, @tasks)
+    socket
+  end
+
+  defp prepare_data(socket), do: socket
+
+  defp subscribe(socket, params) when map_size(params) == 0 do
+    subscribe(socket, %{"topic" => "Monitor", "data" => "data"})
+  end
+
+  defp subscribe(socket, %{"topic" => topic, "data" => data}) do
+    :ok = PubSub.subscribe(Xim2.PubSub, "#{topic}:#{data}")
+    put_private(socket, :pubsub_topic, pubsub_topic([topic, data]))
+  end
+
+  defp pubsub_topic(topic) do
+    topic
+    |> Enum.map(&String.downcase(&1))
+    |> Enum.join("_")
+    |> String.to_atom()
   end
 end

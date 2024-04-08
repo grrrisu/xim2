@@ -67,6 +67,6 @@ defmodule Sim.Monitor.Data do
   end
 
   defp notify_sum(results) do
-    PubSub.broadcast(Xim2.PubSub, "Monitor:data", {:queue_summary, results})
+    PubSub.broadcast(Xim2.PubSub, "Monitor:data", {:monitor_data, :queue_summary, results})
   end
 end
