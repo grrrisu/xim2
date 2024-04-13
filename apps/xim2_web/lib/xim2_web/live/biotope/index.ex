@@ -10,7 +10,7 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      PubSub.subscribe(Xim2.PubSub, "Simulation:biotope")
+      PubSub.subscribe(Xim2.PubSub, "simulation:biotope")
       {:ok, prepare_queues(socket)}
     else
       {:ok, socket}

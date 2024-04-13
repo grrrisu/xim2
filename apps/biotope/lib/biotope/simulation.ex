@@ -105,6 +105,6 @@ defmodule Biotope.Simulation do
 
   defp notify(topic, payload) do
     :ok =
-      PubSub.broadcast(Xim2.PubSub, "Simulation:biotope", {:simulation_biotope, topic, payload})
+      PubSub.broadcast(Xim2.PubSub, "simulation:biotope", {:simulation_biotope, topic, payload})
   end
 end
