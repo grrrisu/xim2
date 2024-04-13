@@ -43,7 +43,7 @@ defmodule Xim2Web.MonitorLive.Index do
         </:box>
       </.boxes>
       <.boxes width="w-1/2">
-        <:box><.duration_chart /></:box>
+        <:box><.chart name="duration-chart" hook="Monitor" /></:box>
         <:box>
           <.duration_table
             durations={@streams.durations}
@@ -54,8 +54,8 @@ defmodule Xim2Web.MonitorLive.Index do
         </:box>
       </.boxes>
       <.boxes width="w-1/2">
-        <:box><.duration_summary_chart /></:box>
-        <:box><.ok_summary_chart /></:box>
+        <:box><.chart name="duration-summary-chart" hook="DurationSummary" /></:box>
+        <:box><.chart name="ok-summary-chart" hook="OkSummary" /></:box>
       </.boxes>
       <:footer>
         <.action_box class="mb-2">
@@ -105,26 +105,10 @@ defmodule Xim2Web.MonitorLive.Index do
     """
   end
 
-  def duration_chart(assigns) do
+  def chart(assigns) do
     ~H"""
-    <div id="duration-chart" phx-update="ignore" class="relative">
-      <canvas id="duration-chart-canvas" phx-hook="Monitor"></canvas>
-    </div>
-    """
-  end
-
-  def duration_summary_chart(assigns) do
-    ~H"""
-    <div id="duration-summary-chart" phx-update="ignore" class="relative">
-      <canvas id="duration-summary-chart-canvas" phx-hook="DurationSummary"></canvas>
-    </div>
-    """
-  end
-
-  def ok_summary_chart(assigns) do
-    ~H"""
-    <div id="ok-summary-chart" phx-update="ignore" class="relative">
-      <canvas id="ok-summary-chart-canvas" phx-hook="OkSummary"></canvas>
+    <div id={@name} phx-update="ignore" class="relative">
+      <canvas id={"#{@name}-canvas"} phx-hook={@hook}></canvas>
     </div>
     """
   end
