@@ -53,6 +53,10 @@ defmodule Xim2Web.MonitorLive.Index do
           />
         </:box>
       </.boxes>
+      <.boxes width="w-1/2">
+        <:box><.duration_summary_chart /></:box>
+        <:box><.ok_summary_chart /></:box>
+      </.boxes>
       <:footer>
         <.action_box class="mb-2">
           <.start_button running={@running} />
@@ -109,6 +113,22 @@ defmodule Xim2Web.MonitorLive.Index do
     """
   end
 
+  def duration_summary_chart(assigns) do
+    ~H"""
+    <div id="duration-summary-chart" phx-update="ignore" class="relative">
+      <canvas id="duration-summary-chart-canvas" phx-hook="DurationSummary"></canvas>
+    </div>
+    """
+  end
+
+  def ok_summary_chart(assigns) do
+    ~H"""
+    <div id="ok-summary-chart" phx-update="ignore" class="relative">
+      <canvas id="ok-summary-chart-canvas" phx-hook="OkSummary"></canvas>
+    </div>
+    """
+  end
+
   def duration_table(assigns) do
     ~H"""
     <table class="table-auto w-full">
@@ -160,6 +180,26 @@ defmodule Xim2Web.MonitorLive.Index do
      })}
   end
 
+  def handle_info(
+        {namespace, :queue_summary, %{results: results}},
+        %{private: %{pubsub_topic: namespace}} = socket
+      ) do
+    {:noreply,
+     socket
+     |> push_event("update-duration-summary-chart", %{
+       x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
+       vegetation: results |> Enum.at(0) |> Map.get(:time),
+       herbivore: results |> Enum.at(1) |> Map.get(:time),
+       predator: results |> Enum.at(2) |> Map.get(:time)
+     })
+     |> push_event("update-ok-summary-chart", %{
+       x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
+       vegetation: results |> Enum.at(0) |> Map.get(:ok),
+       herbivore: results |> Enum.at(1) |> Map.get(:ok),
+       predator: results |> Enum.at(2) |> Map.get(:ok)
+     })}
+  end
+
   def handle_info({namespace, topic, _payload}, %{private: %{pubsub_topic: namespace}} = socket) do
     Logger.info("received simulation #{namespace} topic #{topic}")
     # dbg(payload)
@@ -196,6 +236,7 @@ defmodule Xim2Web.MonitorLive.Index do
   end
 
   defp subscribe(socket, %{"topic" => topic, "data" => data}) do
+    dbg("#{topic}:#{data}")
     :ok = PubSub.subscribe(Xim2.PubSub, "#{topic}:#{data}")
     put_private(socket, :pubsub_topic, pubsub_topic([topic, data]))
   end

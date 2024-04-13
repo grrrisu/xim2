@@ -22,9 +22,13 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
-import MonitorHook from "./monitor"
-Hooks = {}
-Hooks.Monitor = MonitorHook
+import {MonitorHook, DurationSummaryHook, OkSummaryHook} from "./monitor"
+Hooks = {
+  Monitor: MonitorHook,
+  DurationSummary: DurationSummaryHook,
+  OkSummary: OkSummaryHook
+}
+console.log(Hooks)
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})
