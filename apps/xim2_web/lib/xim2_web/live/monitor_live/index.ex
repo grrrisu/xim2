@@ -12,10 +12,13 @@ defmodule Xim2Web.MonitorLive.Index do
   @tasks 500
 
   def mount(params, _session, socket) do
+    if connected?(socket), do: prepare(params)
+
     {:ok,
      socket
-     |> prepare(params)
      |> assign(
+       pubsub_topic: pubsub_topic(params),
+       monitor_view: pubsub_topic(params) == :monitor_data,
        running: false,
        schedulers: System.schedulers_online(),
        tasks: @tasks,
@@ -42,7 +45,7 @@ defmodule Xim2Web.MonitorLive.Index do
           <.info_card value={number_format(@tasks)} icon="la-cogs" />
         </:box>
       </.boxes>
-      <.boxes width="w-1/2">
+      <.boxes :if={@monitor_view} width="w-1/2">
         <:box><.chart name="duration-chart" hook="Monitor" /></:box>
         <:box>
           <.duration_table
@@ -53,12 +56,12 @@ defmodule Xim2Web.MonitorLive.Index do
           />
         </:box>
       </.boxes>
-      <.boxes width="w-1/2">
+      <.boxes :if={!@monitor_view} width="w-1/2">
         <:box><.chart name="duration-summary-chart" hook="DurationSummary" /></:box>
         <:box><.chart name="ok-summary-chart" hook="OkSummary" /></:box>
       </.boxes>
       <:footer>
-        <.action_box class="mb-2">
+        <.action_box :if={@monitor_view} class="mb-2">
           <.start_button running={@running} />
         </.action_box>
       </:footer>
@@ -166,7 +169,7 @@ defmodule Xim2Web.MonitorLive.Index do
 
   def handle_info(
         {namespace, :queue_summary, %{results: results}},
-        %{private: %{pubsub_topic: namespace}} = socket
+        %{assigns: %{pubsub_topic: namespace}} = socket
       ) do
     {:noreply,
      socket
@@ -199,33 +202,29 @@ defmodule Xim2Web.MonitorLive.Index do
     Number.Delimit.number_to_delimited(number, precision: precision)
   end
 
-  defp prepare(socket, params, connnected \\ nil) do
-    case connnected do
-      nil -> prepare(socket, params, connected?(socket))
-      false -> socket
-      true -> socket |> subscribe(params) |> prepare_data()
-    end
+  defp prepare(params) when map_size(params) == 0 do
+    subscribe(%{"topic" => "Monitor", "data" => "data"})
+    prepare_data()
   end
 
-  defp prepare_data(%{private: %{pubsub_topic: :monitor_data}} = socket) do
+  defp prepare(params) do
+    subscribe(params)
+  end
+
+  defp prepare_data() do
     Monitor.create_data(@items)
     Monitor.prepare_queues(@timeout, @tasks)
-    socket
   end
 
-  defp prepare_data(socket), do: socket
-
-  defp subscribe(socket, params) when map_size(params) == 0 do
-    subscribe(socket, %{"topic" => "Monitor", "data" => "data"})
-  end
-
-  defp subscribe(socket, %{"topic" => topic, "data" => data}) do
-    dbg("#{topic}:#{data}")
+  defp subscribe(%{"topic" => topic, "data" => data}) do
     :ok = PubSub.subscribe(Xim2.PubSub, "#{topic}:#{data}")
-    put_private(socket, :pubsub_topic, pubsub_topic([topic, data]))
   end
 
-  defp pubsub_topic(topic) do
+  defp pubsub_topic(params) when map_size(params) == 0, do: pubsub_topic(["Monitor", "data"])
+
+  defp pubsub_topic(%{"topic" => topic, "data" => data}), do: pubsub_topic([topic, data])
+
+  defp pubsub_topic(topic) when is_list(topic) do
     topic
     |> Enum.map(&String.downcase(&1))
     |> Enum.join("_")
