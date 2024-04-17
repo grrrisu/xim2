@@ -16,6 +16,8 @@ defmodule Xim2Web.MonitorLive.Index do
 
     {:ok,
      socket
+     |> prepare_summary_chart("duration-summary-chart", fill: true)
+     |> prepare_summary_chart("ok-summary-chart", fill: false)
      |> assign(
        pubsub_topic: pubsub_topic(params),
        monitor_view: pubsub_topic(params) == :monitor_data,
@@ -57,8 +59,8 @@ defmodule Xim2Web.MonitorLive.Index do
         </:box>
       </.boxes>
       <.boxes :if={!@monitor_view} width="w-1/2">
-        <:box><.chart name="duration-summary-chart" hook="DurationSummary" /></:box>
-        <:box><.chart name="ok-summary-chart" hook="OkSummary" /></:box>
+        <:box><.chart name="duration-summary-chart" hook="Summary" /></:box>
+        <:box><.chart name="ok-summary-chart" hook="Summary" /></:box>
       </.boxes>
       <:footer>
         <.action_box :if={@monitor_view} class="mb-2">
@@ -110,8 +112,8 @@ defmodule Xim2Web.MonitorLive.Index do
 
   def chart(assigns) do
     ~H"""
-    <div id={@name} phx-update="ignore" class="relative">
-      <canvas id={"#{@name}-canvas"} phx-hook={@hook}></canvas>
+    <div id={"#{@name}-container"} phx-update="ignore" class="relative">
+      <canvas id={"#{@name}"} phx-hook={@hook}></canvas>
     </div>
     """
   end
@@ -173,13 +175,13 @@ defmodule Xim2Web.MonitorLive.Index do
       ) do
     {:noreply,
      socket
-     |> push_event("update-duration-summary-chart", %{
+     |> push_event("update-chart-duration-summary-chart", %{
        x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
        vegetation: results |> Enum.at(0) |> Map.get(:time),
        herbivore: results |> Enum.at(1) |> Map.get(:time),
        predator: results |> Enum.at(2) |> Map.get(:time)
      })
-     |> push_event("update-ok-summary-chart", %{
+     |> push_event("update-chart-ok-summary-chart", %{
        x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
        vegetation: results |> Enum.at(0) |> Map.get(:ok),
        herbivore: results |> Enum.at(1) |> Map.get(:ok),
@@ -229,5 +231,37 @@ defmodule Xim2Web.MonitorLive.Index do
     |> Enum.map(&String.downcase(&1))
     |> Enum.join("_")
     |> String.to_atom()
+  end
+
+  defp prepare_summary_chart(socket, chart, fill: fill) do
+    socket
+    |> push_event("init-chart-#{chart}", %{
+      datasets: [
+        %{
+          label: "Vegetation",
+          borderColor: "rgb(16, 185, 129, 0.8)",
+          backgroundColor: "rgb(4, 120, 87, 0.8)",
+          fill: fill,
+          lineTension: 0,
+          borderWidth: 2
+        },
+        %{
+          label: "Herbivore",
+          borderColor: "rgb(249, 115, 22, 0.8)",
+          backgroundColor: "rgb(194, 65, 12, 0.8)",
+          fill: fill,
+          lineTension: 0,
+          borderWidth: 2
+        },
+        %{
+          label: "Predator",
+          borderColor: "rgb(241, 65, 94, 0.8)",
+          backgroundColor: "rgb(180, 14, 41, 0.8)",
+          fill: fill,
+          lineTension: 0,
+          borderWidth: 2
+        }
+      ]
+    })
   end
 end
