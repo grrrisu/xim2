@@ -189,14 +189,14 @@ defmodule Xim2Web.MonitorLive.Index do
      })}
   end
 
-  def handle_info({namespace, topic, _payload}, %{private: %{pubsub_topic: namespace}} = socket) do
+  def handle_info({namespace, topic, _payload}, %{assigns: %{pubsub_topic: namespace}} = socket) do
     Logger.info("received simulation #{namespace} topic #{topic}")
     # dbg(payload)
     {:noreply, socket}
   end
 
   def handle_info(msg, socket) do
-    dbg(msg)
+    Logger.warning("unhandled message #{inspect(msg)}")
     {:noreply, socket}
   end
 
@@ -228,8 +228,7 @@ defmodule Xim2Web.MonitorLive.Index do
 
   defp pubsub_topic(topic) when is_list(topic) do
     topic
-    |> Enum.map(&String.downcase(&1))
-    |> Enum.join("_")
+    |> Enum.map_join("_", &String.downcase(&1))
     |> String.to_atom()
   end
 
