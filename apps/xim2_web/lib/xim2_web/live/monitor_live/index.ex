@@ -7,6 +7,8 @@ defmodule Xim2Web.MonitorLive.Index do
 
   alias Sim.Monitor
 
+  import Xim2Web.Monitor.Components
+
   @items 500
   @timeout 50_000
   @tasks 500
@@ -16,9 +18,17 @@ defmodule Xim2Web.MonitorLive.Index do
 
     {:ok,
      socket
-     |> prepare_summary_chart("duration-summary-chart", fill: true)
-     |> prepare_summary_chart("ok-summary-chart", fill: false)
-     |> prepare_summary_chart("errors-summary-chart", fill: false)
+     |> prepare_summary_chart("duration-summary-chart",
+       fill: true,
+       stacked: true,
+       begin_at_zero: true
+     )
+     |> prepare_summary_chart("ok-summary-chart", fill: false, begin_at_zero: true)
+     |> prepare_summary_chart("errors-summary-chart",
+       type: "bar",
+       fill: false,
+       begin_at_zero: true
+     )
      |> assign(
        pubsub_topic: pubsub_topic(params),
        monitor_view: pubsub_topic(params) == :monitor_data,
@@ -49,7 +59,7 @@ defmodule Xim2Web.MonitorLive.Index do
         </:box>
       </.boxes>
       <.boxes :if={@monitor_view} width="w-1/2">
-        <:box><.chart name="duration-chart" hook="Monitor" /></:box>
+        <:box><.chart title="Duration" name="duration-chart" hook="Monitor" /></:box>
         <:box>
           <.duration_table
             durations={@streams.durations}
@@ -60,12 +70,12 @@ defmodule Xim2Web.MonitorLive.Index do
         </:box>
       </.boxes>
       <.boxes :if={!@monitor_view} width="w-1/2">
-        <:box><.chart name="duration-summary-chart" hook="Summary" /></:box>
-        <:box><.chart name="ok-summary-chart" hook="Summary" /></:box>
+        <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
+        <:box><.chart title="# Items" name="ok-summary-chart" hook="Chart" /></:box>
       </.boxes>
       <.boxes :if={!@monitor_view} width="w-1/2">
-        <:box><.chart name="errors-summary-chart" hook="Summary" /></:box>
-        <:box><.chart name="xxx-summary-chart" hook="Summary" /></:box>
+        <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
+        <:box><.chart title="???" name="xxx-summary-chart" hook="Chart" /></:box>
       </.boxes>
       <:footer>
         <.action_box :if={@monitor_view} class="mb-2">
@@ -73,78 +83,6 @@ defmodule Xim2Web.MonitorLive.Index do
         </.action_box>
       </:footer>
     </.main_section>
-    """
-  end
-
-  attr :title, :string
-  attr :back, :string
-  slot :inner_block, required: true
-  slot :footer
-
-  def main_section(assigns) do
-    ~H"""
-    <section class="flex flex-col">
-      <div>
-        <.main_title><%= @title %></.main_title>
-        <.back navigate={@back}>Home</.back>
-      </div>
-      <div>
-        <%= render_slot(@inner_block) %>
-      </div>
-      <div><%= render_slot(@footer) %></div>
-    </section>
-    """
-  end
-
-  def boxes(assigns) do
-    ~H"""
-    <div class="flex flex-row flex-wrap p-2">
-      <div :for={box <- @box} class={["flex-auto", @width]}>
-        <%= render_slot(box) %>
-      </div>
-    </div>
-    """
-  end
-
-  def info_card(assigns) do
-    ~H"""
-    <div>
-      <span class="align-super"><%= @value %></span>
-      <.icon name={@icon} class="la-2x" />
-    </div>
-    """
-  end
-
-  def chart(assigns) do
-    ~H"""
-    <div id={"#{@name}-container"} phx-update="ignore" class="relative">
-      <canvas id={"#{@name}"} phx-hook={@hook}></canvas>
-    </div>
-    """
-  end
-
-  def duration_table(assigns) do
-    ~H"""
-    <table class="table-auto w-full">
-      <thead class="text-sky-400">
-        <th>Time</th>
-        <th>Duration (µm)</th>
-        <th>Overhead Queue (µm)</th>
-      </thead>
-      <tbody
-        id="durations"
-        phx-update="stream"
-        class="divide-y divide-sky-800 border-t border-sky-600 text-sm leading-6 text-sky-300"
-      >
-        <tr :for={{dom_id, item} <- @durations} id={dom_id}>
-          <td class="text-right"><%= Calendar.strftime(item.time, "%H:%M:%S:%f") %></td>
-          <td class="text-right"><%= item.duration |> number_format() %></td>
-          <td class="text-right">
-            <%= (item.duration - @items * @timeout / @tasks) |> number_format() %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
     """
   end
 
@@ -196,17 +134,15 @@ defmodule Xim2Web.MonitorLive.Index do
     {:noreply, socket}
   end
 
-  defp number_format(number, precision \\ 0) do
-    Number.Delimit.number_to_delimited(number, precision: precision)
-  end
-
   defp push_chart_data(socket, results, event, attribute) do
+    dbg(results)
+
     socket
     |> push_event(event, %{
       x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
-      vegetation: results |> Enum.at(0) |> Map.get(attribute),
-      herbivore: results |> Enum.at(1) |> Map.get(attribute),
-      predator: results |> Enum.at(2) |> Map.get(attribute)
+      vegetation: Map.get(results, :vegetation) |> Map.get(attribute),
+      herbivore: Map.get(results, :herbivore) |> Map.get(attribute),
+      predator: Map.get(results, :predator) |> Map.get(attribute)
     })
   end
 
@@ -238,15 +174,20 @@ defmodule Xim2Web.MonitorLive.Index do
     |> String.to_atom()
   end
 
-  defp prepare_summary_chart(socket, chart, fill: fill) do
+  defp prepare_summary_chart(socket, chart, opts) do
     socket
     |> push_event("init-chart-#{chart}", %{
+      type: opts[:type] || "line",
+      options: %{
+        stacked: opts[:stacked] || false,
+        beginAtZero: opts[:begin_at_zero] || false
+      },
       datasets: [
         %{
           label: "Vegetation",
           borderColor: "rgb(16, 185, 129, 0.8)",
           backgroundColor: "rgb(4, 120, 87, 0.8)",
-          fill: fill,
+          fill: opts[:fill] || false,
           lineTension: 0,
           borderWidth: 2
         },
@@ -254,7 +195,7 @@ defmodule Xim2Web.MonitorLive.Index do
           label: "Herbivore",
           borderColor: "rgb(249, 115, 22, 0.8)",
           backgroundColor: "rgb(194, 65, 12, 0.8)",
-          fill: fill,
+          fill: opts[:fill] || false,
           lineTension: 0,
           borderWidth: 2
         },
@@ -262,7 +203,7 @@ defmodule Xim2Web.MonitorLive.Index do
           label: "Predator",
           borderColor: "rgb(241, 65, 94, 0.8)",
           backgroundColor: "rgb(180, 14, 41, 0.8)",
-          fill: fill,
+          fill: opts[:fill] || false,
           lineTension: 0,
           borderWidth: 2
         }

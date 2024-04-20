@@ -22,10 +22,10 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
-import {MonitorHook, SummaryHook} from "./monitor"
+import {MonitorHook, ChartHook} from "./monitor"
 Hooks = {
   Monitor: MonitorHook,
-  Summary: SummaryHook
+  Chart: ChartHook
 }
 console.log(Hooks)
 

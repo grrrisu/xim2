@@ -47,12 +47,11 @@ const MonitorHook = {
   }
 }
 
-const SummaryHook = {
+const ChartHook = {
   mounted() {
     const chart = new Chart(this.el, {
       type: 'line',
       data: {
-        labels: [1,2,3],
         datasets: []
       },
       options: {
@@ -68,9 +67,7 @@ const SummaryHook = {
             
           },
           y: {
-            stacked: true,
             display: true,
-            beginAtZero: true,
             ticks: {
               color: "rgb(14, 165, 233, 0.8)",
             },
@@ -80,7 +77,10 @@ const SummaryHook = {
     });
 
     this.handleEvent(`init-chart-${this.el.id}`, (data) => {
+      if(data.type) chart.config.type = data.type
       chart.data.datasets = data.datasets;
+      if(data.options.stacked) chart.options.scales.y.stacked = data.options.stacked;
+      if(data.options.beginAtZero) chart.options.scales.y.beginAtZero = data.options.beginAtZero;
       chart.update();
     });
 
@@ -94,4 +94,4 @@ const SummaryHook = {
   }
 }
 
-export {MonitorHook, SummaryHook};
+export {MonitorHook, ChartHook};
