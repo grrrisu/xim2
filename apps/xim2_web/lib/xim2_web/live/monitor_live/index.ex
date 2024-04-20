@@ -18,6 +18,7 @@ defmodule Xim2Web.MonitorLive.Index do
      socket
      |> prepare_summary_chart("duration-summary-chart", fill: true)
      |> prepare_summary_chart("ok-summary-chart", fill: false)
+     |> prepare_summary_chart("errors-summary-chart", fill: false)
      |> assign(
        pubsub_topic: pubsub_topic(params),
        monitor_view: pubsub_topic(params) == :monitor_data,
@@ -61,6 +62,10 @@ defmodule Xim2Web.MonitorLive.Index do
       <.boxes :if={!@monitor_view} width="w-1/2">
         <:box><.chart name="duration-summary-chart" hook="Summary" /></:box>
         <:box><.chart name="ok-summary-chart" hook="Summary" /></:box>
+      </.boxes>
+      <.boxes :if={!@monitor_view} width="w-1/2">
+        <:box><.chart name="errors-summary-chart" hook="Summary" /></:box>
+        <:box><.chart name="xxx-summary-chart" hook="Summary" /></:box>
       </.boxes>
       <:footer>
         <.action_box :if={@monitor_view} class="mb-2">
@@ -175,18 +180,9 @@ defmodule Xim2Web.MonitorLive.Index do
       ) do
     {:noreply,
      socket
-     |> push_event("update-chart-duration-summary-chart", %{
-       x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
-       vegetation: results |> Enum.at(0) |> Map.get(:time),
-       herbivore: results |> Enum.at(1) |> Map.get(:time),
-       predator: results |> Enum.at(2) |> Map.get(:time)
-     })
-     |> push_event("update-chart-ok-summary-chart", %{
-       x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
-       vegetation: results |> Enum.at(0) |> Map.get(:ok),
-       herbivore: results |> Enum.at(1) |> Map.get(:ok),
-       predator: results |> Enum.at(2) |> Map.get(:ok)
-     })}
+     |> push_chart_data(results, "update-chart-duration-summary-chart", :time)
+     |> push_chart_data(results, "update-chart-ok-summary-chart", :ok)
+     |> push_chart_data(results, "update-chart-errors-summary-chart", :errors)}
   end
 
   def handle_info({namespace, topic, _payload}, %{assigns: %{pubsub_topic: namespace}} = socket) do
@@ -202,6 +198,16 @@ defmodule Xim2Web.MonitorLive.Index do
 
   defp number_format(number, precision \\ 0) do
     Number.Delimit.number_to_delimited(number, precision: precision)
+  end
+
+  defp push_chart_data(socket, results, event, attribute) do
+    socket
+    |> push_event(event, %{
+      x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
+      vegetation: results |> Enum.at(0) |> Map.get(attribute),
+      herbivore: results |> Enum.at(1) |> Map.get(attribute),
+      predator: results |> Enum.at(2) |> Map.get(attribute)
+    })
   end
 
   defp prepare(params) when map_size(params) == 0 do
