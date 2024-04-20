@@ -92,8 +92,9 @@ defmodule Biotope.Simulation do
     %{
       queue: queue.name,
       results:
-        Enum.map(results, fn %{error: error, ok: ok, simulation: simulation, time: time} ->
-          %{simulation: simulation, time: time, errors: Enum.count(error), ok: Enum.count(ok)}
+        Enum.reduce(results, %{}, fn %{error: error, ok: ok, simulation: simulation, time: time},
+                                     sum ->
+          Map.put(sum, simulation, %{time: time, errors: Enum.count(error), ok: Enum.count(ok)})
         end)
     }
   end
