@@ -28,7 +28,7 @@ defmodule Biotope.SimulationTest do
 
   describe "notify listener" do
     setup %{data: data} do
-      PubSub.subscribe(Xim2.PubSub, "Simulation:biotope")
+      PubSub.subscribe(Xim2.PubSub, "simulation:biotope")
       Simulation.sim_simulation({:vegetation, Vegetation}, data: data)
       :ok
     end

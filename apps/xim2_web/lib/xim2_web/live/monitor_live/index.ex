@@ -135,8 +135,6 @@ defmodule Xim2Web.MonitorLive.Index do
   end
 
   defp push_chart_data(socket, results, event, attribute) do
-    dbg(results)
-
     socket
     |> push_event(event, %{
       x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
