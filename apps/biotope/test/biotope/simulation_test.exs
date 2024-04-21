@@ -4,6 +4,7 @@ defmodule Biotope.SimulationTest do
   alias Phoenix.PubSub
 
   alias Ximula.AccessData
+  alias Ximula.Sim.Queue
   alias Biotope.Simulation
   alias Biotope.Sim.Vegetation
 
@@ -26,7 +27,7 @@ defmodule Biotope.SimulationTest do
     assert %{vegetation: %{change: %{position: {_x, _y}, size: _size}}} = List.first(success)
   end
 
-  describe "notify listener" do
+  describe "notify sim events" do
     setup %{data: data} do
       PubSub.subscribe(Xim2.PubSub, "simulation:biotope")
       Simulation.sim_simulation({:vegetation, Vegetation}, data: data)
@@ -47,6 +48,26 @@ defmodule Biotope.SimulationTest do
                        %{error: [], ok: success, simulation: :vegetation}}
 
       assert %{vegetation: %{change: %{position: {_x, _y}, size: _size}}} = List.first(success)
+    end
+  end
+
+  describe "notify queue events" do
+    setup %{data: data} do
+      PubSub.subscribe(Xim2.PubSub, "simulation:biotope")
+      Simulation.sim(%Queue{name: "test"}, data: data)
+      :ok
+    end
+
+    test "received queue summary" do
+      assert_received {:simulation_biotope, :queue_summary,
+                       %{
+                         queue: "test",
+                         results: %{
+                           vegetation: %{errors: 0, ok: 2, time: _},
+                           herbivore: %{errors: 0, ok: 1, time: _},
+                           predator: %{errors: 0, ok: 0, time: _}
+                         }
+                       }}
     end
   end
 end
