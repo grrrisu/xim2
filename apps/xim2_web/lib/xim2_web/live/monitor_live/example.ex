@@ -1,9 +1,11 @@
-defmodule Xim2Web.MonitorLive.Index do
+defmodule Xim2Web.MonitorLive.Example do
   use Xim2Web, :live_view
 
   require Logger
 
   alias Phoenix.PubSub
+
+  alias Sim.Monitor
 
   import Xim2Web.Monitor.Components
 
@@ -11,8 +13,8 @@ defmodule Xim2Web.MonitorLive.Index do
   @timeout 50_000
   @tasks 500
 
-  def mount(params, _session, socket) do
-    if connected?(socket), do: prepare(params)
+  def mount(_params, _session, socket) do
+    if connected?(socket), do: prepare()
 
     {:ok,
      socket
@@ -28,8 +30,7 @@ defmodule Xim2Web.MonitorLive.Index do
        begin_at_zero: true
      )
      |> assign(
-       pubsub_topic: pubsub_topic(params),
-       monitor_view: pubsub_topic(params) == :monitor_data,
+       pubsub_topic: :monitor_data,
        running: false,
        schedulers: System.schedulers_online(),
        tasks: @tasks,
@@ -42,7 +43,21 @@ defmodule Xim2Web.MonitorLive.Index do
   def render(assigns) do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
-      <.boxes :if={@monitor_view} width="w-1/2">
+      <.boxes width="w-1/4">
+        <:box>
+          <.info_card value={@schedulers} icon="la-microchip" />
+        </:box>
+        <:box>
+          <.info_card value={number_format(@items)} icon="la-cubes" />
+        </:box>
+        <:box>
+          <.info_card value={number_format(@timeout)} icon="la-hourglass-half" />
+        </:box>
+        <:box>
+          <.info_card value={number_format(@tasks)} icon="la-cogs" />
+        </:box>
+      </.boxes>
+      <.boxes width="w-1/2">
         <:box><.chart title="Duration" name="duration-chart" hook="Monitor" /></:box>
         <:box>
           <.duration_table
@@ -53,16 +68,16 @@ defmodule Xim2Web.MonitorLive.Index do
           />
         </:box>
       </.boxes>
-      <.boxes :if={!@monitor_view} width="w-1/2">
+      <.boxes width="w-1/2">
         <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="# Items" name="ok-summary-chart" hook="Chart" /></:box>
       </.boxes>
-      <.boxes :if={!@monitor_view} width="w-1/2">
+      <.boxes width="w-1/2">
         <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="???" name="xxx-summary-chart" hook="Chart" /></:box>
       </.boxes>
       <:footer>
-        <.action_box :if={@monitor_view} class="mb-2">
+        <.action_box class="mb-2">
           <.start_button running={@running} />
         </.action_box>
       </:footer>
@@ -70,18 +85,16 @@ defmodule Xim2Web.MonitorLive.Index do
     """
   end
 
-  def handle_info({:monitor_data, :queue_summary, result}, socket) do
-    {:noreply,
-     socket
-     |> stream_insert(
-       :durations,
-       Map.put_new(result, :id, System.unique_integer([:positive])),
-       limit: -12
-     )
-     |> push_event("update-duration-chart", %{
-       x_axis: DateTime.to_iso8601(result.time),
-       duration: result.duration
-     })}
+  def handle_event("start", _, socket) do
+    Logger.info("start sim")
+    :ok = Monitor.start()
+    {:noreply, socket |> assign(running: true) |> put_flash(:info, "sim queue started")}
+  end
+
+  def handle_event("stop", _, socket) do
+    Logger.info("stop sim")
+    :ok = Monitor.stop()
+    {:noreply, socket |> assign(running: false) |> put_flash(:info, "sim queue stopped")}
   end
 
   def handle_info(
@@ -90,9 +103,18 @@ defmodule Xim2Web.MonitorLive.Index do
       ) do
     {:noreply,
      socket
-     |> push_chart_data("update-chart-duration-summary-chart", biotope_results(results, :time))
-     |> push_chart_data("update-chart-ok-summary-chart", biotope_results(results, :ok))
-     |> push_chart_data("update-chart-errors-summary-chart", biotope_results(results, :error))}
+     |> stream_insert(
+       :durations,
+       Map.put_new(results.one, :id, System.unique_integer([:positive])),
+       limit: -12
+     )
+     |> push_event("update-duration-chart", %{
+       x_axis: results.one.time |> DateTime.to_iso8601(),
+       duration: results.one.duration
+     })
+     |> push_chart_data("update-chart-duration-summary-chart", [results.one.duration])
+     |> push_chart_data("update-chart-ok-summary-chart", [results.one.ok])
+     |> push_chart_data("update-chart-errors-summary-chart", [results.one.errors])}
   end
 
   def handle_info({namespace, topic, _payload}, %{assigns: %{pubsub_topic: namespace}} = socket) do
@@ -106,22 +128,10 @@ defmodule Xim2Web.MonitorLive.Index do
     {:noreply, socket}
   end
 
-  defp biotope_results(results, attribute) do
-    [
-      Map.get(results, :vegetation) |> Map.get(attribute),
-      Map.get(results, :herbivore) |> Map.get(attribute),
-      Map.get(results, :predator) |> Map.get(attribute)
-    ]
-  end
-
-  defp prepare(%{"topic" => topic, "data" => data}) do
-    :ok = PubSub.subscribe(Xim2.PubSub, "#{topic}:#{data}")
-  end
-
-  defp pubsub_topic(%{"topic" => topic, "data" => data}) do
-    [topic, data]
-    |> Enum.map_join("_", &String.downcase(&1))
-    |> String.to_atom()
+  defp prepare() do
+    :ok = PubSub.subscribe(Xim2.PubSub, "monitor:data")
+    Monitor.create_data(@items)
+    Monitor.prepare_queues(@timeout, @tasks)
   end
 
   defp prepare_summary_chart(socket, chart, opts) do
@@ -134,25 +144,9 @@ defmodule Xim2Web.MonitorLive.Index do
       },
       datasets: [
         %{
-          label: "Vegetation",
+          label: "one",
           borderColor: "rgb(16, 185, 129, 0.8)",
           backgroundColor: "rgb(4, 120, 87, 0.8)",
-          fill: opts[:fill] || false,
-          lineTension: 0,
-          borderWidth: 2
-        },
-        %{
-          label: "Herbivore",
-          borderColor: "rgb(249, 115, 22, 0.8)",
-          backgroundColor: "rgb(194, 65, 12, 0.8)",
-          fill: opts[:fill] || false,
-          lineTension: 0,
-          borderWidth: 2
-        },
-        %{
-          label: "Predator",
-          borderColor: "rgb(241, 65, 94, 0.8)",
-          backgroundColor: "rgb(180, 14, 41, 0.8)",
           fill: opts[:fill] || false,
           lineTension: 0,
           borderWidth: 2
