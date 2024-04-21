@@ -26,7 +26,7 @@ defmodule Xim2Web.MonitorLive.IndexTest do
       errors: 0
     }
 
-    send(view.pid, {:queue_summary, result})
+    send(view.pid, {:monitor_data, :queue_summary, result})
     assert has_element?(view, "tr", "15'00")
   end
 end
