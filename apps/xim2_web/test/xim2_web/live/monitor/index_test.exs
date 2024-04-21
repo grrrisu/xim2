@@ -20,10 +20,14 @@ defmodule Xim2Web.MonitorLive.IndexTest do
 
     result = %{
       queue: :test,
-      time: DateTime.utc_now(),
-      duration: 15_000,
-      ok: 100,
-      errors: 0
+      results: %{
+        one: %{
+          time: DateTime.utc_now(),
+          duration: 15_000,
+          ok: 100,
+          errors: 0
+        }
+      }
     }
 
     send(view.pid, {:monitor_data, :queue_summary, result})

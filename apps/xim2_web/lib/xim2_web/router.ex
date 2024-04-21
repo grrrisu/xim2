@@ -20,10 +20,9 @@ defmodule Xim2Web.Router do
     get "/", PageController, :home
     get "/colors", PageController, :colors
     live "/grid", GridLive.Show, :show
-    live "/monitor", MonitorLive.Index, :index
+    live "/monitor", MonitorLive.Example, :show
     live "/monitor/:topic/:data", MonitorLive.Index, :index
     live "/biotope", BiotopeLive.Index, :index
-    # live "/biotope/new", BiotopeLive.Index, :new
   end
 
   # Other scopes may use custom stacks.

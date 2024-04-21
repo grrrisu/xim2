@@ -59,14 +59,18 @@ defmodule Sim.Monitor.Data do
   defp aggregate_results({duration, %{exit: error, ok: ok}}, queue) do
     %{
       queue: queue,
-      time: DateTime.utc_now(),
-      duration: duration,
-      ok: Enum.count(ok),
-      errors: Enum.count(error)
+      results: %{
+        queue => %{
+          ok: Enum.count(ok),
+          errors: Enum.count(error),
+          time: DateTime.now!("Etc/UTC"),
+          duration: duration
+        }
+      }
     }
   end
 
   defp notify_sum(results) do
-    PubSub.broadcast(Xim2.PubSub, "Monitor:data", {:monitor_data, :queue_summary, results})
+    PubSub.broadcast(Xim2.PubSub, "monitor:data", {:monitor_data, :queue_summary, results})
   end
 end

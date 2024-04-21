@@ -3,6 +3,7 @@ defmodule Xim2Web.Monitor.Components do
   Provides UI components for monitor views
   """
   use Phoenix.Component
+  import Phoenix.LiveView
 
   import Monsum
   import Xim2Web.CoreComponents
@@ -37,7 +38,6 @@ defmodule Xim2Web.Monitor.Components do
     """
   end
 
-  @spec info_card(any()) :: Phoenix.LiveView.Rendered.t()
   def info_card(assigns) do
     ~H"""
     <div>
@@ -54,6 +54,14 @@ defmodule Xim2Web.Monitor.Components do
       <canvas id={"#{@name}"} phx-hook={@hook}></canvas>
     </div>
     """
+  end
+
+  def push_chart_data(socket, event, results) do
+    socket
+    |> push_event(event, %{
+      x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
+      results: results
+    })
   end
 
   def duration_table(assigns) do

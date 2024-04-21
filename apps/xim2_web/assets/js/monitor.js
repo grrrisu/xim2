@@ -86,9 +86,9 @@ const ChartHook = {
 
     this.handleEvent(`update-chart-${this.el.id}`, (data) => {
       chart.data.labels.push(data.x_axis);
-      chart.data.datasets[0].data.push(data.vegetation);
-      chart.data.datasets[1].data.push(data.herbivore);
-      chart.data.datasets[2].data.push(data.predator);
+      data.results.forEach((result, index) => {
+        chart.data.datasets[index].data.push(result);
+      })
       chart.update();
     });
   }
