@@ -62,7 +62,7 @@ defmodule Sim.Monitor.Data do
       results: %{
         queue => %{
           ok: Enum.count(ok),
-          errors: Enum.count(error),
+          error: Enum.count(error),
           time: DateTime.now!("Etc/UTC"),
           duration: duration
         }

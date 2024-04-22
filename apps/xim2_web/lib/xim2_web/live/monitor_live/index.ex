@@ -41,13 +41,14 @@ defmodule Xim2Web.MonitorLive.Index do
        items: @items,
        timeout: @timeout
      )
-     |> stream(:durations, [])}
+     |> stream(:durations, [])
+     |> stream(:error_messages, [])}
   end
 
   def render(assigns) do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
-      <.boxes :if={@monitor_view} width="w-1/2">
+      <.boxes width="w-1/2">
         <:box><.chart title="Duration" name="duration-chart" hook="Monitor" /></:box>
         <:box>
           <.duration_table
@@ -58,19 +59,19 @@ defmodule Xim2Web.MonitorLive.Index do
           />
         </:box>
       </.boxes>
-      <.boxes :if={!@monitor_view} width="w-1/2">
+      <.boxes width="w-1/2">
         <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="Items calculated" name="ok-summary-chart" hook="Chart" /></:box>
       </.boxes>
-      <.boxes :if={!@monitor_view} width="w-1/2">
+      <.boxes width="w-1/2">
         <:box><.chart title="Items changed" name="changed-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
       </.boxes>
-      <:footer>
-        <.action_box :if={@monitor_view} class="mb-2">
-          <.start_button running={@running} />
-        </.action_box>
-      </:footer>
+      <.boxes width="w-1/2">
+        <:box>
+          <.error_message_table error_messages={@streams.error_messages} />
+        </:box>
+      </.boxes>
     </.main_section>
     """
   end
@@ -103,6 +104,26 @@ defmodule Xim2Web.MonitorLive.Index do
   end
 
   def handle_info(
+        {namespace, :simulation_errors, results},
+        %{assigns: %{pubsub_topic: namespace}} = socket
+      ) do
+    {:noreply,
+     Enum.reduce(results, socket, fn {{x, y}, message}, socket ->
+       stream_insert(
+         socket,
+         :error_messages,
+         %{
+           id: System.unique_integer([:positive]),
+           time: DateTime.now!("Etc/UTC"),
+           entity: "{#{x}, #{y}}",
+           message: message
+         },
+         limit: -12
+       )
+     end)}
+  end
+
+  def handle_info(
         {namespace, :queue_summary, %{results: results}},
         %{assigns: %{pubsub_topic: namespace}} = socket
       ) do
@@ -115,7 +136,6 @@ defmodule Xim2Web.MonitorLive.Index do
 
   def handle_info({namespace, topic, _payload}, %{assigns: %{pubsub_topic: namespace}} = socket) do
     Logger.info("received simulation #{namespace} topic #{topic}")
-    # dbg(payload)
     {:noreply, socket}
   end
 
