@@ -26,6 +26,7 @@ defmodule Biotope.Simulation do
     Simulator.benchmark(fn ->
       get_data(sim_key, opts[:data])
       |> sim_items(simulation, opts[:data])
+      |> handle_failed()
       |> handle_results(sim_key)
     end)
   end
@@ -47,14 +48,21 @@ defmodule Biotope.Simulation do
     Data.get_layer_positions(layer, data)
   end
 
+  def handle_failed(%{exit: failed} = results) do
+    failed =
+      Enum.map(failed, fn {id, {exception, stacktrace}} ->
+        {id, Exception.normalize(:error, exception, stacktrace) |> Exception.message()}
+      end)
+
+    if Enum.any?(failed), do: notify(:simulation_errors, failed)
+    Map.put(results, :exit, failed)
+  end
+
   def handle_results(%{ok: success, exit: failed}, simulation) do
     %{
       simulation: simulation,
       ok: success,
-      error:
-        Enum.map(failed, fn {id, {exception, stacktrace}} ->
-          {id, Exception.normalize(:error, exception, stacktrace) |> Exception.message()}
-        end)
+      error: failed
     }
   end
 
@@ -71,7 +79,7 @@ defmodule Biotope.Simulation do
       results:
         Enum.reduce(results, %{}, fn %{error: error, ok: ok, simulation: simulation, time: time},
                                      sum ->
-          Map.put(sum, simulation, %{time: time, errors: Enum.count(error), ok: Enum.count(ok)})
+          Map.put(sum, simulation, %{time: time, error: Enum.count(error), ok: Enum.count(ok)})
         end)
     }
   end
