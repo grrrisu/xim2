@@ -22,6 +22,11 @@ defmodule Xim2Web.MonitorLive.Index do
        begin_at_zero: true
      )
      |> prepare_summary_chart("ok-summary-chart", fill: false, begin_at_zero: true)
+     |> prepare_summary_chart("changed-summary-chart",
+       fill: true,
+       stacked: true,
+       begin_at_zero: true
+     )
      |> prepare_summary_chart("errors-summary-chart",
        type: "bar",
        fill: false,
@@ -55,11 +60,11 @@ defmodule Xim2Web.MonitorLive.Index do
       </.boxes>
       <.boxes :if={!@monitor_view} width="w-1/2">
         <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
-        <:box><.chart title="# Items" name="ok-summary-chart" hook="Chart" /></:box>
+        <:box><.chart title="Items calculated" name="ok-summary-chart" hook="Chart" /></:box>
       </.boxes>
       <.boxes :if={!@monitor_view} width="w-1/2">
+        <:box><.chart title="Items changed" name="changed-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
-        <:box><.chart title="???" name="xxx-summary-chart" hook="Chart" /></:box>
       </.boxes>
       <:footer>
         <.action_box :if={@monitor_view} class="mb-2">
@@ -82,6 +87,19 @@ defmodule Xim2Web.MonitorLive.Index do
        x_axis: DateTime.to_iso8601(result.time),
        duration: result.duration
      })}
+  end
+
+  def handle_info(
+        {namespace, :simulation_aggregated, results},
+        %{assigns: %{pubsub_topic: namespace}} = socket
+      ) do
+    {:noreply,
+     socket
+     |> push_chart_data("update-chart-changed-summary-chart", [
+       Enum.count(results.vegetation),
+       Enum.count(results.herbivore),
+       Enum.count(results.predator)
+     ])}
   end
 
   def handle_info(
