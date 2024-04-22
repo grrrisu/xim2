@@ -50,7 +50,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   end
 
   def handle_info(
-        {:simulation_biotope, :simulation_aggregated,
+        {:simulation_biotope, :entities_changed,
          %{vegetation: vegetation, herbivore: herbivore, predator: predator}},
         socket
       ) do

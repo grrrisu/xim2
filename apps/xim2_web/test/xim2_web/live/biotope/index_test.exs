@@ -29,7 +29,7 @@ defmodule Xim2Web.BiotopeLive.IndexTest do
 
     send(
       view.pid,
-      {:simulation_biotope, :simulation_aggregated,
+      {:simulation_biotope, :entities_changed,
        %{
          vegetation: [%{position: {0, 0}, size: 800}],
          herbivore: [%{position: {0, 1}, size: 200}],
