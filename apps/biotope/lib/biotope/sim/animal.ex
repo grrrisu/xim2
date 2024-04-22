@@ -60,7 +60,7 @@ defmodule Biotope.Sim.Animal do
       %{key: position, data: data}
       |> Map.put_new(:origin, Data.lock_predator(position, data))
       |> then(&Map.put_new(&1, :change, Animal.grow(&1.origin.herbivore, &1.origin.predator)))
-      |> Animal.round_size()
+      |> Animal.set_position(position)
       |> update_data()
       |> result()
     end
@@ -91,15 +91,6 @@ defmodule Biotope.Sim.Animal do
     changeset
     |> put_in([:change, :producer, :position], position)
     |> put_in([:change, :consumer, :position], position)
-  end
-
-  def round_size(
-        %{change: %{producer: %{size: producer_size}, consumer: %{size: consumer_size}}} = change
-      ) do
-    change
-    |> put_in([:change, :producer, :display_size], round(producer_size))
-    |> put_in([:change, :producer, :priority], :normal)
-    |> put_in([:change, :consumer, :display_size], round(consumer_size))
   end
 
   # population grows by birth rate and and and shrinks by death rate (age) and hunger.
