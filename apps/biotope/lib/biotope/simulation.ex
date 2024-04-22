@@ -26,10 +26,7 @@ defmodule Biotope.Simulation do
     Simulator.benchmark(fn ->
       get_data(sim_key, opts[:data])
       |> sim_items(simulation, opts[:data])
-      |> handle_success(sim_key)
-      |> handle_failed(sim_key)
-      |> summarize(sim_key)
-      |> notify_simulation_summary()
+      |> handle_results(sim_key)
     end)
   end
 
@@ -50,35 +47,15 @@ defmodule Biotope.Simulation do
     Data.get_layer_positions(layer, data)
   end
 
-  def handle_success(%{ok: fields} = results, sim_key) do
-    :ok = notify(:simulation_results, {sim_key, fields})
-    results
-  end
-
-  def handle_failed(%{exit: failed} = results, sim_key) do
-    failed =
-      Enum.map(failed, fn {id, {exception, stacktrace}} ->
-        {id, Exception.normalize(:error, exception, stacktrace) |> Exception.message()}
-      end)
-
-    if Enum.any?(failed) do
-      :ok = notify(:simulation_errors, {sim_key, failed})
-    end
-
-    Map.put(results, :exit, failed)
-  end
-
-  def summarize(%{ok: success, exit: failed}, simulation) do
+  def handle_results(%{ok: success, exit: failed}, simulation) do
     %{
       simulation: simulation,
       ok: success,
-      error: failed
+      error:
+        Enum.map(failed, fn {id, {exception, stacktrace}} ->
+          {id, Exception.normalize(:error, exception, stacktrace) |> Exception.message()}
+        end)
     }
-  end
-
-  def notify_simulation_summary(result) do
-    :ok = notify(:simulation_summary, result)
-    result
   end
 
   def aggregate_simulations(results, queue) do

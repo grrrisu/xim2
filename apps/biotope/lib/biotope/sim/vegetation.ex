@@ -24,20 +24,6 @@ defmodule Biotope.Sim.Vegetation do
     Map.put_new(change, :position, position)
   end
 
-  def round_size(%{size: size} = change) do
-    Map.put_new(change, :display_size, round(size))
-  end
-
-  def has_changed?(%{change: %{display_size: size}, origin: %{display_size: previous_size}}) do
-    size - previous_size != 0
-  end
-
-  def set_queue(%{changed: true} = changeset),
-    do: put_in(changeset, [:change, :priority], :normal)
-
-  def set_queue(%{changed: false} = changeset),
-    do: put_in(changeset, [:change, :priority], :low)
-
   def update_data(%{key: position, data: data, origin: vegetation, change: change} = changeset) do
     vegetation
     |> Map.merge(change)
