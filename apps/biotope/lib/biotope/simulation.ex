@@ -83,7 +83,7 @@ defmodule Biotope.Simulation do
 
   def aggregate_simulations(results, queue) do
     summary = Aggregator.aggregate_simulations(results, queue)
-    :ok = notify(:simulation_aggregated, summary)
+    :ok = notify(:entities_changed, summary)
     results
   end
 

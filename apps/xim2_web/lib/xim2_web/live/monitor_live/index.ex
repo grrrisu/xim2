@@ -90,7 +90,7 @@ defmodule Xim2Web.MonitorLive.Index do
   end
 
   def handle_info(
-        {namespace, :simulation_aggregated, results},
+        {namespace, :entities_changed, results},
         %{assigns: %{pubsub_topic: namespace}} = socket
       ) do
     {:noreply,
