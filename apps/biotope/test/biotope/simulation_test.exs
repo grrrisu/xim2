@@ -34,20 +34,8 @@ defmodule Biotope.SimulationTest do
       :ok
     end
 
-    test "received simulation results" do
-      assert_received {:simulation_biotope, :simulation_results, {:vegetation, results}}
-      assert %{vegetation: %{change: %{position: {_x, _y}, size: _size}}} = List.first(results)
-    end
-
     test "no simulation errors received" do
       refute_received {:simulation_biotope, :simulation_errors, _}
-    end
-
-    test "received simulation summary" do
-      assert_received {:simulation_biotope, :simulation_summary,
-                       %{error: [], ok: success, simulation: :vegetation}}
-
-      assert %{vegetation: %{change: %{position: {_x, _y}, size: _size}}} = List.first(success)
     end
   end
 
@@ -58,14 +46,23 @@ defmodule Biotope.SimulationTest do
       :ok
     end
 
+    test "changed entities received" do
+      assert_received {:simulation_biotope, :entities_changed,
+                       %{vegetation: vegetation, herbivore: herbivore, predator: predator}}
+
+      assert 2 == Enum.count(vegetation)
+      assert 1 == Enum.count(herbivore)
+      assert Enum.empty?(predator)
+    end
+
     test "received queue summary" do
       assert_received {:simulation_biotope, :queue_summary,
                        %{
                          queue: "test",
                          results: %{
-                           vegetation: %{errors: 0, ok: 2, time: _},
-                           herbivore: %{errors: 0, ok: 1, time: _},
-                           predator: %{errors: 0, ok: 0, time: _}
+                           vegetation: %{error: 0, ok: 2, time: _},
+                           herbivore: %{error: 0, ok: 1, time: _},
+                           predator: %{error: 0, ok: 0, time: _}
                          }
                        }}
     end

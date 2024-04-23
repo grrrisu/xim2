@@ -15,7 +15,7 @@ defmodule Xim2Web.MonitorLive.IndexTest do
     assert has_element?(view, "div[role=\"alert\"]", "stopped")
   end
 
-  test "receive queue results", %{conn: conn} do
+  test "receive queue summary", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/monitor")
 
     result = %{
@@ -25,7 +25,7 @@ defmodule Xim2Web.MonitorLive.IndexTest do
           time: DateTime.utc_now(),
           duration: 15_000,
           ok: 100,
-          errors: 0
+          error: 0
         }
       }
     }
