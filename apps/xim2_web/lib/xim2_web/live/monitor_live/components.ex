@@ -70,7 +70,7 @@ defmodule Xim2Web.Monitor.Components do
       <thead class="text-sky-400">
         <th>Time</th>
         <th>Duration (µm)</th>
-        <th>Overhead Queue (µm)</th>
+        <th :if={@items}>Overhead Queue (µm)</th>
       </thead>
       <tbody
         id="durations"
@@ -80,7 +80,7 @@ defmodule Xim2Web.Monitor.Components do
         <tr :for={{dom_id, item} <- @durations} id={dom_id}>
           <td class="text-right"><%= Calendar.strftime(item.time, "%H:%M:%S:%f") %></td>
           <td class="text-right"><%= item.duration |> number_format() %></td>
-          <td class="text-right">
+          <td :if={@items} class="text-right">
             <%= (item.duration - @items * @timeout / @tasks) |> number_format() %>
           </td>
         </tr>
@@ -108,8 +108,8 @@ defmodule Xim2Web.Monitor.Components do
       >
         <tr :for={{dom_id, item} <- @error_messages} id={dom_id}>
           <td class="text-right"><%= Calendar.strftime(item.time, "%H:%M:%S:%f") %></td>
-          <td class="text-right"><%= item.entity %></td>
-          <td class="text-right"><%= item.message %></td>
+          <td class="text-center"><%= item.entity %></td>
+          <td class="text-left"><%= item.message %></td>
         </tr>
       </tbody>
     </table>

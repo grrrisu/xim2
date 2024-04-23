@@ -34,7 +34,6 @@ defmodule Xim2Web.MonitorLive.Index do
      )
      |> assign(
        pubsub_topic: pubsub_topic(params),
-       monitor_view: pubsub_topic(params) == :monitor_data,
        running: false,
        schedulers: System.schedulers_online(),
        tasks: @tasks,
@@ -49,25 +48,17 @@ defmodule Xim2Web.MonitorLive.Index do
     ~H"""
     <.main_section title="Sim Monitor" back={~p"/"}>
       <.boxes width="w-1/2">
-        <:box><.chart title="Duration" name="duration-chart" hook="Monitor" /></:box>
+        <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box>
-          <.duration_table
-            durations={@streams.durations}
-            items={@items}
-            tasks={@tasks}
-            timeout={@timeout}
-          />
+          <.duration_table durations={@streams.durations} items={nil} tasks={nil} timeout={nil} />
         </:box>
       </.boxes>
       <.boxes width="w-1/2">
-        <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="Items calculated" name="ok-summary-chart" hook="Chart" /></:box>
-      </.boxes>
-      <.boxes width="w-1/2">
         <:box><.chart title="Items changed" name="changed-summary-chart" hook="Chart" /></:box>
-        <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
       </.boxes>
       <.boxes width="w-1/2">
+        <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
         <:box>
           <.error_message_table error_messages={@streams.error_messages} />
         </:box>
@@ -129,6 +120,7 @@ defmodule Xim2Web.MonitorLive.Index do
       ) do
     {:noreply,
      socket
+     |> insert_total_duration(results)
      |> push_chart_data("update-chart-duration-summary-chart", biotope_results(results, :time))
      |> push_chart_data("update-chart-ok-summary-chart", biotope_results(results, :ok))
      |> push_chart_data("update-chart-errors-summary-chart", biotope_results(results, :error))}
@@ -142,6 +134,19 @@ defmodule Xim2Web.MonitorLive.Index do
   def handle_info(msg, socket) do
     Logger.warning("unhandled message #{inspect(msg)}")
     {:noreply, socket}
+  end
+
+  defp insert_total_duration(socket, results) do
+    socket
+    |> stream_insert(
+      :durations,
+      %{
+        id: System.unique_integer([:positive]),
+        time: DateTime.now!("Etc/UTC"),
+        duration: Enum.reduce(results, 0, fn {_, result}, sum -> sum + result.time end)
+      },
+      limit: -12
+    )
   end
 
   defp biotope_results(results, attribute) do
