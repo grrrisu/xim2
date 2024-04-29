@@ -6,9 +6,9 @@ defmodule Biotope.Sim.Animal do
               birth_rate: 0.5,
               death_rate: 0.01,
               needed_food: 5,
-              starving_rate: 0.4,
+              starving_rate: 0.8,
               graze_rate: 0.05,
-              size: 50
+              size: 150
 
     alias Biotope.Sim.Animal
 
@@ -47,10 +47,10 @@ defmodule Biotope.Sim.Animal do
 
   defmodule Predator do
     defstruct position: {0, 0},
-              birth_rate: 0.5,
+              birth_rate: 0.3,
               death_rate: 0.01,
-              needed_food: 3,
-              starving_rate: 0.3,
+              needed_food: 2,
+              starving_rate: 0.5,
               graze_rate: 0.1,
               size: 10
 
@@ -81,8 +81,8 @@ defmodule Biotope.Sim.Animal do
     def result(%{change: %{producer: herbivore, consumer: predator}, key: position}) do
       {position,
        %{
-         herbivore: {position, %{size: herbivore.display_size, position: position}},
-         predator: {position, %{size: predator.display_size, position: position}}
+         herbivore: {position, %{size: herbivore.size, position: position}},
+         predator: {position, %{size: predator.size, position: position}}
        }}
     end
   end
@@ -112,52 +112,48 @@ defmodule Biotope.Sim.Animal do
   # Δs = s (b - a ------  - d)
   #                 v
 
-  def grow(producer, nil), do: {producer, nil}
+  def grow(producer, animal, step \\ 1)
 
-  def grow(%{size: producer_size}, %{size: size} = animal, step \\ 1) do
-    producer_size = producer_size - delta_producer(animal, producer_size) * step
-    animal_size = size + delta_animal(animal, producer_size) * step
+  def grow(producer, nil, _step), do: %{producer: %{size: producer.size}}
 
-    %{producer: %{size: producer_size}, consumer: %{size: animal_size}}
+  def grow(nil, %{size: size} = animal, step) do
+    {0, animal_size} = calculate_delta(false, %{size: 0}, animal)
+    %{consumer: %{size: size + animal_size * step}}
   end
 
-  def delta_producer(
-        %{
-          needed_food: needed_food,
-          graze_rate: graze_rate,
-          size: size
-        },
-        producer_size
-      ) do
-    (needed_food * size * graze_rate)
-    |> max_consumed_food(producer_size)
+  def grow(%{size: producer_size} = producer, %{size: size} = animal, step) do
+    {consumed_food, animal_size} =
+      calculate_delta(
+        size * animal.needed_food / animal.graze_rate <= producer_size,
+        producer,
+        animal
+      )
+
+    %{
+      producer: %{size: (producer_size - consumed_food * step) |> min_zero()},
+      consumer: %{size: size + animal_size * step}
+    }
   end
 
-  defp max_consumed_food(consumed_food, producer) when producer - consumed_food < 0 do
-    0
+  # enough food
+  def calculate_delta(true, _producer, %{size: size} = animal) do
+    growth = size * (animal.birth_rate - animal.death_rate)
+    {size * animal.needed_food, growth}
   end
 
-  defp max_consumed_food(consumed_food, _producer), do: consumed_food
+  # not enough food
+  def calculate_delta(false, %{size: producer_size}, %{size: size} = animal) do
+    needed_producers = size * animal.needed_food / animal.graze_rate
 
-  def delta_animal(
-        %{
-          birth_rate: birth_rate,
-          death_rate: death_rate,
-          needed_food: needed_food,
-          starving_rate: starving_rate,
-          size: size
-        },
-        producer_size
-      ) do
-    hunger_rate = starving_rate * (size * needed_food / producer_size)
+    starving_rate =
+      animal.starving_rate * (needed_producers - producer_size) / needed_producers
 
-    (size * (birth_rate - hunger_rate - death_rate))
-    |> min_grown_size(size, starving_rate)
+    starved = size * starving_rate
+    growth = size * (animal.birth_rate - animal.death_rate)
+
+    {(size - starved) * animal.needed_food, growth - starved}
   end
 
-  defp min_grown_size(grown_size, size, starving_rate) when size + grown_size < 0 do
-    -size * starving_rate * 2
-  end
-
-  defp min_grown_size(grown_size, _size, _starving_rate), do: grown_size
+  def min_zero(n) when n < 0, do: 0
+  def min_zero(n), do: n
 end
