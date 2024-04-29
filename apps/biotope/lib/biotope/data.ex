@@ -124,9 +124,9 @@ defmodule Biotope.Data do
     %{
       vegetation: Grid.create(width, height, fn x, y -> %Vegetation{position: {x, y}} end),
       herbivore:
-        create_animals(width, height, 0.1, fn position -> %Herbivore{position: position} end)
-      # predator:
-      #  create_animals(width, height, 0.02, fn position -> %Predator{position: position} end)
+        create_animals(width, height, 0.1, fn position -> %Herbivore{position: position} end),
+      predator:
+        create_animals(width, height, 0.02, fn position -> %Predator{position: position} end)
     }
   end
 

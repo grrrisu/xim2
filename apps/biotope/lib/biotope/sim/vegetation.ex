@@ -4,11 +4,10 @@ defmodule Biotope.Sim.Vegetation do
   alias Biotope.Sim.Vegetation
 
   defstruct position: {0, 0},
-            capacity: 6000,
+            capacity: 60_000,
             birth_rate: 0.15,
             death_rate: 0.05,
-            size: 650.0,
-            display_size: 650,
+            size: 12_000.0,
             priority: :normal
 
   def sim(position, data: data) do
