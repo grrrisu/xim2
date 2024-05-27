@@ -151,7 +151,7 @@ defmodule Biotope.Sim.Animal do
     starved = size * starving_rate
     growth = size * (animal.birth_rate - animal.death_rate)
 
-    {(size - starved) * animal.needed_food, growth - starved}
+    {producer_size * animal.graze_rate, growth - starved}
   end
 
   def min_zero(n) when n < 0, do: 0
