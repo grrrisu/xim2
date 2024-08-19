@@ -53,7 +53,8 @@ defmodule Xim2Web.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:xim2, in_umbrella: true},
       {:biotope, in_umbrella: true},
-      {:monitor, in_umbrella: true}
+      {:monitor, in_umbrella: true},
+      {:astrorunner, in_umbrella: true}
     ]
   end
 
