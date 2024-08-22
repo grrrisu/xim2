@@ -6,6 +6,8 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   alias Ximula.Grid
   alias Xim2Web.BiotopeLive.Form
+
+  import Xim2Web.ProjectComponents
   import Xim2Web.GridCompnent
 
   def mount(_params, _session, socket) do
@@ -74,7 +76,7 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def render(%{new: true} = assigns) do
     ~H"""
-    <.main_section>
+    <.main_section title="Biotope" back={~p"/"}>
       <.live_component id="biotope-form" module={Form} />
     </.main_section>
     """
@@ -82,7 +84,7 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def render(%{new: false} = assigns) do
     ~H"""
-    <.main_section>
+    <.main_section title="Biotope" back={~p"/"}>
       <.action_box class="mb-2">
         <.start_button running={@running} />
         <.reset_button />
@@ -107,17 +109,6 @@ defmodule Xim2Web.BiotopeLive.Index do
         </:layer>
       </.grid>
     </.main_section>
-    """
-  end
-
-  def main_section(assigns) do
-    ~H"""
-    <section>
-      <.main_title>Biotope</.main_title>
-      <.back navigate={~p"/"}>Home</.back>
-      <p><%= Biotope.get_queues() |> Enum.count() %></p>
-      <%= render_slot(@inner_block) %>
-    </section>
     """
   end
 

@@ -7,6 +7,15 @@ defmodule Monsum do
 
   import Xim2Web.CoreComponents
 
+  slot :inner_block, required: true
+  def flexbox_col(assigns) do
+    ~H"""
+    <div class="flex flex-col gap-y-4">
+      <%= render_slot(@inner_block) %>
+    </div>
+    """
+  end
+
   def main_title(assigns) do
     ~H"""
     <h1 class="text-slate-200 text-4xl font-light mb-6"><%= render_slot(@inner_block) %></h1>
