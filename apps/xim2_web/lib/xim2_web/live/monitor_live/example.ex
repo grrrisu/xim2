@@ -7,6 +7,7 @@ defmodule Xim2Web.MonitorLive.Example do
 
   alias Sim.Monitor
 
+  import Xim2Web.ProjectComponents
   import Xim2Web.Monitor.Components
 
   @items 500

@@ -8,26 +8,6 @@ defmodule Xim2Web.Monitor.Components do
   import Monsum
   import Xim2Web.CoreComponents
 
-  attr :title, :string
-  attr :back, :string
-  slot :inner_block, required: true
-  slot :footer
-
-  def main_section(assigns) do
-    ~H"""
-    <section class="flex flex-col">
-      <div>
-        <.main_title><%= @title %></.main_title>
-        <.back navigate={@back}>Home</.back>
-      </div>
-      <div>
-        <%= render_slot(@inner_block) %>
-      </div>
-      <div><%= render_slot(@footer) %></div>
-    </section>
-    """
-  end
-
   def boxes(assigns) do
     ~H"""
     <div class="flex flex-row flex-wrap p-2">

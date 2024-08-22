@@ -3,6 +3,7 @@ defmodule Xim2Web.GridLive.Show do
 
   alias Ximula.Grid
 
+  import Xim2Web.ProjectComponents
   import Xim2Web.GridCompnent
 
   def mount(_params, _session, socket) do
@@ -64,29 +65,29 @@ defmodule Xim2Web.GridLive.Show do
 
   def render(assigns) do
     ~H"""
-    <.main_title>Grid</.main_title>
-    <.back navigate={~p"/"}>Home</.back>
-    <div class="border border-red-500 text-slate-900 bg-red-100">
-      <div class="m-2">
-        <p>Some text before the grid</p>
-        <.button phx-click="update">Update</.button>
-        <.button phx-click="replace">Replace</.button>
-        <.button phx-click="bigger">Bigger</.button>
-        <.button phx-click="smaller">Smaller</.button>
+    <.main_section title="Grid" back={~p"/"}>
+      <div class="border border-red-500 text-slate-900 bg-red-100">
+        <div class="m-2">
+          <p>Some text before the grid</p>
+          <.button phx-click="update">Update</.button>
+          <.button phx-click="replace">Replace</.button>
+          <.button phx-click="bigger">Bigger</.button>
+          <.button phx-click="smaller">Smaller</.button>
+        </div>
+        <.grid
+          grid={@streams.grid}
+          grid_height={@grid_height}
+          grid_width={@grid_width}
+          width="200vmin"
+          height="100vmin"
+          class="m-6"
+        >
+          <:fields :let={{dom_id, %{x: x, y: y, value: value}}}>
+            <.field id={dom_id} x={x} y={y} value={value} class="bg-green-300" />
+          </:fields>
+        </.grid>
       </div>
-      <.grid
-        grid={@streams.grid}
-        grid_height={@grid_height}
-        grid_width={@grid_width}
-        width="200vmin"
-        height="100vmin"
-        class="m-6"
-      >
-        <:fields :let={{dom_id, %{x: x, y: y, value: value}}}>
-          <.field id={dom_id} x={x} y={y} value={value} class="bg-green-300" />
-        </:fields>
-      </.grid>
-    </div>
+    </.main_section>
     """
   end
 
