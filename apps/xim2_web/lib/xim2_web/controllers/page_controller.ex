@@ -8,6 +8,8 @@ defmodule Xim2Web.PageController do
   end
 
   def colors(conn, _params) do
-    render(conn, :colors)
+    conn
+    |> assign(:page_title, "Colors")
+    |> render(:colors)
   end
 end

@@ -5,7 +5,6 @@ defmodule Xim2Web.Monitor.Components do
   use Phoenix.Component
   import Phoenix.LiveView
 
-  import Monsum
   import Xim2Web.CoreComponents
 
   def boxes(assigns) do

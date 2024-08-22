@@ -19,6 +19,7 @@ defmodule Xim2Web.MonitorLive.Example do
 
     {:ok,
      socket
+     |> assign(:page_title, "Monitor Example")
      |> prepare_summary_chart("duration-summary-chart",
        fill: true,
        stacked: true,
@@ -43,7 +44,7 @@ defmodule Xim2Web.MonitorLive.Example do
 
   def render(assigns) do
     ~H"""
-    <.main_section title="Sim Monitor" back={~p"/"}>
+    <.main_section title={@page_title} back={~p"/"}>
       <.boxes width="w-1/4">
         <:box>
           <.info_card value={@schedulers} icon="la-microchip" />

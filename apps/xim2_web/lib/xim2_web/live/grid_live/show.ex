@@ -13,6 +13,7 @@ defmodule Xim2Web.GridLive.Show do
     {:ok,
      socket
      |> stream(:grid, streamify(grid))
+     |> assign(:page_title, "Grid")
      |> assign(grid_width: Grid.width(grid), grid_height: Grid.height(grid), value: value)}
   end
 

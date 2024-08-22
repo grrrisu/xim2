@@ -15,7 +15,7 @@ defmodule Xim2Web.BiotopeLive.Index do
       PubSub.subscribe(Xim2.PubSub, "simulation:biotope")
       {:ok, prepare_queues(socket)}
     else
-      {:ok, socket}
+      {:ok, socket |> assign(:page_title, "Biotope")}
     end
   end
 

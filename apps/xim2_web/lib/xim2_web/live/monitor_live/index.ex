@@ -12,11 +12,12 @@ defmodule Xim2Web.MonitorLive.Index do
   @timeout 50_000
   @tasks 500
 
-  def mount(params, _session, socket) do
+  def mount(%{"topic" => _topic, "data" => data} = params, _session, socket) do
     if connected?(socket), do: prepare(params)
 
     {:ok,
      socket
+     |> assign(:page_title, "Monitor #{data}")
      |> prepare_summary_chart("duration-summary-chart",
        fill: true,
        stacked: true,
@@ -47,7 +48,7 @@ defmodule Xim2Web.MonitorLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section title="Sim Monitor" back={~p"/"}>
+    <.main_section title={@page_title} back={~p"/"}>
       <.boxes width="w-1/2">
         <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box>
