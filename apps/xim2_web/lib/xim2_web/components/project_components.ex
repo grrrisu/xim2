@@ -10,12 +10,13 @@ defmodule Xim2Web.ProjectComponents do
   attr :back, :string, default: nil, doc: "~p\"/path/to/parent\""
   slot :inner_block, required: true
   slot :footer, default: nil
+
   def main_section(assigns) do
     ~H"""
     <.flexbox_col>
       <div>
         <.main_title><%= @title %></.main_title>
-        <.back navigate={@back}>Home</.back>
+        <.back navigate={@back} class="mt-16">Home</.back>
       </div>
       <div>
         <%= render_slot(@inner_block) %>
@@ -24,5 +25,4 @@ defmodule Xim2Web.ProjectComponents do
     </.flexbox_col>
     """
   end
-
 end
