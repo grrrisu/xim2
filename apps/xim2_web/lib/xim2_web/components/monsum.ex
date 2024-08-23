@@ -8,17 +8,23 @@ defmodule Monsum do
   import Xim2Web.CoreComponents
 
   slot :inner_block, required: true
+  attr :class, :string, default: ""
+
   def flexbox_col(assigns) do
     ~H"""
-    <div class="flex flex-col gap-y-4">
+    <div class={["flex flex-col gap-y-4", @class]}>
       <%= render_slot(@inner_block) %>
     </div>
     """
   end
 
+  attr :class, :string, default: ""
+
   def main_title(assigns) do
     ~H"""
-    <h1 class="text-slate-200 text-4xl font-light mb-6"><%= render_slot(@inner_block) %></h1>
+    <h1 class={["text-slate-200 text-4xl font-light mb-6", @class]}>
+      <%= render_slot(@inner_block) %>
+    </h1>
     """
   end
 
@@ -117,11 +123,12 @@ defmodule Monsum do
       <.back navigate={~p"/posts"}>Back to posts</.back>
   """
   attr :navigate, :any, required: true
+  attr :class, :string, default: ""
   slot :inner_block, required: true
 
   def back(assigns) do
     ~H"""
-    <div class="mt-16">
+    <div class={@class}>
       <.link navigate={@navigate} class="text-sm font-semibold leading-6">
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
         <%= render_slot(@inner_block) %>

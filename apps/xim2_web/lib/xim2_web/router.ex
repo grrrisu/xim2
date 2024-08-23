@@ -23,6 +23,7 @@ defmodule Xim2Web.Router do
     live "/monitor", MonitorLive.Example, :show
     live "/monitor/:topic/:data", MonitorLive.Index, :index
     live "/biotope", BiotopeLive.Index, :index
+    live "/components", ComponentLive.Index, :index
   end
 
   # Other scopes may use custom stacks.
