@@ -19,6 +19,7 @@ defmodule Monsum do
   end
 
   attr :class, :string, default: ""
+  slot :inner_block, required: true
 
   def main_title(assigns) do
     ~H"""
