@@ -7,14 +7,40 @@ defmodule Xim2Web.ComponentLive.Index do
   import Xim2Web.ProjectComponents
   import Xim2Web.GridCompnent
 
-  def mount(session, params, socket) do
-    {:ok, socket |> assign(page_title: "Components", changeset: prepare_changeset())}
+  def mount(_session, _params, socket) do
+    {:ok,
+     socket
+     |> assign(
+       page_title: "Components",
+       components: "grid",
+       changeset: prepare_changeset(),
+       grid: prepare_grid()
+     )
+     |> stream(:grid, prepare_grid())}
+  end
+
+  def handle_event("change-components", %{"components" => components}, socket) do
+    {:noreply, socket |> assign(:components, components) |> stream(:grid, prepare_grid())}
   end
 
   def render(assigns) do
     ~H"""
-    <h1>Components</h1>
-    <h2>Monsum</h2>
+    <.main_title>Components</.main_title>
+    <div class="flex">
+      <a phx-click="change-components" phx-value-components="monsum" class="mr-4" href="#">Monsum</a>
+      <a phx-click="change-components" phx-value-components="project" class="mr-4" href="#">
+        Project
+      </a>
+      <a phx-click="change-components" phx-value-components="grid" class="mr-4" href="#">Grid</a>
+    </div>
+    <.monsum_components :if={@components == "monsum"} changeset={@changeset} />
+    <.project_components :if={@components == "project"} />
+    <.grid_components :if={@components == "grid"} grid={@streams.grid} />
+    """
+  end
+
+  def monsum_components(assigns) do
+    ~H"""
     <.flexbox_col class="border border-gray-500 w-full min-h-screen">
       <div>
         <h3>flexbox_col</h3>
@@ -64,7 +90,7 @@ defmodule Xim2Web.ComponentLive.Index do
       </div>
       <div>
         <h3>Form</h3>
-        <.form :let={form} for={@changeset} as="user">
+        <.form :let={form} for={@changeset} as={:user}>
           <.input field={form[:name]} label="Name" />
           <.input field={form[:email]} label="E-Mail" />
           <%!-- <.input field={form[:bio]} type="textarea" label="Bio" /> --%>
@@ -74,10 +100,54 @@ defmodule Xim2Web.ComponentLive.Index do
     """
   end
 
+  def project_components(assigns) do
+    ~H"""
+    <.flexbox_col class="border border-gray-500 w-full min-h-screen">
+      <div>
+        <h3>main_section</h3>
+        <.main_section title="Main Title" back={~p"/"}>
+          <div class="bg-sky-500 text-center">Main Section</div>
+          <:footer>
+            <div class="bg-sky-500 text-center">Footer</div>
+          </:footer>
+        </.main_section>
+      </div>
+    </.flexbox_col>
+    """
+  end
+
+  def grid_components(assigns) do
+    ~H"""
+    <.flexbox_col class="border border-gray-500 w-full min-h-screen">
+      <div>
+        <h3>grid</h3>
+        <.grid grid={@grid} grid_width={5} grid_height={5}>
+          <:fields :let={{dom_id, %{x: x, y: y, value: value}}}>
+            <div
+              id={dom_id}
+              class="text-slate-900 text-center content-center border-t border-r border-gray-900"
+            >
+              Position [<%= x %>,<%= y %>]: <%= value %>
+            </div>
+          </:fields>
+        </.grid>
+      </div>
+    </.flexbox_col>
+    """
+  end
+
   defp prepare_changeset() do
     {%{email: "dead@pool.com", name: "Deadpool"}, %{name: :string, email: :string, bio: :string}}
     |> Changeset.change(email: "dead@@@@@pool.com")
     |> Changeset.add_error(:email, "invalid mail address")
-    |> to_form(action: :insert, as: "user")
+    |> to_form(action: :insert, as: :user)
+  end
+
+  defp prepare_grid() do
+    Enum.flat_map(0..4, fn y ->
+      Enum.map(0..4, fn x ->
+        %{id: "#{x}-#{y}", x: x, y: y, value: x + y}
+      end)
+    end)
   end
 end
