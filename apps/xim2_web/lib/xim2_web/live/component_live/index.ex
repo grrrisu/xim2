@@ -4,8 +4,9 @@ defmodule Xim2Web.ComponentLive.Index do
   alias Ecto.Changeset
 
   import Monsum
+  import Monsum.BoardgameComponents
+  import Monsum.GridCompnent
   import Xim2Web.ProjectComponents
-  import Xim2Web.GridCompnent
 
   def mount(_session, _params, socket) do
     {:ok,
@@ -30,14 +31,18 @@ defmodule Xim2Web.ComponentLive.Index do
         <a phx-click="change-components" phx-value-components="monsum" class="mr-4" href="#">
           Monsum
         </a>
+        <a phx-click="change-components" phx-value-components="grid" class="mr-4" href="#">Grid</a>
+        <a phx-click="change-components" phx-value-components="boardgame" class="mr-4" href="#">
+          Boardgame
+        </a>
         <a phx-click="change-components" phx-value-components="project" class="mr-4" href="#">
           Project
         </a>
-        <a phx-click="change-components" phx-value-components="grid" class="mr-4" href="#">Grid</a>
       </div>
       <.monsum_components :if={@components == "monsum"} changeset={@changeset} />
       <.project_components :if={@components == "project"} />
       <.grid_components :if={@components == "grid"} grid={@streams.grid} />
+      <.boardgame_components :if={@components == "boardgame"} />
     </.main_section>
     """
   end
@@ -135,6 +140,14 @@ defmodule Xim2Web.ComponentLive.Index do
           </:fields>
         </.grid>
       </div>
+    </.flexbox_col>
+    """
+  end
+
+  def boardgame_components(assigns) do
+    ~H"""
+    <.flexbox_col class="border border-gray-500 w-full min-h-screen">
+      <h3>card</h3>
     </.flexbox_col>
     """
   end
