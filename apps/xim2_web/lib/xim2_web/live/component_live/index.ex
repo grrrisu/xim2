@@ -12,7 +12,7 @@ defmodule Xim2Web.ComponentLive.Index do
      socket
      |> assign(
        page_title: "Components",
-       components: "grid",
+       components: "monsum",
        changeset: prepare_changeset(),
        grid: prepare_grid()
      )
@@ -25,17 +25,20 @@ defmodule Xim2Web.ComponentLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_title>Components</.main_title>
-    <div class="flex">
-      <a phx-click="change-components" phx-value-components="monsum" class="mr-4" href="#">Monsum</a>
-      <a phx-click="change-components" phx-value-components="project" class="mr-4" href="#">
-        Project
-      </a>
-      <a phx-click="change-components" phx-value-components="grid" class="mr-4" href="#">Grid</a>
-    </div>
-    <.monsum_components :if={@components == "monsum"} changeset={@changeset} />
-    <.project_components :if={@components == "project"} />
-    <.grid_components :if={@components == "grid"} grid={@streams.grid} />
+    <.main_section title="Components" back={~p"/"}>
+      <div class="flex">
+        <a phx-click="change-components" phx-value-components="monsum" class="mr-4" href="#">
+          Monsum
+        </a>
+        <a phx-click="change-components" phx-value-components="project" class="mr-4" href="#">
+          Project
+        </a>
+        <a phx-click="change-components" phx-value-components="grid" class="mr-4" href="#">Grid</a>
+      </div>
+      <.monsum_components :if={@components == "monsum"} changeset={@changeset} />
+      <.project_components :if={@components == "project"} />
+      <.grid_components :if={@components == "grid"} grid={@streams.grid} />
+    </.main_section>
     """
   end
 
