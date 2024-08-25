@@ -4,7 +4,7 @@ defmodule Xim2Web.GridLive.Show do
   alias Ximula.Grid
 
   import Xim2Web.ProjectComponents
-  import Xim2Web.GridCompnent
+  import Monsum.GridCompnent
 
   def mount(_params, _session, socket) do
     value = 1

@@ -8,7 +8,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   alias Xim2Web.BiotopeLive.Form
 
   import Xim2Web.ProjectComponents
-  import Xim2Web.GridCompnent
+  import Monsum.GridCompnent
 
   def mount(_params, _session, socket) do
     if connected?(socket) do

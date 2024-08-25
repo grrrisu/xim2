@@ -1,4 +1,4 @@
-defmodule Xim2Web.GridCompnent do
+defmodule Monsum.GridCompnent do
   use Phoenix.Component
 
   @doc """
