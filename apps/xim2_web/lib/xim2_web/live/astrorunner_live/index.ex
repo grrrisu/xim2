@@ -11,7 +11,16 @@ defmodule Xim2Web.AstrorunnerLive.Index do
   def render(assigns) do
     ~H"""
     <.main_section title="Astrorunner" back={~p"/"}>
-      <.card></.card>
+      <.card>
+        <:title>Card Title</:title>
+        <:picture>
+          <.picture small={~p"/images/mountain-searching.avif"} />
+        </:picture>
+        <:body_title>Title</:body_title>
+        <:body>
+          Card Body
+        </:body>
+      </.card>
     </.main_section>
     """
   end
