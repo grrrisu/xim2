@@ -148,6 +148,16 @@ defmodule Xim2Web.ComponentLive.Index do
     ~H"""
     <.flexbox_col class="border border-gray-500 w-full min-h-screen">
       <h3>card</h3>
+      <.card>
+        <:title>Card Title</:title>
+        <:picture>
+          <.picture small={~p"/images/mountain-searching.avif"} />
+        </:picture>
+        <:body_title>Title</:body_title>
+        <:body>
+          Card Body
+        </:body>
+      </.card>
     </.flexbox_col>
     """
   end
