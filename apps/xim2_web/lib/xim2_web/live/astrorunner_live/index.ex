@@ -22,7 +22,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     {:noreply, socket}
   end
 
-  def handle_info({"astrorunner", :setup_done}, socket) do
+  def handle_info(:setup_done, socket) do
     {:noreply, assign(socket, global_board: global_board())}
   end
 
@@ -30,15 +30,24 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     ~H"""
     <.main_section title="Astrorunner" back={~p"/"}>
       <%= if board_setup?(@global_board) do %>
-        <h2>Arbeitsmarkt</h2>
-        <.cards deck={@global_board.cards.pilots} />
-        <.cards deck={@global_board.cards.level_2} />
-        <.cards deck={@global_board.cards.level_1} />
+        <.job_market cards={@global_board.cards} />
+        <.button phx-click="setup_board" data-confirm="Are you sure?">Reset Board</.button>
       <% else %>
         <p class="mb-3">No game available.</p>
         <.button phx-click="setup_board">Setup Board</.button>
       <% end %>
     </.main_section>
+    """
+  end
+
+  def job_market(assigns) do
+    ~H"""
+    <div class="mb-5">
+      <.sub_title>Arbeitsmarkt</.sub_title>
+      <.cards deck={@cards.pilots} />
+      <.cards deck={@cards.level_2} />
+      <.cards deck={@cards.level_1} />
+    </div>
     """
   end
 
