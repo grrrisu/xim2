@@ -3,10 +3,15 @@ defmodule Astrorunner do
   Digital version of the boardgame *Astrorunner*
   """
 
+  alias Phoenix.PubSub
   alias Astrorunner.Board
 
   def setup() do
-    Board.global_setup()
+    {:ok, _pid} =
+      Task.start(fn ->
+        Board.global_setup()
+        :ok = PubSub.broadcast(Xim2.PubSub, "astrorunner", :setup_done)
+      end)
   end
 
   def global_board() do
