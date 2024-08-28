@@ -2,11 +2,10 @@ defmodule Astrorunner.BoardTest do
   use ExUnit.Case, async: true
 
   alias Astrorunner.Board
-  alias Astrorunner.Card
 
   test "handle_global_setup" do
-    %{cards: %{level_1: cards}} = Board.handle_global_setup()
-    assert 4 == Enum.count(cards)
-    assert %Card{title: "Labor Assistent"} = Enum.at(cards, 0)
+    %{cards: %{pilots: pilot_deck, level_1: level_1_deck}} = Board.handle_global_setup()
+    assert 8 - 4 == Enum.count(level_1_deck.draw_pile)
+    assert 15 - 4 == Enum.count(pilot_deck.draw_pile)
   end
 end

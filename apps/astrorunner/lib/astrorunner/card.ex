@@ -9,7 +9,11 @@ defmodule Astrorunner.Card do
 
   def card_types() do
     %{
-      lab_assistent: %Card{title: "Labor Assistent", costs: 1, image: "", text: "upps!"}
+      lab_assistent: %Card{title: "Labor Assistent", costs: 1, image: "", text: "upps!"},
+      tinkerer: %Card{title: "Tüftler", costs: 2, image: "", text: "let's try this ..."},
+      stuntmen: %Card{title: "Stuntmen", costs: 2, image: "", text: "tell me where to crash!"},
+      line_pilot: %Card{title: "Linien Pilotin", costs: 4, image: "", text: "have nice flight"},
+      test_pilot: %Card{title: "Test Pilot", costs: 7, image: "", text: "to infinity and beyond!"}
     }
   end
 

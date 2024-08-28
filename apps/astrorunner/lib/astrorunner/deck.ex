@@ -7,6 +7,10 @@ defmodule Astrorunner.Deck do
 
   defstruct draw_pile: [], revealed: [], discard_pile: []
 
+  def setup(cards) do
+    %Deck{draw_pile: cards} |> shuffle_draw_pile()
+  end
+
   def shuffle_draw_pile(%Deck{draw_pile: draw_pile} = deck) do
     %{deck | draw_pile: Enum.shuffle(draw_pile)}
   end
