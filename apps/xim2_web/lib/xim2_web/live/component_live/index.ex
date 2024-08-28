@@ -63,6 +63,14 @@ defmodule Xim2Web.ComponentLive.Index do
         <.main_title>Main Title</.main_title>
       </div>
       <div>
+        <h3>title</h3>
+        <.title>Title</.title>
+      </div>
+      <div>
+        <h3>sub_title</h3>
+        <.sub_title>Sub Title</.sub_title>
+      </div>
+      <div>
         <h3>back</h3>
         <.back navigate={~p"/"}>Back</.back>
       </div>

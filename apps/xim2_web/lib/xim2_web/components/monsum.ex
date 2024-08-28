@@ -29,6 +29,28 @@ defmodule Monsum do
     """
   end
 
+  attr :class, :string, default: ""
+  slot :inner_block, required: true
+
+  def title(assigns) do
+    ~H"""
+    <h2 class={["text-slate-200 text-2xl font-light mb-4", @class]}>
+      <%= render_slot(@inner_block) %>
+    </h2>
+    """
+  end
+
+  attr :class, :string, default: ""
+  slot :inner_block, required: true
+
+  def sub_title(assigns) do
+    ~H"""
+    <h3 class={["text-slate-200 text-xl font-light mb-2", @class]}>
+      <%= render_slot(@inner_block) %>
+    </h3>
+    """
+  end
+
   attr :small, :string, required: true, doc: "smaller 768px"
   attr :medium, :string, default: nil, doc: "min 768px"
   attr :large, :string, default: nil, doc: "min 1024px"
