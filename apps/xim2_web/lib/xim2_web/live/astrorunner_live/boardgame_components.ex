@@ -4,6 +4,8 @@ defmodule Monsum.BoardgameComponents do
   attr :class, :string, required: false, default: ""
   attr :border_class, :string, required: false, default: ""
   attr :height, :integer, default: 448
+  attr :click, :string, required: false, default: nil
+  attr :card_value, :any, required: false, default: nil
   slot :title, required: false
   slot :picture, required: false
   slot :body_title, required: false
@@ -21,6 +23,8 @@ defmodule Monsum.BoardgameComponents do
         @border_class
       ]}
       style={"height: #{@height}px; width: #{@width}px"}
+      phx-click={@click}
+      phx-value-card={@card_value}
     >
       <div class={["border border-gray-800 h-full", @class]}>
         <div class="flex flex-col h-full">

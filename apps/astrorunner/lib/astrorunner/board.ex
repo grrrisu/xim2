@@ -33,6 +33,12 @@ defmodule Astrorunner.Board do
     Agent.get(server, fn %{global: global} -> handle_get_global(func, global) end)
   end
 
+  def update(func, server \\ __MODULE__, params) do
+    Agent.update(server, fn %{global: global} = state ->
+      %{state | global: handle_update_global(func, global, params)}
+    end)
+  end
+
   def global_board(server \\ __MODULE__) do
     Agent.get(server, fn %{global: global} -> global end)
   end
@@ -47,6 +53,10 @@ defmodule Astrorunner.Board do
 
   def handle_get_global(func, global) do
     func.(global)
+  end
+
+  def handle_update_global(func, global, params) do
+    func.(global, params)
   end
 
   def handle_global_setup() do

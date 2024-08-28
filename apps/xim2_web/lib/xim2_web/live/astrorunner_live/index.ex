@@ -22,6 +22,17 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     {:noreply, socket}
   end
 
+  def handle_event("select-card", %{"card" => value}, socket) do
+    value
+    |> String.split("-")
+    |> then(fn [name, index] ->
+      [name: String.to_atom(name), index: String.to_integer(index), user: "me"]
+    end)
+    |> Astrorunner.take_revealed_card()
+
+    {:noreply, socket}
+  end
+
   def handle_info(:setup_done, socket) do
     {:noreply, assign(socket, global_board: global_board())}
   end
@@ -44,9 +55,9 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     ~H"""
     <div class="mb-5">
       <.sub_title>Arbeitsmarkt</.sub_title>
-      <.cards deck={@cards.pilots} />
-      <.cards deck={@cards.level_2} />
-      <.cards deck={@cards.level_1} />
+      <.cards name="pilots" deck={@cards.pilots} />
+      <.cards name="level_2" deck={@cards.level_2} />
+      <.cards name="level_1" deck={@cards.level_1} />
     </div>
     """
   end
@@ -54,7 +65,12 @@ defmodule Xim2Web.AstrorunnerLive.Index do
   def cards(assigns) do
     ~H"""
     <div class="flex mb-3">
-      <.card :for={card <- @deck.revealed} border_class="mr-2">
+      <.card
+        :for={{card, index} <- Enum.with_index(@deck.revealed)}
+        border_class="mr-2"
+        click="select-card"
+        card_value={"#{@name}-#{index}"}
+      >
         <:title><%= card.title %></:title>
         <:picture>
           <.picture small={~p"/images/mountain-searching.avif"} />
