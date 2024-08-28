@@ -7,7 +7,7 @@ defmodule Astrorunner.Board do
 
   alias Astrorunner.{Card, Deck}
 
-  @global_board %{cards: %{pilots: [], level_1: [], level_2: []}}
+  @global_board %{cards: nil}
   # @user_board %{mission_control: [], crew: [], research: []}
 
   @level_1_cards %{
