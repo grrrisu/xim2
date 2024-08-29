@@ -13,8 +13,8 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     {:ok, assign(socket, global_board: global_board())}
   end
 
-  def board_setup?(global_board) do
-    !is_nil(global_board.cards)
+  defp global_board() do
+    Astrorunner.global_board()
   end
 
   def handle_event("setup_board", _params, socket) do
@@ -23,18 +23,26 @@ defmodule Xim2Web.AstrorunnerLive.Index do
   end
 
   def handle_event("select-card", %{"card" => value}, socket) do
-    value
-    |> String.split("-")
-    |> then(fn [name, index] ->
-      [name: String.to_atom(name), index: String.to_integer(index), user: "me"]
-    end)
-    |> Astrorunner.take_revealed_card()
+    res =
+      value
+      |> String.split("-")
+      |> then(fn [name, index] ->
+        [name: String.to_atom(name), index: String.to_integer(index), player: "me"]
+      end)
+      |> Astrorunner.take_revealed_card()
 
-    {:noreply, socket}
+    case res do
+      {:error, msg} -> {:noreply, put_flash(socket, :error, msg)}
+      _deck -> assign(socket, global_board: global_board())
+    end
   end
 
   def handle_info(:setup_done, socket) do
     {:noreply, assign(socket, global_board: global_board())}
+  end
+
+  def board_setup?(global_board) do
+    !is_nil(global_board.cards)
   end
 
   def render(assigns) do
@@ -82,9 +90,5 @@ defmodule Xim2Web.AstrorunnerLive.Index do
       </.card>
     </div>
     """
-  end
-
-  defp global_board() do
-    Astrorunner.global_board()
   end
 end

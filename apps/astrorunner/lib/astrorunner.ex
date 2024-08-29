@@ -4,7 +4,7 @@ defmodule Astrorunner do
   """
 
   alias Phoenix.PubSub
-  alias Astrorunner.Board
+  alias Astrorunner.{Board, Deck}
 
   def setup() do
     {:ok, _pid} =
@@ -22,8 +22,8 @@ defmodule Astrorunner do
     Board.get_global(&fun_get_global_decks(&1))
   end
 
-  def take_revealed_card(name: name, index: index, user: user) do
-    Board.update(&fun_take_revealed_card(&1, &2), name: name, index: index, user: user)
+  def take_revealed_card([name: _name, index: _index, player: _player] = params) do
+    Board.update_global_board(&fun_take_revealed_card(&1, &2), params)
   end
 
   def fun_get_global_decks(global) do
@@ -34,7 +34,12 @@ defmodule Astrorunner do
     end)
   end
 
-  def fun_take_revealed_card(global, [name: name, index: index, user: user] = params) do
-    dbg(params)
+  def fun_take_revealed_card(global, name: name, index: index, player: _player) do
+    with deck when not is_nil(deck) <- Map.get(global.cards, name),
+         {card, deck} <- Deck.take(deck, index) do
+      {card, put_in(global, [:cards, name], deck)}
+    else
+      _ -> {{:error, "failed to take card from deck #{name} at position #{index}"}, global}
+    end
   end
 end
