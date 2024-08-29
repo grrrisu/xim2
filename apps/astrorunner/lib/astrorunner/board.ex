@@ -24,9 +24,11 @@ defmodule Astrorunner.Board do
   }
 
   def start_link(opts \\ []) do
-    Agent.start_link(fn -> %{global: @global_board, users: %{}} end,
-      name: opts[:name] || __MODULE__
-    )
+    Agent.start_link(&handle_initial_state/0, name: opts[:name] || __MODULE__)
+  end
+
+  def clear(server \\ __MODULE__) do
+    Agent.update(server, &handle_initial_state/1)
   end
 
   def get_global(func, server \\ __MODULE__) do
@@ -35,7 +37,8 @@ defmodule Astrorunner.Board do
 
   def update_global_board(func, server \\ __MODULE__, params) do
     Agent.get_and_update(server, fn %{global: global} = state ->
-      %{state | global: handle_update_global(func, global, params)}
+      {result, global} = handle_update_global(func, global, params)
+      {result, %{state | global: global}}
     end)
   end
 
@@ -49,6 +52,10 @@ defmodule Astrorunner.Board do
 
   def global_setup(server \\ __MODULE__) do
     Agent.update(server, fn state -> Map.put(state, :global, handle_global_setup()) end)
+  end
+
+  def handle_initial_state(_state \\ nil) do
+    %{global: @global_board, users: %{}}
   end
 
   def handle_get_global(func, global) do

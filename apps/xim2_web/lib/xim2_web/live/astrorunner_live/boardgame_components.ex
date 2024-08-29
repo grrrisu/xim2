@@ -1,6 +1,7 @@
 defmodule Monsum.BoardgameComponents do
   use Phoenix.Component
 
+  attr :id, :string, required: false, default: nil
   attr :class, :string, required: false, default: ""
   attr :border_class, :string, required: false, default: ""
   attr :height, :integer, default: 448
@@ -18,6 +19,7 @@ defmodule Monsum.BoardgameComponents do
 
     ~H"""
     <div
+      id={@id}
       class={[
         "bg-gray-50 text-gray-800 rounded-lg drop-shadow-md border border-gray-800 p-4",
         @border_class
