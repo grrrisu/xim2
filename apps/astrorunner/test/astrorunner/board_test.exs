@@ -8,4 +8,8 @@ defmodule Astrorunner.BoardTest do
     assert 8 - 4 == Enum.count(level_1_deck.draw_pile)
     assert 15 - 4 == Enum.count(pilot_deck.draw_pile)
   end
+
+  test "handle_inital_state" do
+    assert %{global: %{cards: nil}, users: %{}} = Board.handle_initial_state()
+  end
 end

@@ -33,7 +33,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
 
     case res do
       {:error, msg} -> {:noreply, put_flash(socket, :error, msg)}
-      _deck -> assign(socket, global_board: global_board())
+      _deck -> {:noreply, assign(socket, global_board: global_board())}
     end
   end
 
@@ -72,9 +72,10 @@ defmodule Xim2Web.AstrorunnerLive.Index do
 
   def cards(assigns) do
     ~H"""
-    <div class="flex mb-3">
+    <div class="flex mb-3" id={"deck-#{@name}"}>
       <.card
         :for={{card, index} <- Enum.with_index(@deck.revealed)}
+        id={"card-#{@name}-#{index}"}
         border_class="mr-2"
         click="select-card"
         card_value={"#{@name}-#{index}"}

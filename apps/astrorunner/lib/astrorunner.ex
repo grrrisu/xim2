@@ -14,9 +14,8 @@ defmodule Astrorunner do
       end)
   end
 
-  def global_board() do
-    Board.global_board()
-  end
+  defdelegate clear(), to: Board
+  defdelegate global_board(), to: Board
 
   def get_global_decks() do
     Board.get_global(&fun_get_global_decks(&1))
