@@ -20,4 +20,16 @@ defmodule AstrorunnerTest do
     assert 4 == Enum.count(level_1)
     assert %Card{} = List.first(pilots)
   end
+
+  describe "take revealed card" do
+    test "returns the taken card", %{board: board} do
+      assert {%Card{}, _new_board} =
+               Astrorunner.fun_take_revealed_card(board, name: :pilots, index: 1, player: "one")
+    end
+
+    test "returns an error", %{board: board} do
+      assert {{:error, _msg}, ^board} =
+               Astrorunner.fun_take_revealed_card(board, name: :unknown, index: 1, player: "one")
+    end
+  end
 end
