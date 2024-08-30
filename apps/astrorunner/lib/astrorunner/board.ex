@@ -54,6 +54,21 @@ defmodule Astrorunner.Board do
     Agent.update(server, fn state -> Map.put(state, :global, handle_global_setup()) end)
   end
 
+  def get_deck_and_player_tableau(name, player, server \\ __MODULE__) do
+    Agent.get(server, fn state ->
+      {get_in(state, [:global, :cards, name]), get_in(state, [:users, player])}
+    end)
+  end
+
+  def put_deck_and_player_tableau({name, deck}, {player, tableau}, server \\ __MODULE__) do
+    Agent.get_and_update(server, fn state ->
+      {
+        {deck, tableau},
+        state |> put_in([:global, :cards, name], deck) |> put_in([:users, player], tableau)
+      }
+    end)
+  end
+
   def handle_initial_state(_state \\ nil) do
     %{global: @global_board, users: %{}}
   end
