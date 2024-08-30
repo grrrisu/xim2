@@ -10,7 +10,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
       PubSub.subscribe(Xim2.PubSub, "astrorunner")
     end
 
-    {:ok, assign(socket, global_board: global_board())}
+    {:ok, assign(socket, player: "me", global_board: global_board())}
   end
 
   defp global_board() do
@@ -22,19 +22,21 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     {:noreply, socket}
   end
 
-  def handle_event("select-card", %{"card" => value}, socket) do
-    res =
-      value
-      |> String.split("-")
-      |> then(fn [name, index] ->
-        [name: String.to_atom(name), index: String.to_integer(index), player: "me"]
-      end)
-      |> Astrorunner.take_revealed_card()
+  def handle_event("select-card", %{"card" => value}, %{assigns: %{player: player}} = socket) do
+    params = [{:player, player} | parse_card(value)]
 
-    case res do
+    case Astrorunner.take_revealed_card(params) do
       {:error, msg} -> {:noreply, put_flash(socket, :error, msg)}
-      _deck -> {:noreply, assign(socket, global_board: global_board())}
+      {_deck, _tableau} -> {:noreply, assign(socket, global_board: global_board())}
     end
+  end
+
+  defp parse_card(value) do
+    value
+    |> String.split("-")
+    |> then(fn [name, index] ->
+      [name: String.to_atom(name), index: String.to_integer(index)]
+    end)
   end
 
   def handle_info(:setup_done, socket) do
