@@ -24,7 +24,7 @@ defmodule Astrorunner.Board do
   }
 
   def start_link(opts \\ []) do
-    Agent.start_link(&handle_initial_state/0, name: opts[:name] || __MODULE__)
+    Agent.start_link(&handle_initial_state/0, name: opts[:name])
   end
 
   def clear(server \\ __MODULE__) do
@@ -96,5 +96,14 @@ defmodule Astrorunner.Board do
     |> Enum.reduce([], fn {name, amount}, res -> res ++ Card.build(name, amount) end)
     |> Deck.setup()
     |> Deck.reveal(4)
+  end
+
+  def tableau_place(card) do
+    case card.type do
+      :pilot -> :crew
+      :research -> :rnd
+      :engineer -> :rnd
+      :mission -> :mission
+    end
   end
 end

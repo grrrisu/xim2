@@ -1,7 +1,7 @@
 defmodule Astrorunner.DeckTest do
   use ExUnit.Case, async: true
 
-  alias Astrorunner.Deck
+  alias Astrorunner.{Card, Deck}
 
   @draw_deck %Deck{draw_pile: [1, 2, 3, 4, 5], revealed: [], discard_pile: []}
   @revealed_deck %Deck{draw_pile: [1, 2], revealed: [3, 4], discard_pile: [5, 6]}
@@ -108,6 +108,17 @@ defmodule Astrorunner.DeckTest do
 
     test "second and replace" do
       assert {4, %Deck{revealed: [3, 1]}} = Deck.take_and_replace(@revealed_deck, 1)
+    end
+  end
+
+  @card %Card{title: "Hero"}
+  describe "add card" do
+    test "to existing" do
+      assert %Deck{revealed: [1, 2, @card]} = Deck.add(%Deck{revealed: [1, 2]}, @card)
+    end
+
+    test "to empty" do
+      assert %Deck{revealed: [@card]} = Deck.add(%Deck{revealed: []}, @card)
     end
   end
 end
