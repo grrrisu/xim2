@@ -1,5 +1,5 @@
 defmodule AstrorunnerTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   doctest Astrorunner
 
   alias Astrorunner.{Card, Board, Deck}
@@ -21,15 +21,23 @@ defmodule AstrorunnerTest do
     assert %Card{} = List.first(pilots)
   end
 
+  @data %{
+    global: %{cards: %{pilots: Deck.setup(Card.build(:stuntmen), Card.build(:line_pilot, 4))}},
+    users: %{"one" => %{crew: []}}
+  }
   describe "take revealed card" do
-    test "returns the taken card", %{board: board} do
-      assert {%Card{}, _new_board} =
-               Astrorunner.fun_take_revealed_card(board, name: :pilots, index: 1, player: "one")
+    test "and adds it to his tableau" do
+      Agent.update(Board, fn _ -> @data end)
+
+      assert {%Deck{}, %{crew: [%Card{}]}} =
+               Astrorunner.take_revealed_card(player: "one", name: :pilots, index: 3)
     end
 
-    test "returns an error", %{board: board} do
-      assert {{:error, _msg}, ^board} =
-               Astrorunner.fun_take_revealed_card(board, name: :unknown, index: 1, player: "one")
+    test "returns an error" do
+      Agent.update(Board, fn _ -> @data end)
+
+      assert {:error, _msg} =
+               Astrorunner.take_revealed_card(player: "one", name: :unknown, index: 3)
     end
   end
 end

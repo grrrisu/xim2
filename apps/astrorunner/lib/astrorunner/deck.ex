@@ -3,12 +3,12 @@ defmodule Astrorunner.Deck do
   Deck consists of cards. They can be in 3 different places: in the draw pile, revealed or in the discard pile.
   """
 
-  alias Astrorunner.Deck
+  alias Astrorunner.{Card, Deck}
 
   defstruct draw_pile: [], revealed: [], discard_pile: []
 
-  def setup(cards) do
-    %Deck{draw_pile: cards} |> shuffle_draw_pile()
+  def setup(cards, revealed \\ []) do
+    %Deck{draw_pile: cards, revealed: revealed} |> shuffle_draw_pile()
   end
 
   def shuffle_draw_pile(%Deck{draw_pile: draw_pile} = deck) do
@@ -68,5 +68,10 @@ defmodule Astrorunner.Deck do
   def take_and_replace(%Deck{revealed: _revealed} = deck, index \\ 0) do
     {taken, deck} = take(deck, index)
     {taken, reveal(deck)}
+  end
+
+  @doc "add a card to the revealed row"
+  def add(%Deck{revealed: revealed} = deck, %Card{} = card) do
+    %Deck{deck | revealed: revealed ++ [card]}
   end
 end

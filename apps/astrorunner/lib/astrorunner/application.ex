@@ -8,7 +8,7 @@ defmodule Astrorunner.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      Astrorunner.Board
+      {Astrorunner.Board, name: Astrorunner.Board}
     ]
 
     opts = [strategy: :one_for_one, name: Astrorunner.Supervisor]
