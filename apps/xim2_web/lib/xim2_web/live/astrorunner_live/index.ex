@@ -18,7 +18,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
   end
 
   def handle_event("setup_board", _params, socket) do
-    Astrorunner.setup()
+    Astrorunner.setup([socket.assigns.player])
     {:noreply, socket}
   end
 

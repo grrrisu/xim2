@@ -50,8 +50,12 @@ defmodule Astrorunner.Board do
     Agent.get(server, fn %{users: users} -> Map.get(users, user) end)
   end
 
-  def global_setup(server \\ __MODULE__) do
-    Agent.update(server, fn state -> Map.put(state, :global, handle_global_setup()) end)
+  def setup(players, server \\ __MODULE__) do
+    Agent.update(server, fn state ->
+      state
+      |> Map.put(:global, handle_global_setup())
+      |> Map.put(:users, handle_players_setup(players))
+    end)
   end
 
   def get_deck_and_player_tableau(name, player, server \\ __MODULE__) do
@@ -89,6 +93,20 @@ defmodule Astrorunner.Board do
         level_2: build_cards(@level_2_cards)
       }
     }
+  end
+
+  def handle_players_setup(players) do
+    Enum.reduce(players, %{}, fn player, players ->
+      Map.put_new(players, player, %{
+        crew: [],
+        mission: [],
+        rnd: [],
+        money: 3,
+        xp: %{chemistry: 0, engineering: 0, math: 0},
+        research: %{radar: 0, survive: 0, navigation: 0, structure: 0, engine: 0},
+        equipment: %{radar: 1, survive: 1, navigation: 1, structure: 1, engine: 1}
+      })
+    end)
   end
 
   defp build_cards(cards) do

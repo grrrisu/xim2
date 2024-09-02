@@ -1,6 +1,10 @@
 defmodule Monsum.GridCompnent do
   use Phoenix.Component
 
+  @moduledoc """
+  components to display grids
+  """
+
   @doc """
   Renders a streamed grid wrapped in an overflow div.
 
