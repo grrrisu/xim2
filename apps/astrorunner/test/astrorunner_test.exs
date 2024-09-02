@@ -2,20 +2,30 @@ defmodule AstrorunnerTest do
   use ExUnit.Case
   doctest Astrorunner
 
+  alias Phoenix.PubSub
   alias Astrorunner.{Card, Board, Deck}
 
   setup do
-    %{board: Board.handle_global_setup()}
+    Astrorunner.clear()
+    PubSub.subscribe(Xim2.PubSub, "astrorunner")
+    on_exit(fn -> PubSub.unsubscribe(Xim2.PubSub, "astrorunner") end)
+    :ok
   end
 
-  test "setup", %{board: board} do
-    assert %{cards: %{pilots: pilots, level_1: _level_1}} = board
+  test "setup" do
+    {:ok, _pid} = Astrorunner.setup(["one"])
+    assert_receive(:setup_done)
+    board = Agent.get(Board, & &1)
+    assert %{cards: %{pilots: pilots, level_1: _level_1}} = board.global
     assert %Deck{} = pilots
     assert %Card{} = pilots.draw_pile |> List.first()
+    assert [] = get_in(board, [:users, "one", :crew])
   end
 
-  test "get global cards", %{board: board} do
-    %{pilots: pilots, level_1: level_1} = Astrorunner.fun_get_global_decks(board)
+  test "get global cards" do
+    {:ok, _pid} = Astrorunner.setup(["one"])
+    assert_receive(:setup_done)
+    %{pilots: pilots, level_1: level_1} = Astrorunner.get_global_decks()
     assert 4 == Enum.count(pilots)
     assert 4 == Enum.count(level_1)
     assert %Card{} = List.first(pilots)

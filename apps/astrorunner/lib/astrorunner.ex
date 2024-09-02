@@ -6,10 +6,10 @@ defmodule Astrorunner do
   alias Phoenix.PubSub
   alias Astrorunner.{Board, Rule}
 
-  def setup() do
+  def setup(players \\ []) do
     {:ok, _pid} =
       Task.start(fn ->
-        Board.global_setup()
+        Board.setup(players)
         :ok = PubSub.broadcast(Xim2.PubSub, "astrorunner", :setup_done)
       end)
   end

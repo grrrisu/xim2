@@ -27,7 +27,7 @@ defmodule Astrorunner.BoardTest do
     Agent.update(board, fn _ -> @data end)
     assert {deck, tableau} = Board.get_deck_and_player_tableau(:pilots, "deadpool", board)
     assert 4 == Enum.count(deck.revealed)
-    assert 0 == Enum.count(tableau.crew)
+    assert Enum.empty?(tableau.crew)
   end
 
   test "put_deck_and_player_tableau", %{board: board} do

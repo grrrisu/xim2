@@ -14,11 +14,11 @@ defmodule Astrorunner.Rule do
          tableau <- add_card_to_tableau(tableau, card) do
       {:ok, {deck, tableau}}
     else
-      _ -> {:error, "taking card failed"}
+      _ -> {:error, "taking card from job market failed"}
     end
   end
 
-  def can_take_card?(deck, index, tableau) do
+  def can_take_card?(_deck, _index, _tableau) do
     true
   end
 

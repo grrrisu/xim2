@@ -1,4 +1,7 @@
 defmodule Monsum.BoardgameComponents do
+  @moduledoc """
+  components for board games
+  """
   use Phoenix.Component
 
   attr :id, :string, required: false, default: nil
