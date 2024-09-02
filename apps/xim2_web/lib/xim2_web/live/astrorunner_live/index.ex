@@ -10,7 +10,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
       PubSub.subscribe(Xim2.PubSub, "astrorunner")
     end
 
-    {:ok, assign(socket, player: "me", global_board: global_board())}
+    {:ok, assign(socket, player: "me", global_board: global_board(), tableau: nil)}
   end
 
   defp global_board() do
@@ -52,6 +52,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     <.main_section title="Astrorunner" back={~p"/"}>
       <%= if board_setup?(@global_board) do %>
         <.job_market cards={@global_board.cards} />
+        <.my_player_board tableau={@tableau} />
         <.button phx-click="setup_board" data-confirm="Are you sure?">Reset Board</.button>
       <% else %>
         <p class="mb-3">No game available.</p>
@@ -65,10 +66,24 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     ~H"""
     <div class="mb-5">
       <.sub_title>Arbeitsmarkt</.sub_title>
+      <.sub_title>Piloten</.sub_title>
       <.cards name="pilots" deck={@cards.pilots} />
+      <.sub_title>Spezialisten</.sub_title>
       <.cards name="level_2" deck={@cards.level_2} />
+      <.sub_title>Normale</.sub_title>
       <.cards name="level_1" deck={@cards.level_1} />
     </div>
+    """
+  end
+
+  def my_player_board(assigns) do
+    ~H"""
+    <.title>Mein Tableau</.title>
+    <.sub_title>Mission Control</.sub_title>
+    <.sub_title>Mannschaft</.sub_title>
+    <.sub_title>Geld</.sub_title>
+    <p>0 <i class="las la-money-bill-wave-alt"></i></p>
+    <.sub_title>Forschung und Entwicklung</.sub_title>
     """
   end
 
@@ -77,6 +92,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     <div class="flex mb-3" id={"deck-#{@name}"}>
       <.card
         :for={{card, index} <- Enum.with_index(@deck.revealed)}
+        height={336}
         id={"card-#{@name}-#{index}"}
         border_class="mr-2"
         click="select-card"
@@ -86,7 +102,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
         <:picture>
           <.picture small={~p"/images/mountain-searching.avif"} />
         </:picture>
-        <:body_title>Title</:body_title>
+        <:body_title><%= card.type %></:body_title>
         <:body>
           <%= card.text %>
         </:body>
