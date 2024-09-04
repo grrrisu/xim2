@@ -7,8 +7,7 @@ defmodule Astrorunner.Board do
 
   alias Astrorunner.{Card, Deck}
 
-  @global_board %{cards: nil}
-  # @user_board %{mission_control: [], crew: [], research: []}
+  @initial_state %{global: %{cards: nil}, users: %{}}
 
   @level_1_cards %{
     lab_assistent: 4,
@@ -24,11 +23,15 @@ defmodule Astrorunner.Board do
   }
 
   def start_link(opts \\ []) do
-    Agent.start_link(&handle_initial_state/0, name: opts[:name])
+    Agent.start_link(fn -> @initial_state end, name: opts[:name])
   end
 
   def clear(server \\ __MODULE__) do
-    Agent.update(server, &handle_initial_state/1)
+    Agent.update(server, fn _ -> @initial_state end)
+  end
+
+  def get(func \\ & &1, server \\ __MODULE__) do
+    Agent.get(server, func)
   end
 
   def get_global(func, server \\ __MODULE__) do
@@ -49,6 +52,12 @@ defmodule Astrorunner.Board do
   def user_board(user, server \\ __MODULE__) do
     Agent.get(server, fn %{users: users} -> Map.get(users, user) end)
   end
+
+  # def job_market_and_tableaus(server \\ __MODULE__) do
+  #   Agent.get(server, fn state ->
+  #     {state.global.cards, state.users}
+  #   end)
+  # end
 
   def setup(players, server \\ __MODULE__) do
     Agent.update(server, fn state ->
@@ -71,10 +80,6 @@ defmodule Astrorunner.Board do
         state |> put_in([:global, :cards, name], deck) |> put_in([:users, player], tableau)
       }
     end)
-  end
-
-  def handle_initial_state(_state \\ nil) do
-    %{global: @global_board, users: %{}}
   end
 
   def handle_get_global(func, global) do

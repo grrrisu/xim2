@@ -14,11 +14,18 @@ defmodule Astrorunner do
       end)
   end
 
-  defdelegate clear(), to: Board
-  defdelegate global_board(), to: Board
+  defdelegate clear(server \\ Board), to: Board
+  # defdelegate global_board(), to: Board
+  # defdelegate job_market_and_tableaus(), to: Board
+  defdelegate get(func \\ &board_for_ui(&1), server \\ Board), to: Board
 
   def get_global_decks() do
     Board.get_global(&fun_get_global_decks(&1))
+  end
+
+  def board_for_ui(state) do
+    state
+    |> put_in([:global, :cards], fun_get_global_decks(state.global))
   end
 
   def fun_get_global_decks(global) do
