@@ -6,10 +6,10 @@ defmodule Astrorunner do
   alias Phoenix.PubSub
   alias Astrorunner.{Board, Rule}
 
-  def setup(players \\ []) do
+  def setup(players \\ [], server \\ Board) do
     {:ok, _pid} =
       Task.start(fn ->
-        Board.setup(players)
+        Board.setup(players, server)
         :ok = PubSub.broadcast(Xim2.PubSub, "astrorunner", :setup_done)
       end)
   end
@@ -19,9 +19,9 @@ defmodule Astrorunner do
   # defdelegate job_market_and_tableaus(), to: Board
   defdelegate get(func \\ &board_for_ui(&1), server \\ Board), to: Board
 
-  def get_global_decks() do
-    Board.get_global(&fun_get_global_decks(&1))
-  end
+  # def get_global_decks() do
+  #   Board.get_global(&fun_get_global_decks(&1))
+  # end
 
   def board_for_ui(state) do
     state
@@ -36,11 +36,11 @@ defmodule Astrorunner do
     end)
   end
 
-  def take_revealed_card(player: player, name: name, index: index) do
+  def take_revealed_card(server \\ Board, player: player, name: name, index: index) do
     with {deck, tableau} when not is_nil(deck) and not is_nil(tableau) <-
-           Board.get_deck_and_player_tableau(name, player),
+           Board.get_deck_and_player_tableau(name, player, server),
          {:ok, {deck, tableau}} <- Rule.take_card_from_job_market(deck, index, tableau) do
-      Board.put_deck_and_player_tableau({name, deck}, {player, tableau})
+      Board.put_deck_and_player_tableau({name, deck}, {player, tableau}, server)
     else
       {:error, reason} -> {:error, reason}
       _ -> {:error, "taking card failed!"}
