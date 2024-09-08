@@ -28,9 +28,10 @@ defmodule Astrorunner do
     |> put_in([:global, :cards], fun_get_global_decks(state.global))
   end
 
-  def fun_get_global_decks(global) do
-    global
-    |> Map.get(:cards)
+  def fun_get_global_decks(%{cards: nil}), do: nil
+
+  def fun_get_global_decks(%{cards: cards}) do
+    cards
     |> Enum.reduce(%{}, fn {key, value}, res ->
       Map.put_new(res, key, value.revealed)
     end)

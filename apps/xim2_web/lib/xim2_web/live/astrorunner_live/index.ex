@@ -114,7 +114,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
       >
         <:title><%= card.title %></:title>
         <:picture>
-          <.picture small={~p"/images/mountain-searching.avif"} />
+          <.picture small={~p"/images/astrorunner/#{card.image}"} />
         </:picture>
         <:body_title><%= card.type %></:body_title>
         <:body>

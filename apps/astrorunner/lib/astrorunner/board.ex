@@ -11,7 +11,12 @@ defmodule Astrorunner.Board do
 
   @level_1_cards %{
     lab_assistent: 4,
-    tinkerer: 4
+    tinkerer: 4,
+    mathematician: 4,
+    racing_car_mechanic: 4,
+    trouble_shooter: 4,
+    tester: 4,
+    data_analyst: 4
   }
 
   @level_2_cards %{}
