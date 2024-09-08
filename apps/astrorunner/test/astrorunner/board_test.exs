@@ -15,12 +15,12 @@ defmodule Astrorunner.BoardTest do
 
   test "handle_global_setup" do
     %{cards: %{pilots: pilot_deck, level_1: level_1_deck}} = Board.handle_global_setup()
-    assert 8 - 4 == Enum.count(level_1_deck.draw_pile)
+    assert 7 * 4 - 4 == Enum.count(level_1_deck.draw_pile)
     assert 15 - 4 == Enum.count(pilot_deck.draw_pile)
   end
 
-  test "handle_inital_state" do
-    assert %{global: %{cards: nil}, users: %{}} = Board.handle_initial_state()
+  test "handle_inital_state", %{board: board} do
+    assert %{global: %{cards: nil}, users: %{}} = Astrorunner.get(& &1, board)
   end
 
   test "get_deck_and_player_tableau", %{board: board} do
