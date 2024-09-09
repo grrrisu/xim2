@@ -108,7 +108,7 @@ defmodule Astrorunner.Board do
         money: 3,
         xp: %{chemistry: 0, engineering: 0, math: 0},
         research: %{radar: 0, survive: 0, navigation: 0, structure: 0, engine: 0},
-        equipment: %{radar: 1, survive: 1, navigation: 1, structure: 1, engine: 1}
+        gear: %{radar: 1, survive: 1, navigation: 1, structure: 1, engine: 1}
       })
     end)
   end
