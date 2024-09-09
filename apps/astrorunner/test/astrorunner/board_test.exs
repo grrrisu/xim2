@@ -10,7 +10,7 @@ defmodule Astrorunner.BoardTest do
 
   @data %{
     global: %{cards: %{pilots: Deck.setup(Card.build(:stuntmen), Card.build(:line_pilot, 4))}},
-    users: %{"deadpool" => %{crew: []}}
+    players: %{"deadpool" => %{crew: []}}
   }
 
   test "handle_global_setup" do
@@ -20,7 +20,7 @@ defmodule Astrorunner.BoardTest do
   end
 
   test "handle_inital_state", %{board: board} do
-    assert %{global: %{cards: nil}, users: %{}} = Astrorunner.get(& &1, board)
+    assert %{global: %{cards: nil}, players: %{}} = Astrorunner.get(& &1, board)
   end
 
   test "get_deck_and_player_tableau", %{board: board} do

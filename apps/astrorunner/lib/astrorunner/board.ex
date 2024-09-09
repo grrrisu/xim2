@@ -7,7 +7,7 @@ defmodule Astrorunner.Board do
 
   alias Astrorunner.{Card, Deck}
 
-  @initial_state %{global: %{cards: nil}, users: %{}}
+  @initial_state %{global: %{cards: nil}, players: %{}}
 
   @level_1_cards %{
     lab_assistent: 4,
@@ -54,27 +54,21 @@ defmodule Astrorunner.Board do
     Agent.get(server, fn %{global: global} -> global end)
   end
 
-  def user_board(user, server \\ __MODULE__) do
-    Agent.get(server, fn %{users: users} -> Map.get(users, user) end)
+  def player_board(player, server \\ __MODULE__) do
+    Agent.get(server, fn %{players: players} -> Map.get(players, player) end)
   end
-
-  # def job_market_and_tableaus(server \\ __MODULE__) do
-  #   Agent.get(server, fn state ->
-  #     {state.global.cards, state.users}
-  #   end)
-  # end
 
   def setup(players, server \\ __MODULE__) do
     Agent.update(server, fn state ->
       state
       |> Map.put(:global, handle_global_setup())
-      |> Map.put(:users, handle_players_setup(players))
+      |> Map.put(:players, handle_players_setup(players))
     end)
   end
 
   def get_deck_and_player_tableau(name, player, server \\ __MODULE__) do
     Agent.get(server, fn state ->
-      {get_in(state, [:global, :cards, name]), get_in(state, [:users, player])}
+      {get_in(state, [:global, :cards, name]), get_in(state, [:players, player])}
     end)
   end
 
@@ -82,7 +76,7 @@ defmodule Astrorunner.Board do
     Agent.get_and_update(server, fn state ->
       {
         {deck, tableau},
-        state |> put_in([:global, :cards, name], deck) |> put_in([:users, player], tableau)
+        state |> put_in([:global, :cards, name], deck) |> put_in([:players, player], tableau)
       }
     end)
   end
