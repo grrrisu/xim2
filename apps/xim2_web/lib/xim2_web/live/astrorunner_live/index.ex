@@ -41,6 +41,10 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     end
   end
 
+  def handle_event("take-action", %{"card" => _value}, %{assigns: %{player: _player}} = socket) do
+    {:noreply, socket}
+  end
+
   defp parse_card(value) do
     value
     |> String.split("-")
@@ -78,11 +82,11 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     <div class="mb-5">
       <.sub_title>Arbeitsmarkt</.sub_title>
       <.sub_title>Piloten</.sub_title>
-      <.cards name="pilots" deck={@cards.pilots} />
+      <.cards name="pilots" deck={@cards.pilots} click="select-card" />
       <.sub_title>Spezialisten</.sub_title>
-      <.cards name="level_2" deck={@cards.level_2} />
+      <.cards name="level_2" deck={@cards.level_2} click="select-card" />
       <.sub_title>Normale</.sub_title>
-      <.cards name="level_1" deck={@cards.level_1} />
+      <.cards name="level_1" deck={@cards.level_1} click="select-card" />
     </div>
     """
   end
@@ -91,13 +95,13 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     ~H"""
     <.title>Mein Tableau</.title>
     <.sub_title>Mission Control</.sub_title>
-    <.cards name="mission" deck={@tableau.mission} />
+    <.cards name="mission" deck={@tableau.mission} click="take-action" />
     <.sub_title>Mannschaft</.sub_title>
-    <.cards name="crew" deck={@tableau.crew} />
+    <.cards name="crew" deck={@tableau.crew} click="take-action" />
     <.sub_title>Geld</.sub_title>
     <p>0 <i class="las la-money-bill-wave-alt"></i></p>
     <.sub_title>Forschung und Entwicklung</.sub_title>
-    <.cards name="rnd" deck={@tableau.rnd} />
+    <.cards name="rnd" deck={@tableau.rnd} click="take-action" />
     """
   end
 
@@ -109,7 +113,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
         height={336}
         id={"card-#{@name}-#{index}"}
         border_class="mr-2"
-        click="select-card"
+        click={@click}
         card_value={"#{@name}-#{index}"}
       >
         <:title><%= card.title %></:title>
