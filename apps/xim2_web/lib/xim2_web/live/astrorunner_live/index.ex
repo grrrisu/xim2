@@ -23,22 +23,18 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     |> assign(:tableaus, tableaus)
   end
 
-  # defp global_board() do
-  #   Astrorunner.global_board()
-  # end
-
   def handle_event("setup_board", _params, socket) do
     Astrorunner.setup([socket.assigns.player])
     {:noreply, socket}
   end
 
-  def handle_event("select-card", %{"card" => value}, %{assigns: %{player: player}} = socket) do
+  def handle_event(
+        "select-card",
+        %{"card" => value},
+        %{assigns: %{global_board: global, player: player}} = socket
+      ) do
     params = [{:player, player} | parse_card(value)]
-
-    case Astrorunner.take_revealed_card(params) do
-      {:error, msg} -> {:noreply, put_flash(socket, :error, msg)}
-      {_deck, _tableau} -> {:noreply, assign_board(socket)}
-    end
+    {:noreply, take_selected_card(params, global, socket)}
   end
 
   def handle_event("take-action", %{"card" => _value}, %{assigns: %{player: _player}} = socket) do
@@ -59,6 +55,19 @@ defmodule Xim2Web.AstrorunnerLive.Index do
 
   def board_setup?(global_board) do
     !is_nil(global_board.cards)
+  end
+
+  defp take_selected_card(params, global, socket) do
+    case Astrorunner.take_revealed_card(params) do
+      {:error, msg} ->
+        put_flash(socket, :error, msg)
+
+      {deck, tableau} ->
+        assign(socket,
+          my_tableau: tableau,
+          global_board: put_in(global, [:cards, params[:name]], deck)
+        )
+    end
   end
 
   def render(assigns) do

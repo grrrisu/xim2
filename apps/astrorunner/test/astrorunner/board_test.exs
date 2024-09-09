@@ -35,10 +35,10 @@ defmodule Astrorunner.BoardTest do
     deck = Deck.setup([], Card.build(:line_pilot, 3))
     tableau = %{crew: [Card.build(:line_pilot)]}
 
-    assert {deck, tableau} =
+    assert {cards, tableau} =
              Board.put_deck_and_player_tableau({:pilots, deck}, {"deadpool", tableau}, board)
 
-    assert 3 == Enum.count(deck.revealed)
+    assert 3 == Enum.count(cards)
     assert 1 == Enum.count(tableau.crew)
   end
 end
