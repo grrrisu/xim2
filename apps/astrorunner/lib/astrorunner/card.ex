@@ -3,7 +3,7 @@ defmodule Astrorunner.Card do
   Card
   """
 
-  defstruct(title: nil, type: :mission, costs: 0, image: "", text: "", rule: nil)
+  defstruct(title: nil, type: :mission, costs: 0, image: "", text: "", rules: [])
 
   alias Astrorunner.Card
 
@@ -21,42 +21,48 @@ defmodule Astrorunner.Card do
         type: :research,
         costs: 1,
         image: "lab_assistant.jpg",
-        text: "upps!"
+        text: "upps!",
+        rules: [%{xp: 1}]
       },
       tinkerer: %Card{
         title: "Tüftler",
         type: :engineer,
         costs: 2,
         image: "tinkerer.jpg",
-        text: "let's try this ..."
+        text: "let's try this ...",
+        rules: [%{engineer: 1}, %{gear: 1, engineer: -1}]
       },
       mathematician: %Card{
         title: "Mathematikerin",
         type: :research,
         costs: 2,
         image: "mathematician.jpg",
-        text: "so then x is ..."
+        text: "so then x is ...",
+        rules: [math: 2]
       },
       racing_car_mechanic: %Card{
         title: "Rennauto Mechanikerin",
         type: :engineer,
         costs: 2,
         image: "racing_car_mechanic.jpg",
-        text: "I can make it faster"
+        text: "I can make it faster",
+        rules: [gear: 1]
       },
       trouble_shooter: %Card{
         title: "Trouble Shooter",
         type: :mission,
         costs: 2,
         image: "trouble_shooter.jpg",
-        text: "Wait jsut a moment!"
+        text: "Wait jsut a moment!",
+        rules: []
       },
       tester: %Card{
         title: "Tester",
         type: :mission,
         costs: 2,
         image: "tester.jpg",
-        text: "Let' retry this again!"
+        text: "Let' retry this again!",
+        rules: []
       },
       data_analyst: %Card{
         title: "Daten Analystin",
