@@ -15,7 +15,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
 
   defp assign_board(%{assigns: %{player: player}} = socket) do
     board = Astrorunner.get()
-    {my_tableau, tableaus} = Map.pop(board.users, player)
+    {my_tableau, tableaus} = Map.pop(board.players, player)
 
     socket
     |> assign(:global_board, board.global)

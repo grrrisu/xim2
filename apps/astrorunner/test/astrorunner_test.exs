@@ -7,7 +7,7 @@ defmodule AstrorunnerTest do
 
   @data %{
     global: %{cards: %{pilots: Deck.setup(Card.build(:stuntmen), Card.build(:line_pilot, 4))}},
-    users: %{"one" => %{crew: []}}
+    players: %{"one" => %{crew: []}}
   }
 
   setup do
@@ -25,15 +25,15 @@ defmodule AstrorunnerTest do
     assert %{cards: %{pilots: pilots, level_1: _level_1}} = board.global
     assert %Deck{} = pilots
     assert %Card{} = pilots.draw_pile |> List.first()
-    assert [] = get_in(board, [:users, "one", :crew])
+    assert [] = get_in(board, [:players, "one", :crew])
   end
 
   test "board_for_ui" do
-    %{global: %{cards: %{pilots: pilots}}, users: users} = Astrorunner.board_for_ui(@data)
+    %{global: %{cards: %{pilots: pilots}}, players: players} = Astrorunner.board_for_ui(@data)
 
     assert 4 == Enum.count(pilots)
     assert %Card{} = List.first(pilots)
-    assert %{"one" => %{crew: []}} = users
+    assert %{"one" => %{crew: []}} = players
   end
 
   describe "take revealed card" do
