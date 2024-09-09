@@ -40,7 +40,7 @@ defmodule AstrorunnerTest do
     test "and adds it to his tableau", %{board: board} do
       Agent.update(board, fn _ -> @data end)
 
-      assert {%Deck{}, %{crew: [%Card{}]}} =
+      assert {[%Card{} | _], %{crew: [%Card{}]}} =
                Astrorunner.take_revealed_card(board, player: "one", name: :pilots, index: 3)
     end
 

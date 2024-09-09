@@ -75,7 +75,7 @@ defmodule Astrorunner.Board do
   def put_deck_and_player_tableau({name, deck}, {player, tableau}, server \\ __MODULE__) do
     Agent.get_and_update(server, fn state ->
       {
-        {deck, tableau},
+        {deck.revealed, tableau},
         state |> put_in([:global, :cards, name], deck) |> put_in([:players, player], tableau)
       }
     end)
