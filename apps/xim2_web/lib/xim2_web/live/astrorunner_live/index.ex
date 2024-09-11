@@ -104,15 +104,20 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     ~H"""
     <.title>Mein Tableau</.title>
     <.sub_title>Mission Control</.sub_title>
-    <.cards name="mission" deck={@tableau.mission} click="take-action" />
+    <.cards name="mission" deck={@tableau.mission} activated={true} />
     <.sub_title>Mannschaft</.sub_title>
-    <.cards name="crew" deck={@tableau.crew} click="take-action" />
+    <.cards name="crew" deck={@tableau.crew} activated={true} />
     <.sub_title>Geld</.sub_title>
     <p>0 <i class="las la-money-bill-wave-alt"></i></p>
     <.sub_title>Forschung und Entwicklung</.sub_title>
-    <.cards name="rnd" deck={@tableau.rnd} click="take-action" />
+    <.cards name="rnd" deck={@tableau.rnd} activated={true} />
     """
   end
+
+  attr :name, :string, required: true
+  attr :deck, :any, required: true
+  attr :click, :string, required: false, default: nil
+  attr :activated, :boolean, required: false, default: false
 
   def cards(assigns) do
     ~H"""
@@ -131,10 +136,49 @@ defmodule Xim2Web.AstrorunnerLive.Index do
         </:picture>
         <:body_title><%= card.type %></:body_title>
         <:body>
+          <.card_action
+            :for={{key, value} <- card.rules}
+            key={key}
+            value={value}
+            activated={@activated}
+          />
           <%= card.text %>
         </:body>
       </.card>
     </div>
     """
+  end
+
+  def card_action(assigns) do
+    params =
+      if assigns.activated do
+        %{click: "take-action", click_value: 123, class: "cursor-pointer"}
+      else
+        %{}
+      end
+
+    assigns =
+      assigns |> assign(icon: key_icon(assigns.key)) |> assign(params)
+
+    ~H"""
+    <div class={["text-center text-lg", @class]} phx-click={@click} phx-value-card={@click_value}>
+      + <%= @value %><.icon name={@icon} class="la-lg" />
+    </div>
+    """
+  end
+
+  def key_icon(key) do
+    case key do
+      :xp -> "la-eye"
+      :chemistry -> "la-flask"
+      :engineer -> "la-wrench"
+      :math -> "la-square-root-alt"
+      :gear -> "la-cube"
+      :engine -> "la-rocket"
+      :navigation -> "la-dharmachakra"
+      :radio -> "la-satellite-dish"
+      :survivial -> "la-heartbeat"
+      :structure -> "la-drum-steelpan"
+    end
   end
 end
