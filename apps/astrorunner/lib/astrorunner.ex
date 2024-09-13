@@ -37,10 +37,10 @@ defmodule Astrorunner do
     end)
   end
 
-  def take_revealed_card(server \\ Board, player: player, name: name, index: index) do
+  def take_revealed_card(server \\ Board, player: player, name: name, card_id: card_id) do
     with {deck, tableau} when not is_nil(deck) and not is_nil(tableau) <-
            Board.get_deck_and_player_tableau(name, player, server),
-         {:ok, {deck, tableau}} <- Rule.take_card_from_job_market(deck, index, tableau) do
+         {:ok, {deck, tableau}} <- Rule.take_card_from_job_market(deck, card_id, tableau) do
       Board.put_deck_and_player_tableau({name, deck}, {player, tableau}, server)
     else
       {:error, reason} -> {:error, reason}

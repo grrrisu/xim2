@@ -58,15 +58,30 @@ defmodule Astrorunner.Deck do
     end
   end
 
+  def take_at(deck, index \\ 0)
+
+  def take_at(%Deck{} = deck, nil), do: {nil, deck}
+
   @doc "take a card from the revealed row"
-  def take(%Deck{revealed: revealed} = deck, index \\ 0) do
+  def take_at(%Deck{revealed: revealed} = deck, index) when is_integer(index) do
     {taken, remaining} = List.pop_at(revealed, index)
     {taken, %{deck | revealed: remaining}}
   end
 
+  @doc "take a card from the revealed row"
+  def take(%Deck{revealed: revealed} = deck, id) do
+    take_at(deck, Enum.find_index(revealed, &(&1.id == id)))
+  end
+
   @doc "take a card from the revelead row and replace it with one from the draw pile"
-  def take_and_replace(%Deck{revealed: _revealed} = deck, index \\ 0) do
-    {taken, deck} = take(deck, index)
+  def take_at_and_replace(%Deck{} = deck, index \\ 0) do
+    {taken, deck} = take_at(deck, index)
+    {taken, reveal(deck)}
+  end
+
+  @doc "take a card from the revelead row and replace it with one from the draw pile"
+  def take_and_replace(%Deck{} = deck, id) do
+    {taken, deck} = take(deck, id)
     {taken, reveal(deck)}
   end
 

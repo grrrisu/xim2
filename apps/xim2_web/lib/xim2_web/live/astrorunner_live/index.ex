@@ -37,15 +37,19 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     {:noreply, take_selected_card(params, global, socket)}
   end
 
-  def handle_event("take-action", %{"card" => _value}, %{assigns: %{player: _player}} = socket) do
+  def handle_event(
+        "take-action",
+        %{"card" => _id, "rule" => _rule},
+        %{assigns: %{player: _player}} = socket
+      ) do
     {:noreply, socket}
   end
 
   defp parse_card(value) do
     value
     |> String.split("-")
-    |> then(fn [name, index] ->
-      [name: String.to_atom(name), index: String.to_integer(index)]
+    |> then(fn [name, card_id] ->
+      [name: String.to_atom(name), card_id: String.to_integer(card_id)]
     end)
   end
 
@@ -123,12 +127,12 @@ defmodule Xim2Web.AstrorunnerLive.Index do
     ~H"""
     <div class="flex mb-3" id={"deck-#{@name}"}>
       <.card
-        :for={{card, index} <- Enum.with_index(@deck)}
+        :for={card <- @deck}
         height={336}
-        id={"card-#{@name}-#{index}"}
+        id={"card-#{card.id}"}
         border_class="mr-2"
         click={@click}
-        card_value={"#{@name}-#{index}"}
+        card_value={"#{@name}-#{card.id}"}
       >
         <:title><%= card.title %></:title>
         <:picture>
@@ -140,6 +144,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
             :for={{key, value} <- card.rules}
             key={key}
             value={value}
+            card_id={card.id}
             activated={@activated}
           />
           <%= card.text %>
@@ -154,14 +159,19 @@ defmodule Xim2Web.AstrorunnerLive.Index do
       if assigns.activated do
         %{click: "take-action", click_value: 123, class: "cursor-pointer"}
       else
-        %{}
+        %{click: nil, click_value: nil, class: ""}
       end
 
     assigns =
       assigns |> assign(icon: key_icon(assigns.key)) |> assign(params)
 
     ~H"""
-    <div class={["text-center text-lg", @class]} phx-click={@click} phx-value-card={@click_value}>
+    <div
+      class={["text-center text-lg", @class]}
+      phx-click={@click}
+      phx-value-rule={@click_value}
+      phx-value-card={@card_id}
+    >
       + <%= @value %><.icon name={@icon} class="la-lg" />
     </div>
     """

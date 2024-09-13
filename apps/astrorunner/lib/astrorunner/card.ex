@@ -3,7 +3,7 @@ defmodule Astrorunner.Card do
   Card
   """
 
-  defstruct(title: nil, type: :mission, costs: 0, image: "", text: "", rules: [])
+  defstruct(id: nil, title: nil, type: :mission, costs: 0, image: "", text: "", rules: [])
 
   alias Astrorunner.Card
 
@@ -97,7 +97,7 @@ defmodule Astrorunner.Card do
 
   def build(name, n \\ 1) do
     Enum.map(1..n, fn _n ->
-      card_types()[name]
+      card_types()[name] |> Map.put(:id, System.unique_integer([:positive]))
     end)
   end
 end
