@@ -7,6 +7,11 @@ defmodule Astrorunner.DeckTest do
   @revealed_deck %Deck{draw_pile: [1, 2], revealed: [3, 4], discard_pile: [5, 6]}
   @discarded_deck %Deck{draw_pile: [], revealed: [], discard_pile: [1, 2, 3, 4, 5]}
   @empty_deck %Deck{draw_pile: [], revealed: [], discard_pile: []}
+  @revealed_deck_with_ids %Deck{
+    draw_pile: [%{id: 1}, %{id: 2}],
+    revealed: [%{id: 3}, %{id: 4}],
+    discard_pile: []
+  }
 
   describe "shuffle deck" do
     test "full deck" do
@@ -97,28 +102,44 @@ defmodule Astrorunner.DeckTest do
     end
   end
 
-  describe "take card" do
+  describe "take card at index" do
     test "first" do
-      assert {3, %Deck{revealed: [4]}} = Deck.take(@revealed_deck)
+      assert {3, %Deck{revealed: [4]}} = Deck.take_at(@revealed_deck)
     end
 
     test "second" do
-      assert {4, %Deck{revealed: [3]}} = Deck.take(@revealed_deck, 1)
+      assert {4, %Deck{revealed: [3]}} = Deck.take_at(@revealed_deck, 1)
     end
 
     test "second and replace" do
-      assert {4, %Deck{revealed: [3, 1]}} = Deck.take_and_replace(@revealed_deck, 1)
+      assert {4, %Deck{revealed: [3, 1]}} = Deck.take_at_and_replace(@revealed_deck, 1)
     end
   end
 
-  @card %Card{title: "Hero"}
+  describe "take card by id" do
+    test "not found" do
+      assert {nil, %Deck{revealed: [%{id: 3}, %{id: 4}]}} =
+               Deck.take(@revealed_deck_with_ids, 404)
+    end
+
+    test "with id 4" do
+      assert {%{id: 4}, %Deck{revealed: [%{id: 3}]}} = Deck.take(@revealed_deck_with_ids, 4)
+    end
+
+    test "with id 3 and replace" do
+      assert {%{id: 3}, %Deck{revealed: [%{id: 4}, %{id: 1}]}} =
+               Deck.take_and_replace(@revealed_deck_with_ids, 3)
+    end
+  end
+
+  @card_ids %Card{title: "Hero"}
   describe "add card" do
     test "to existing" do
-      assert %Deck{revealed: [1, 2, @card]} = Deck.add(%Deck{revealed: [1, 2]}, @card)
+      assert %Deck{revealed: [1, 2, @card_ids]} = Deck.add(%Deck{revealed: [1, 2]}, @card_ids)
     end
 
     test "to empty" do
-      assert %Deck{revealed: [@card]} = Deck.add(%Deck{revealed: []}, @card)
+      assert %Deck{revealed: [@card_ids]} = Deck.add(%Deck{revealed: []}, @card_ids)
     end
   end
 end

@@ -11,7 +11,6 @@ defmodule AstrorunnerTest do
   }
 
   setup do
-    # Astrorunner.clear()
     PubSub.subscribe(Xim2.PubSub, "astrorunner")
     {:ok, pid} = start_supervised(Board)
     on_exit(fn -> PubSub.unsubscribe(Xim2.PubSub, "astrorunner") end)
@@ -39,16 +38,26 @@ defmodule AstrorunnerTest do
   describe "take revealed card" do
     test "and adds it to his tableau", %{board: board} do
       Agent.update(board, fn _ -> @data end)
+      card = get_in(@data, [:global, :cards, :pilots]) |> Map.get(:revealed) |> Enum.at(3)
 
       assert {[%Card{} | _], %{crew: [%Card{}]}} =
-               Astrorunner.take_revealed_card(board, player: "one", name: :pilots, index: 3)
+               Astrorunner.take_revealed_card(board,
+                 player: "one",
+                 name: :pilots,
+                 card_id: card.id
+               )
     end
 
     test "returns an error", %{board: board} do
       Agent.update(board, fn _ -> @data end)
+      card = get_in(@data, [:global, :cards, :pilots]) |> Map.get(:revealed) |> Enum.at(3)
 
       assert {:error, _msg} =
-               Astrorunner.take_revealed_card(board, player: "one", name: :unknown, index: 3)
+               Astrorunner.take_revealed_card(board,
+                 player: "one",
+                 name: :unknown,
+                 card_id: card.id
+               )
     end
   end
 end
