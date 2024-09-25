@@ -4,12 +4,16 @@ defmodule Monsum.BoardgameComponents do
   """
   use Phoenix.Component
 
+  alias Phoenix.LiveView.JS
+
   attr :id, :string, required: false, default: nil
   attr :class, :string, required: false, default: ""
   attr :border_class, :string, required: false, default: ""
   attr :height, :integer, default: 448
   attr :click, :string, required: false, default: nil
   attr :card_value, :any, required: false, default: nil
+  attr :mounted, :any, required: false, default: nil
+  attr :remove, :any, required: false, default: nil
   slot :title, required: false
   slot :picture, required: false
   slot :body_title, required: false
@@ -30,6 +34,8 @@ defmodule Monsum.BoardgameComponents do
       style={"height: #{@height}px; width: #{@width}px"}
       phx-click={@click}
       phx-value-card={@card_value}
+      phx-mounted={@mounted}
+      phx-remove={@remove}
     >
       <div class={["border border-gray-800 h-full", @class]}>
         <div class="flex flex-col h-full">
@@ -53,5 +59,21 @@ defmodule Monsum.BoardgameComponents do
       </div>
     </div>
     """
+  end
+
+  ## transitions
+
+  def card_slide_in(js \\ %JS{}) do
+    js
+    |> JS.transition({"ease-out duration-1000", "-left-32", "left-0"},
+      time: 1000
+    )
+  end
+
+  def card_fade_out(js \\ %JS{}) do
+    js
+    |> JS.transition({"ease-in duration-300", "top-0 opacity-100", "top-24 opacity-0"},
+      time: 300
+    )
   end
 end
