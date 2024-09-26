@@ -119,7 +119,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
   end
 
   attr :name, :string, required: true
-  attr :deck, :any, required: true
+  attr :deck, :list, required: true
   attr :click, :string, required: false, default: nil
   attr :activated, :boolean, required: false, default: false
 
@@ -129,10 +129,12 @@ defmodule Xim2Web.AstrorunnerLive.Index do
       <.card
         :for={card <- @deck}
         height={336}
-        id={"card-#{card.id}"}
+        id={"card-#{@name}-#{card.id}"}
         border_class="mr-2"
         click={@click}
         card_value={"#{@name}-#{card.id}"}
+        mounted={card_slide_in()}
+        remove={card_fade_out()}
       >
         <:title><%= card.title %></:title>
         <:picture>

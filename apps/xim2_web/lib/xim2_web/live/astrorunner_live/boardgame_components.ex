@@ -22,13 +22,13 @@ defmodule Monsum.BoardgameComponents do
   @card_ratio 64 / 89
 
   def card(assigns) do
-    assigns = assign(assigns, width: assigns.height * @card_ratio)
+    assigns = assign(assigns, width: (assigns.height * @card_ratio) |> Float.round(3))
 
     ~H"""
     <div
       id={@id}
       class={[
-        "bg-gray-50 text-gray-800 rounded-lg drop-shadow-md border border-gray-800 p-4",
+        "relative bg-gray-50 text-gray-800 rounded-lg drop-shadow-md border border-gray-800 p-4",
         @border_class
       ]}
       style={"height: #{@height}px; width: #{@width}px"}

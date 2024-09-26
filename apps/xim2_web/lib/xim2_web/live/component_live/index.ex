@@ -216,7 +216,7 @@ defmodule Xim2Web.ComponentLive.Index do
       phx-mounted={card_slide_in()}
       phx-remove={card_fade_out()}
       phx-click={JS.push("remove-card", value: %{index: @index})}
-      class="relative top-0 opacity-100 h-40 w-32 text-center border border-gray-500 bg-sky-200 mr-4"
+      class="relative h-40 w-32 text-center border border-gray-500 bg-sky-200 mr-4"
     >
       <%= render_slot(@inner_block) %>
     </div>
