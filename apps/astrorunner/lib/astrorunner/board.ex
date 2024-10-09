@@ -7,12 +7,16 @@ defmodule Astrorunner.Board do
 
   alias Astrorunner.{Card, Deck}
 
-  @global_board %{cards: nil}
-  # @user_board %{mission_control: [], crew: [], research: []}
+  @initial_state %{global: %{cards: nil}, players: %{}}
 
   @level_1_cards %{
     lab_assistent: 4,
-    tinkerer: 4
+    tinkerer: 4,
+    mathematician: 4,
+    racing_car_mechanic: 4,
+    trouble_shooter: 4,
+    tester: 4,
+    data_analyst: 4
   }
 
   @level_2_cards %{}
@@ -24,11 +28,15 @@ defmodule Astrorunner.Board do
   }
 
   def start_link(opts \\ []) do
-    Agent.start_link(&handle_initial_state/0, name: opts[:name])
+    Agent.start_link(fn -> @initial_state end, name: opts[:name])
   end
 
   def clear(server \\ __MODULE__) do
-    Agent.update(server, &handle_initial_state/1)
+    Agent.update(server, fn _ -> @initial_state end)
+  end
+
+  def get(func \\ & &1, server \\ __MODULE__) do
+    Agent.get(server, func)
   end
 
   def get_global(func, server \\ __MODULE__) do
@@ -46,35 +54,31 @@ defmodule Astrorunner.Board do
     Agent.get(server, fn %{global: global} -> global end)
   end
 
-  def user_board(user, server \\ __MODULE__) do
-    Agent.get(server, fn %{users: users} -> Map.get(users, user) end)
+  def player_board(player, server \\ __MODULE__) do
+    Agent.get(server, fn %{players: players} -> Map.get(players, player) end)
   end
 
   def setup(players, server \\ __MODULE__) do
     Agent.update(server, fn state ->
       state
       |> Map.put(:global, handle_global_setup())
-      |> Map.put(:users, handle_players_setup(players))
+      |> Map.put(:players, handle_players_setup(players))
     end)
   end
 
   def get_deck_and_player_tableau(name, player, server \\ __MODULE__) do
     Agent.get(server, fn state ->
-      {get_in(state, [:global, :cards, name]), get_in(state, [:users, player])}
+      {get_in(state, [:global, :cards, name]), get_in(state, [:players, player])}
     end)
   end
 
   def put_deck_and_player_tableau({name, deck}, {player, tableau}, server \\ __MODULE__) do
     Agent.get_and_update(server, fn state ->
       {
-        {deck, tableau},
-        state |> put_in([:global, :cards, name], deck) |> put_in([:users, player], tableau)
+        {deck.revealed, tableau},
+        state |> put_in([:global, :cards, name], deck) |> put_in([:players, player], tableau)
       }
     end)
-  end
-
-  def handle_initial_state(_state \\ nil) do
-    %{global: @global_board, users: %{}}
   end
 
   def handle_get_global(func, global) do
@@ -104,7 +108,7 @@ defmodule Astrorunner.Board do
         money: 3,
         xp: %{chemistry: 0, engineering: 0, math: 0},
         research: %{radar: 0, survive: 0, navigation: 0, structure: 0, engine: 0},
-        equipment: %{radar: 1, survive: 1, navigation: 1, structure: 1, engine: 1}
+        gear: %{radar: 1, survive: 1, navigation: 1, structure: 1, engine: 1}
       })
     end)
   end

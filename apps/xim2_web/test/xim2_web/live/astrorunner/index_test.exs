@@ -28,7 +28,8 @@ defmodule Xim2Web.AstrorunnerLive.IndexTest do
   test "take a card", %{conn: conn} do
     Astrorunner.setup(["me"])
     {:ok, view, _html} = live(conn, "/astrorunner")
-    assert view |> element("div#card-pilots-0") |> render_click(%{"card" => "pilots-3"})
-    refute view |> has_element?("div#card-pilots-3")
+    refute view |> has_element?("div#deck-crew > :last-child")
+    assert view |> element("div#deck-pilots > :last-child") |> render_click()
+    assert view |> has_element?("div#deck-crew > :last-child")
   end
 end

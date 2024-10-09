@@ -10,17 +10,17 @@ defmodule Astrorunner.BoardTest do
 
   @data %{
     global: %{cards: %{pilots: Deck.setup(Card.build(:stuntmen), Card.build(:line_pilot, 4))}},
-    users: %{"deadpool" => %{crew: []}}
+    players: %{"deadpool" => %{crew: []}}
   }
 
   test "handle_global_setup" do
     %{cards: %{pilots: pilot_deck, level_1: level_1_deck}} = Board.handle_global_setup()
-    assert 8 - 4 == Enum.count(level_1_deck.draw_pile)
+    assert 7 * 4 - 4 == Enum.count(level_1_deck.draw_pile)
     assert 15 - 4 == Enum.count(pilot_deck.draw_pile)
   end
 
-  test "handle_inital_state" do
-    assert %{global: %{cards: nil}, users: %{}} = Board.handle_initial_state()
+  test "handle_inital_state", %{board: board} do
+    assert %{global: %{cards: nil}, players: %{}} = Astrorunner.get(& &1, board)
   end
 
   test "get_deck_and_player_tableau", %{board: board} do
@@ -35,10 +35,10 @@ defmodule Astrorunner.BoardTest do
     deck = Deck.setup([], Card.build(:line_pilot, 3))
     tableau = %{crew: [Card.build(:line_pilot)]}
 
-    assert {deck, tableau} =
+    assert {cards, tableau} =
              Board.put_deck_and_player_tableau({:pilots, deck}, {"deadpool", tableau}, board)
 
-    assert 3 == Enum.count(deck.revealed)
+    assert 3 == Enum.count(cards)
     assert 1 == Enum.count(tableau.crew)
   end
 end

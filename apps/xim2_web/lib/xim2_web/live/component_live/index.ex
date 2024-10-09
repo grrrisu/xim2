@@ -13,15 +13,27 @@ defmodule Xim2Web.ComponentLive.Index do
      socket
      |> assign(
        page_title: "Components",
-       components: "monsum",
+       components: "transition",
        changeset: prepare_changeset(),
-       grid: prepare_grid()
+       grid: prepare_grid(),
+       top_cards: ["A", "B", "C", "D", "E"],
+       bottom_cards: []
      )
      |> stream(:grid, prepare_grid())}
   end
 
+  @spec handle_event(<<_::88, _::_*48>>, map(), map()) :: {:noreply, any()}
   def handle_event("change-components", %{"components" => components}, socket) do
     {:noreply, socket |> assign(:components, components) |> stream(:grid, prepare_grid())}
+  end
+
+  def handle_event(
+        "remove-card",
+        %{"index" => index},
+        %{assigns: %{top_cards: cards, bottom_cards: bottom_cards}} = socket
+      ) do
+    cards = List.delete_at(cards, index) |> dbg()
+    {:noreply, socket |> assign(top_cards: cards, bottom_cards: [index | bottom_cards])}
   end
 
   def render(assigns) do
@@ -38,11 +50,19 @@ defmodule Xim2Web.ComponentLive.Index do
         <a phx-click="change-components" phx-value-components="project" class="mr-4" href="#">
           Project
         </a>
+        <a phx-click="change-components" phx-value-components="transition" class="mr-4" href="#">
+          Transitions
+        </a>
       </div>
       <.monsum_components :if={@components == "monsum"} changeset={@changeset} />
       <.project_components :if={@components == "project"} />
       <.grid_components :if={@components == "grid"} grid={@streams.grid} />
       <.boardgame_components :if={@components == "boardgame"} />
+      <.transition_components
+        :if={@components == "transition"}
+        top_cards={@top_cards}
+        bottom_cards={@bottom_cards}
+      />
     </.main_section>
     """
   end
@@ -167,6 +187,39 @@ defmodule Xim2Web.ComponentLive.Index do
         </:body>
       </.card>
     </.flexbox_col>
+    """
+  end
+
+  def transition_components(assigns) do
+    ~H"""
+    <.flexbox_col class="border border-gray-500 w-full min-h-screen">
+      <h3>Card Transitions</h3>
+      <p>card_slide_in() and card_fade_out()</p>
+      <div class="flex">
+        <.anibox :for={{card, index} <- Enum.with_index(@top_cards)} index={index} name="top">
+          <span class="text-xl text-slate-950"><%= card %></span>
+        </.anibox>
+      </div>
+      <div class="flex">
+        <.anibox :for={{card, index} <- Enum.with_index(@bottom_cards)} index={index} name="bottom">
+          <span class="text-xl text-slate-950"><%= card %></span>
+        </.anibox>
+      </div>
+    </.flexbox_col>
+    """
+  end
+
+  defp anibox(assigns) do
+    ~H"""
+    <div
+      id={"card-#{@name}-#{@index}"}
+      phx-mounted={card_slide_in()}
+      phx-remove={card_fade_out()}
+      phx-click={JS.push("remove-card", value: %{index: @index})}
+      class="relative h-40 w-32 text-center border border-gray-500 bg-sky-200 mr-4"
+    >
+      <%= render_slot(@inner_block) %>
+    </div>
     """
   end
 

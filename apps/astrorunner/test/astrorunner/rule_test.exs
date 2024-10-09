@@ -5,9 +5,18 @@ defmodule Astrorunner.RuleTest do
 
   describe "take_card_from_job_market" do
     test "is possible" do
-      deck = Deck.setup([], Card.build(:stuntmen, 3))
+      [one, two, three] = Card.build(:stuntmen, 3)
+
+      deck = Deck.setup([], [one, two, three])
       tableau = %{crew: []}
-      assert {:ok, {deck, tableau}} = Rule.take_card_from_job_market(deck, 1, tableau)
+
+      assert {:ok, {deck, tableau}} =
+               Rule.take_card_from_job_market(
+                 deck,
+                 two.id,
+                 tableau
+               )
+
       assert 2 == Enum.count(deck.revealed)
       assert 1 == Enum.count(tableau.crew)
     end
