@@ -5,7 +5,7 @@ defmodule Xim2Web.Gettext do
   By using [Gettext](https://hexdocs.pm/gettext),
   your module gains a set of macros for translations, for example:
 
-      import Xim2Web.Gettext
+      use Gettext, backend: Xim2Web.Gettext
 
       # Simple translation
       gettext("Here is the string to translate")
@@ -20,5 +20,5 @@ defmodule Xim2Web.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :xim2_web
+  use Gettext.Backend, otp_app: :xim2_web
 end
