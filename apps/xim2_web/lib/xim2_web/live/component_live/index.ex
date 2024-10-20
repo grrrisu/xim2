@@ -13,7 +13,7 @@ defmodule Xim2Web.ComponentLive.Index do
      socket
      |> assign(
        page_title: "Components",
-       components: "transition",
+       components: "monsum",
        changeset: prepare_changeset(),
        grid: prepare_grid(),
        top_cards: ["A", "B", "C", "D", "E"],
@@ -32,7 +32,7 @@ defmodule Xim2Web.ComponentLive.Index do
         %{"index" => index},
         %{assigns: %{top_cards: cards, bottom_cards: bottom_cards}} = socket
       ) do
-    cards = List.delete_at(cards, index) |> dbg()
+    cards = List.delete_at(cards, index)
     {:noreply, socket |> assign(top_cards: cards, bottom_cards: [index | bottom_cards])}
   end
 
