@@ -25,6 +25,7 @@ defmodule Xim2Web.Router do
     live "/biotope", BiotopeLive.Index, :index
     live "/components", ComponentLive.Index, :index
     live "/astrorunner", AstrorunnerLive.Index, :index
+    live "/my_liege", MyLiegeLive.Index, :index
   end
 
   # Other scopes may use custom stacks.

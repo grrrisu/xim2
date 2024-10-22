@@ -366,6 +366,7 @@ defmodule Xim2Web.CoreComponents do
   """
   attr :name, :string, required: true
   attr :class, :string, default: nil
+  attr :package, :string, default: "las"
 
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
@@ -375,7 +376,7 @@ defmodule Xim2Web.CoreComponents do
 
   def icon(%{name: "la-" <> _} = assigns) do
     ~H"""
-    <span class={["las ", @name, @class]} />
+    <span class={[@package, @name, @class]} />
     """
   end
 
