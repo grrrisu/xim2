@@ -1,4 +1,3 @@
 defmodule MyLiege do
-  @moduledoc """
-  """
+  @moduledoc false
 end
