@@ -2,6 +2,7 @@ defmodule MyLiege.SimulationTest do
   use ExUnit.Case, async: true
 
   alias MyLiege.Simulation
+  alias MyLiege.Population
 
   def round_population(
         %{
@@ -29,8 +30,8 @@ defmodule MyLiege.SimulationTest do
       %{
         change: %{
           food: 0.0,
-          working: %{gen_1: 10.0, gen_2: 10.0, gen_3: 10.0},
-          poverty: %{gen_1: 10.0, gen_2: 10.0, gen_3: 10.0}
+          working: %Population{gen_1: 10.0, gen_2: 10.0, gen_3: 10.0, needed_food: {1, 2, 3}},
+          poverty: %Population{gen_1: 10.0, gen_2: 10.0, gen_3: 10.0, needed_food: {1, 1, 1}}
         }
       }
     end
