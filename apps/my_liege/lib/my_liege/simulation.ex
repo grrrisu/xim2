@@ -14,26 +14,37 @@ defmodule MyLiege.Simulation do
   alias MyLiege.Population
 
   def sim({data, global}) do
-    # gather working population in factories for sim_population
-    # if idle population after sim_population is negative, we need to remove poeple from the factories
-    # if working + (negative) idle < 0 -> GAME over no population
+    # gather amount of workers in factories for sim_population
+    # if working population after sim_population is smaller than the amount of factory workers, we need to remove dead workers from the factories
+    # if working (and maybe also poverty) <= 0 -> GAME over no population
     {%{}, data, global}
     |> harvest()
     |> sim_population()
 
-    # |> handle_shrinking_workers()
+    # |> handle_dead_workers()
   end
 
   def harvest({change, data, global}) do
     {Map.merge(change, %{food: 100}), data, global}
   end
 
-  def sim_population({change, data, global}) do
-    {Map.merge(change, %{working: data.working, poverty: data.poverty}), data, global}
+  def sim_population(
+        {change,
+         %{
+           working: working,
+           poverty: poverty,
+           birth_rate: birth_rate,
+           death_rate: death_rate,
+           disease_rate: disease_rate
+         }, global}
+      ) do
+    change = Map.merge(change, %{working: working, poverty: poverty})
+
+    {change, %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate},
+     global}
     |> grow_population()
     |> feed_population()
     |> shrink_population()
-    |> dbg()
   end
 
   def grow_population(
@@ -62,21 +73,24 @@ defmodule MyLiege.Simulation do
         {%{
            working: working,
            poverty: poverty
-         } = change, %{death_rate: death_rate} = data, %{} = global}
+         } = change, %{death_rate: death_rate, disease_rate: disease_rate} = data, %{} = global}
       ) do
     {%{
        change
-       | working: shrink_social_stratum(working, death_rate),
-         poverty: shrink_social_stratum(poverty, death_rate * 2)
+       | working: shrink_social_stratum(working, {death_rate, disease_rate}),
+         poverty: shrink_social_stratum(poverty, {death_rate * 1.5, disease_rate * 1.5})
      }, data, global}
   end
 
-  def shrink_social_stratum(%{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population, death_rate) do
+  def shrink_social_stratum(
+        %{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population,
+        {death_rate, disease_rate}
+      ) do
     %{
       population
-      | gen_1: gen_1 - death_rate * gen_1 * 1.25,
-        gen_2: gen_2 - death_rate * gen_2,
-        gen_3: gen_3 - death_rate * gen_3
+      | gen_1: gen_1 - disease_rate * 1.5 * gen_1,
+        gen_2: gen_2 - disease_rate * gen_2,
+        gen_3: gen_3 - (death_rate + disease_rate) * gen_3
     }
   end
 
@@ -111,7 +125,7 @@ defmodule MyLiege.Simulation do
       when food >= needed_food do
     food_diff = working_needed_food - poverty_needed_food
     remaining_food = food - needed_food
-    possible = (remaining_food / food_diff) |> round()
+    possible = remaining_food / food_diff
     possible = if possible < poverty.gen_3, do: possible, else: poverty.gen_3
 
     {remaining_food - possible * food_diff, Map.put(working, :gen_3, working.gen_3 + possible),
@@ -146,7 +160,7 @@ defmodule MyLiege.Simulation do
         %Population{} = new_poverty
       )
       when working.gen_3 > new_working.gen_3 do
-    dying = ((working.gen_3 - new_working.gen_3) / working_needed_food) |> round()
+    dying = (working.gen_3 - new_working.gen_3) / working_needed_food
     possible = if new_working.gen_3 >= dying, do: dying, else: new_working.gen_3
 
     {Map.put(new_working, :gen_3, new_working.gen_3 - possible),
@@ -176,7 +190,7 @@ defmodule MyLiege.Simulation do
     }
   end
 
-  def handle_shrinking_workers(_population_result, _data) do
+  def handle_dead_workers(_population_result, _data) do
     # if idle population after sim_population is negative, we need to remove poeple from the factories
     # if working + (negative) idle < 0 -> GAME over no population
   end

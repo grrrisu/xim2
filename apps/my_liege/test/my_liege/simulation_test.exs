@@ -47,17 +47,18 @@ defmodule MyLiege.SimulationTest do
       }
     end
 
-    test "normal", %{population: population} do
+    test "enough food", %{population: population} do
       # enough food for population after grow
-      change = %{food: 12 + 20 + 39 + 16 + 10 + 13}
+      change = %{food: 107}
 
-      data = Map.merge(population, %{birth_rate: 0.4, death_rate: 0.3})
+      data = Map.merge(population, %{birth_rate: 0.4, death_rate: 0.1, disease_rate: 0.2})
       {change, _data, _global} = Simulation.sim_population({change, data, %{}})
       change = round_population(change)
 
       assert %{
-               working: %{gen_1: 10, gen_2: 10, gen_3: 10},
-               poverty: %{gen_1: 10, gen_2: 10, gen_3: 10}
+               food: +0.0,
+               working: %{gen_1: 8, gen_2: 8, gen_3: 9},
+               poverty: %{gen_1: 9, gen_2: 7, gen_3: 7}
              } = change
     end
   end
@@ -110,12 +111,14 @@ defmodule MyLiege.SimulationTest do
     end
 
     test "normal", %{change: change} do
-      {change, _data, _global} = Simulation.shrink_population({change, %{death_rate: 0.3}, %{}})
+      {change, _data, _global} =
+        Simulation.shrink_population({change, %{death_rate: 0.2, disease_rate: 0.1}, %{}})
+
       change = round_population(change)
 
       assert %{
-               working: %{gen_1: 6, gen_2: 7, gen_3: 7},
-               poverty: %{gen_1: 3, gen_2: 4, gen_3: 4}
+               working: %{gen_1: 9, gen_2: 9, gen_3: 7},
+               poverty: %{gen_1: 8, gen_2: 9, gen_3: 5}
              } = change
     end
   end
@@ -172,8 +175,8 @@ defmodule MyLiege.SimulationTest do
 
       assert %{
                food: +0.0,
-               working: %{gen_1: 9, gen_2: 9, gen_3: 9},
-               poverty: %{gen_1: 3, gen_2: 3, gen_3: 3}
+               working: %{gen_1: 9, gen_2: 9, gen_3: 8},
+               poverty: %{gen_1: 3, gen_2: 3, gen_3: 4}
              } = change
     end
 
