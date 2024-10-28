@@ -4,7 +4,7 @@ defmodule MyLiege.Population do
   needed food is per generation
   """
   alias MyLiege.Population
-  defstruct gen_1: 0.0, gen_2: 0.0, gen_3: 0.0, needed_food: {1, 1, 1}
+  defstruct gen_1: 0.0, gen_2: 0.0, gen_3: 0.0, needed_food: {1, 1, 1}, spending_power: 1
 
   def needed_food(%Population{
         gen_1: gen_1,

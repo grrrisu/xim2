@@ -85,18 +85,19 @@ defmodule MyLiege.Simulation do
     }
   end
 
-  def feed_population_with({food, working, poverty}, %{needed_food: needed_food})
+  def feed_population_with(
+        {food, %Population{needed_food: {_, _, working_needed_food}} = working,
+         %Population{needed_food: {_, _, poverty_needed_food}} = poverty},
+        %{needed_food: needed_food}
+      )
       when food >= needed_food do
+    food_diff = working_needed_food - poverty_needed_food
     remaining_food = food - needed_food
-    possible = (remaining_food / (3 - 1)) |> round()
+    possible = (remaining_food / food_diff) |> round()
+    possible = if possible < poverty.gen_3, do: possible, else: poverty.gen_3
 
-    if possible <= poverty.gen_3 do
-      {remaining_food - possible * (3 - 1), Map.put(working, :gen_3, working.gen_3 + possible),
-       Map.put(poverty, :gen_3, poverty.gen_3 - possible)}
-    else
-      {remaining_food - poverty.gen_3 * (3 - 1),
-       Map.put(working, :gen_3, working.gen_3 + poverty.gen_3), Map.put(poverty, :gen_3, 0)}
-    end
+    {remaining_food - possible * food_diff, Map.put(working, :gen_3, working.gen_3 + possible),
+     Map.put(poverty, :gen_3, poverty.gen_3 - possible)}
   end
 
   def feed_population_with({food, working, poverty}, %{
@@ -105,28 +106,47 @@ defmodule MyLiege.Simulation do
         poverty_needed_food: poverty_needed_food
       })
       when food < needed_food do
-    # 45 / (180 + 30)
-    ratio = food / (working_needed_food * 3 + poverty_needed_food * 1)
-    # ratio * 180 => 39 | 6
-    new_working =
-      feed_social_stratum(working, ratio * working_needed_food * 3, {1, 2, 3})
+    working_obtained_food = obtained_food(working, working_needed_food)
+    poverty_obtained_food = obtained_food(poverty, poverty_needed_food)
+    ratio = food / (working_obtained_food + poverty_obtained_food)
 
-    new_poverty =
-      feed_social_stratum(poverty, ratio * poverty_needed_food * 1, {1, 1, 1})
+    new_working = feed_social_stratum(working, ratio * working_obtained_food)
+    new_poverty = feed_social_stratum(poverty, ratio * poverty_obtained_food)
+    {new_working, new_poverty} = working_to_poverty(working, new_working, new_poverty)
 
-    # if working.gen_3 > new_working.gen_3 do
-    #   # needed food
-    #   decline = (working.gen_3 - new_working.gen_3 / (3 - 1)) |> round()
-    #   new_working = Map.put(new_working, :gen_3, new_working.gen_3 - decline)
-    #   new_poverty = Map.put(new_poverty, :gen_3, new_poverty.gen_3 + decline * 3)
-    # end
     {0.0, new_working, new_poverty}
   end
 
+  def working_to_poverty(working, new_working, new_poverty)
+      when working.gen_3 <= new_working.gen_3 do
+    {new_working, new_poverty}
+  end
+
+  def working_to_poverty(
+        working,
+        %Population{needed_food: {_, _, working_needed_food}} = new_working,
+        %Population{} = new_poverty
+      )
+      when working.gen_3 > new_working.gen_3 do
+    dying = ((working.gen_3 - new_working.gen_3) / working_needed_food) |> round()
+    possible = if new_working.gen_3 >= dying, do: dying, else: new_working.gen_3
+
+    {Map.put(new_working, :gen_3, new_working.gen_3 - possible),
+     Map.put(new_poverty, :gen_3, new_poverty.gen_3 + possible * working_needed_food)}
+  end
+
+  def obtained_food(population, needed_food) do
+    population.spending_power * needed_food
+  end
+
   def feed_social_stratum(
-        %{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population,
-        food,
-        {needed_1, needed_2, needed_3}
+        %Population{
+          gen_1: gen_1,
+          gen_2: gen_2,
+          gen_3: gen_3,
+          needed_food: {needed_1, needed_2, needed_3}
+        } = population,
+        food
       ) do
     ratio = food / (gen_1 * needed_1 + gen_2 * needed_2 + gen_3 * needed_3)
 

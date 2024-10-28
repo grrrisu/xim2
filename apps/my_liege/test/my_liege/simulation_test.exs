@@ -30,8 +30,20 @@ defmodule MyLiege.SimulationTest do
       %{
         change: %{
           food: 0.0,
-          working: %Population{gen_1: 10.0, gen_2: 10.0, gen_3: 10.0, needed_food: {1, 2, 3}},
-          poverty: %Population{gen_1: 10.0, gen_2: 10.0, gen_3: 10.0, needed_food: {1, 1, 1}}
+          working: %Population{
+            gen_1: 10.0,
+            gen_2: 10.0,
+            gen_3: 10.0,
+            needed_food: {1, 2, 3},
+            spending_power: 3
+          },
+          poverty: %Population{
+            gen_1: 10.0,
+            gen_2: 10.0,
+            gen_3: 10.0,
+            needed_food: {1, 1, 1},
+            spending_power: 1
+          }
         }
       }
     end
@@ -39,12 +51,11 @@ defmodule MyLiege.SimulationTest do
     test "feed social stratum" do
       population =
         Simulation.feed_social_stratum(
-          %{gen_1: 2, gen_2: 4, gen_3: 8},
-          (2 + 8 + 24) / 2,
-          {1, 2, 3}
+          %Population{gen_1: 2, gen_2: 4, gen_3: 8, needed_food: {1, 2, 3}},
+          (2 + 8 + 24) / 2
         )
 
-      assert %{gen_1: 1, gen_2: 2, gen_3: 4} == population
+      assert %{gen_1: 1.0, gen_2: 2.0, gen_3: 4.0} = population
     end
 
     test "no food", %{change: change} do
@@ -78,8 +89,8 @@ defmodule MyLiege.SimulationTest do
 
       assert %{
                food: +0.0,
-               working: %{gen_1: 4, gen_2: 4, gen_3: 4},
-               poverty: %{gen_1: 1, gen_2: 1, gen_3: 1}
+               working: %{gen_1: 4, gen_2: 4, gen_3: 2},
+               poverty: %{gen_1: 1, gen_2: 1, gen_3: 7}
              } = change
     end
 
