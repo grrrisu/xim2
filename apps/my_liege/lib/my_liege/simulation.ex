@@ -29,28 +29,24 @@ defmodule MyLiege.Simulation do
   end
 
   def sim_population({change, data, global}) do
-    {change, data, global}
+    {Map.merge(change, %{working: data.working, poverty: data.poverty}), data, global}
     |> grow_population()
     |> feed_population()
-
-    # |> shrink_population()
+    |> shrink_population()
+    |> dbg()
   end
 
   def grow_population(
-        {change,
-         %{
-           birth_rate: birth_rate,
+        {%{
            working: working,
            poverty: poverty
-         } =
-           population, %{} = _global}
+         } = change, %{birth_rate: birth_rate} = data, %{} = global}
       ) do
-    new_change = %{
-      working: grow_social_stratum(working, birth_rate),
-      poverty: grow_social_stratum(poverty, birth_rate)
-    }
-
-    {Map.merge(change, new_change), population}
+    {%{
+       change
+       | working: grow_social_stratum(working, birth_rate),
+         poverty: grow_social_stratum(poverty, birth_rate * 2)
+     }, data, global}
   end
 
   def grow_social_stratum(%{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population, birth_rate) do
@@ -59,6 +55,28 @@ defmodule MyLiege.Simulation do
       | gen_1: gen_1 * 0.75 + birth_rate * gen_3,
         gen_2: gen_2 * 0.75 + gen_1 * 0.25,
         gen_3: gen_3 + gen_2 * 0.25
+    }
+  end
+
+  def shrink_population(
+        {%{
+           working: working,
+           poverty: poverty
+         } = change, %{death_rate: death_rate} = data, %{} = global}
+      ) do
+    {%{
+       change
+       | working: shrink_social_stratum(working, death_rate),
+         poverty: shrink_social_stratum(poverty, death_rate * 2)
+     }, data, global}
+  end
+
+  def shrink_social_stratum(%{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population, death_rate) do
+    %{
+      population
+      | gen_1: gen_1 - death_rate * gen_1 * 1.25,
+        gen_2: gen_2 - death_rate * gen_2,
+        gen_3: gen_3 - death_rate * gen_3
     }
   end
 

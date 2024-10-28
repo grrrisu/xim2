@@ -25,6 +25,101 @@ defmodule MyLiege.SimulationTest do
     }
   end
 
+  describe "sim_population" do
+    setup do
+      %{
+        population: %{
+          working: %Population{
+            gen_1: 10.0,
+            gen_2: 10.0,
+            gen_3: 10.0,
+            needed_food: {1, 2, 3},
+            spending_power: 3
+          },
+          poverty: %Population{
+            gen_1: 10.0,
+            gen_2: 10.0,
+            gen_3: 10.0,
+            needed_food: {1, 1, 1},
+            spending_power: 1
+          }
+        }
+      }
+    end
+
+    test "normal", %{population: population} do
+      # enough food for population after grow
+      change = %{food: 12 + 20 + 39 + 16 + 10 + 13}
+
+      data = Map.merge(population, %{birth_rate: 0.4, death_rate: 0.3})
+      {change, _data, _global} = Simulation.sim_population({change, data, %{}})
+      change = round_population(change)
+
+      assert %{
+               working: %{gen_1: 10, gen_2: 10, gen_3: 10},
+               poverty: %{gen_1: 10, gen_2: 10, gen_3: 10}
+             } = change
+    end
+  end
+
+  describe "grow_population" do
+    setup do
+      %{
+        change: %{
+          working: %Population{
+            gen_1: 10.0,
+            gen_2: 10.0,
+            gen_3: 10.0
+          },
+          poverty: %Population{
+            gen_1: 10.0,
+            gen_2: 10.0,
+            gen_3: 10.0
+          }
+        }
+      }
+    end
+
+    test "normal", %{change: change} do
+      {change, _data, _global} = Simulation.grow_population({change, %{birth_rate: 0.4}, %{}})
+      change = round_population(change)
+
+      assert %{
+               working: %{gen_1: 12, gen_2: 10, gen_3: 13},
+               poverty: %{gen_1: 16, gen_2: 10, gen_3: 13}
+             } = change
+    end
+  end
+
+  describe "shrink_population" do
+    setup do
+      %{
+        change: %{
+          working: %Population{
+            gen_1: 10.0,
+            gen_2: 10.0,
+            gen_3: 10.0
+          },
+          poverty: %Population{
+            gen_1: 10.0,
+            gen_2: 10.0,
+            gen_3: 10.0
+          }
+        }
+      }
+    end
+
+    test "normal", %{change: change} do
+      {change, _data, _global} = Simulation.shrink_population({change, %{death_rate: 0.3}, %{}})
+      change = round_population(change)
+
+      assert %{
+               working: %{gen_1: 6, gen_2: 7, gen_3: 7},
+               poverty: %{gen_1: 3, gen_2: 4, gen_3: 4}
+             } = change
+    end
+  end
+
   describe "feed_population" do
     setup do
       %{
