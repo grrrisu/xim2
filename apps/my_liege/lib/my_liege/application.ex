@@ -8,12 +8,9 @@ defmodule MyLiege.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: MyLiege.Worker.start_link(arg)
-      # {MyLiege.Worker, arg}
+      {MyLiege.Realm, name: MyLiege.Realm}
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: MyLiege.Supervisor]
     Supervisor.start_link(children, opts)
   end
