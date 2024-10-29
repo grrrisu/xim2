@@ -20,8 +20,14 @@ defmodule MyLiege.Simulation do
     {%{}, data, global}
     |> harvest()
     |> sim_population()
+    |> apply_changes()
 
     # |> handle_dead_workers()
+  end
+
+  def apply_changes({change, data, _global}) do
+    # maybe notifing
+    Map.merge(data, change)
   end
 
   def harvest({change, data, global}) do
