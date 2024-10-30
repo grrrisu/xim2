@@ -1,7 +1,7 @@
 defmodule MyLiege.SimulationTest do
   use ExUnit.Case, async: true
 
-  alias MyLiege.Simulation
+  alias MyLiege.Simulation.Population, as: Simulation
   alias MyLiege.Population
 
   def round_population(
