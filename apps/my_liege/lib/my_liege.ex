@@ -4,6 +4,7 @@ defmodule MyLiege do
   alias MyLiege.{Population, Simulation}
 
   @test_data %{
+    storage: %{food: 107},
     working: %Population{
       gen_1: 10.0,
       gen_2: 10.0,
@@ -24,7 +25,7 @@ defmodule MyLiege do
   }
 
   def create(server \\ MyLiege.Realm) do
-    Agent.update(server, fn _ -> @test_data end)
+    Agent.get_and_update(server, fn _ -> {@test_data, @test_data} end)
   end
 
   def get_realm(server \\ MyLiege.Realm) do
@@ -35,5 +36,6 @@ defmodule MyLiege do
     realm = Agent.get(server, & &1)
     realm = Simulation.sim({realm, %{}})
     Agent.update(server, fn _old -> realm end)
+    realm
   end
 end

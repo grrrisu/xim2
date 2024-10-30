@@ -12,15 +12,15 @@ defmodule MyLiege.Simulation.Population do
            birth_rate: birth_rate,
            death_rate: death_rate,
            disease_rate: disease_rate
-         }, global}
+         } = data, global}
       ) do
     change = Map.merge(change, %{working: working, poverty: poverty})
 
-    {change, %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate},
-     global}
+    {change, %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate}, %{}}
     |> grow_population()
     |> feed_population()
     |> shrink_population()
+    |> then(fn {change, _, _} -> {change, data, global} end)
   end
 
   def grow_population(
