@@ -30,7 +30,7 @@ defmodule MyLiege.Simulation do
   end
 
   def harvest({change, data, global}) do
-    {Map.merge(change, %{food: 100}), data, global}
+    {Map.merge(change, %{food: Map.get(data.storage, :food, 0)}), data, global}
   end
 
   def handle_dead_workers(_population_result, _data) do
