@@ -10,11 +10,8 @@ defmodule Xim2Web.MyLiegeLive.Index do
   end
 
   def prepare_realm(socket) do
-    PubSub.subscribe(Xim2.PubSub, "my_liege")
-    MyLiege.create()
-    socket = assign(socket, realm: MyLiege.get_realm())
-    form_fields = %{"food" => 0}
-    assign(socket, form: to_form(form_fields))
+    PubSub.subscribe(Xim2Web.PubSub, "my_liege")
+    handle_change(MyLiege.create(), socket)
   end
 
   def handle_event("change_food", %{"realm" => %{"food" => food}}, socket) do
@@ -23,11 +20,26 @@ defmodule Xim2Web.MyLiegeLive.Index do
   end
 
   def handle_event("sim_step", %{}, socket) do
-    {:noreply, assign(socket, realm: MyLiege.sim_step())}
+    {:noreply, handle_change(MyLiege.sim_step(), socket)}
   end
 
   def handle_event("create", %{}, socket) do
     {:noreply, assign(socket, realm: MyLiege.create())}
+  end
+
+  def handle_change(realm, socket) do
+    form_fields = %{"food" => Map.get(realm.storage, :food, 0)}
+    assign(socket, realm: realm, form: to_form(form_fields))
+  end
+
+  def handle_info({_sim, _attr, _value} = event, socket) do
+    dbg(event)
+    {:noreply, socket}
+  end
+
+  def handle_info(msg, socket) do
+    dbg(msg)
+    {:noreply, socket}
   end
 
   def render(assigns) do

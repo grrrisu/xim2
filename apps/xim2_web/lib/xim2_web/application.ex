@@ -8,6 +8,7 @@ defmodule Xim2Web.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {Phoenix.PubSub, name: Xim2Web.PubSub},
       Xim2Web.Telemetry,
       # Start a worker by calling: Xim2Web.Worker.start_link(arg)
       # {Xim2Web.Worker, arg},
