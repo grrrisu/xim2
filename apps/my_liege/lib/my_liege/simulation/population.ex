@@ -2,7 +2,7 @@ defmodule MyLiege.Simulation.Population do
   @moduledoc """
   simulates the grows and deaths of the population
   """
-  alias MyLiege.Population
+  alias MyLiege.{Population, Simulation}
 
   def sim_population(
         {change,
@@ -79,6 +79,9 @@ defmodule MyLiege.Simulation.Population do
     poverty_needed_food = Population.needed_food(poverty)
     needed_food = working_needed_food + poverty_needed_food
 
+    Simulation.notify({:sim_population, :food, food})
+    Simulation.notify({:sim_population, :needed_food, needed_food})
+
     {food, working, poverty} =
       feed_population_with({food, working, poverty}, %{
         needed_food: needed_food,
@@ -104,7 +107,10 @@ defmodule MyLiege.Simulation.Population do
     possible = remaining_food / food_diff
     possible = if possible < poverty.gen_3, do: possible, else: poverty.gen_3
 
-    {remaining_food - possible * food_diff, Map.put(working, :gen_3, working.gen_3 + possible),
+    remaining_food = remaining_food - possible * food_diff
+    Simulation.notify({:sim_population, :remaining_food, remaining_food})
+
+    {remaining_food, Map.put(working, :gen_3, working.gen_3 + possible),
      Map.put(poverty, :gen_3, poverty.gen_3 - possible)}
   end
 

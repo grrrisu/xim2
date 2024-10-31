@@ -10,6 +10,8 @@ defmodule MyLiege.Simulation do
     }
   }
   """
+  alias Phoenix.PubSub
+
   alias MyLiege.Simulation.Population
 
   def sim({data, global}) do
@@ -30,11 +32,16 @@ defmodule MyLiege.Simulation do
   end
 
   def harvest({change, data, global}) do
-    {Map.merge(change, %{food: Map.get(data.storage, :food, 0)}), data, global}
+    food = Map.get(data.storage, :food, 0)
+    {Map.merge(change, %{food: food}), data, global}
   end
 
   def handle_dead_workers(_population_result, _data) do
     # if idle population after sim_population is negative, we need to remove poeple from the factories
     # if working + (negative) idle < 0 -> GAME over no population
+  end
+
+  def notify(event) do
+    PubSub.broadcast(Xim2Web.PubSub, "my_liege", event)
   end
 end
