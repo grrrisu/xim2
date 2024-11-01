@@ -15,8 +15,9 @@ defmodule Xim2Web.MyLiegeLive.Index do
   end
 
   def handle_event("change_food", %{"realm" => %{"food" => food}}, socket) do
-    String.to_integer(food)
-    {:noreply, socket}
+    food = String.to_integer(food)
+    MyLiege.update({[:storage, :food], food})
+    {:noreply, assign(socket, form: food_form_data(food))}
   end
 
   def handle_event("sim_step", %{}, socket) do
@@ -28,8 +29,8 @@ defmodule Xim2Web.MyLiegeLive.Index do
   end
 
   def handle_change(realm, socket) do
-    form_fields = %{"food" => Map.get(realm.storage, :food, 0)}
-    assign(socket, realm: realm, form: to_form(form_fields))
+    form = food_form_data(Map.get(realm.storage, :food, 0))
+    assign(socket, realm: realm, form: form)
   end
 
   def handle_info({_sim, _attr, _value} = event, socket) do
@@ -42,16 +43,16 @@ defmodule Xim2Web.MyLiegeLive.Index do
     {:noreply, socket}
   end
 
+  def food_form_data(food) do
+    %{"food" => food} |> to_form()
+  end
+
   def render(assigns) do
     ~H"""
     <.main_section title="My Liege" back={~p"/"}>
       <%= if @realm do %>
         <.food_form form={@form} />
-        <.action_box class="mb-2">
-          <h4 class="text-lg mb-2 font-semibold">Population</h4>
-          <.social_stratum social={@realm.working} name="Working" />
-          <.social_stratum social={@realm.poverty} name="Poverty" />
-        </.action_box>
+        <.population realm={@realm} />
       <% else %>
         <p>Loading...</p>
       <% end %>
@@ -64,21 +65,36 @@ defmodule Xim2Web.MyLiegeLive.Index do
     <.action_box class="mb-2">
       <.form :let={form} for={@form} as={:realm} phx-submit="change_food" class="flex items-end">
         <.input field={form[:food]} label="Food" value={form[:food].value} />
-        <.button class="ml-2">Change</.button>
+        <.button class="ml-2" id="button-change">Change</.button>
       </.form>
-      <.button class="mt-5 mr-2" phx-click="sim_step">Sim Step</.button>
-      <.button class="mt-5" phx-click="create">Recreate</.button>
+      <.button class="mt-5 mr-2" phx-click="sim_step" id="button-sim-step">Sim Step</.button>
+      <.button class="mt-5" phx-click="create" id="button-recreate">Recreate</.button>
+    </.action_box>
+    """
+  end
+
+  def population(assigns) do
+    ~H"""
+    <.action_box class="mb-2">
+      <h4 class="text-lg mb-2 font-semibold">Population</h4>
+      <.social_stratum social={@realm.working} name="working" />
+      <.social_stratum social={@realm.poverty} name="poverty" />
     </.action_box>
     """
   end
 
   def social_stratum(assigns) do
+    assigns = assign(assigns, title: String.capitalize(assigns.name))
+
     ~H"""
-    <div class="mb-2">
-      <strong><.icon name="la-users" class="la-2x align-middle mr-1" /><%= @name %></strong>
+    <div class="mb-2" id={"social_stratum_#{@name}"}>
+      <strong>
+        <.icon name="la-users" class="la-2x align-middle mr-1" /><%= @title %>
+      </strong>
       <p>
-        <%= @social.gen_1 |> Float.round(2) %> | <%= @social.gen_2 |> Float.round(2) %> | <%= @social.gen_3
-        |> Float.round(2) %>
+        <span class="gen_1"><%= @social.gen_1 |> Float.round(2) %></span>
+        | <span class="gen_2"><%= @social.gen_2 |> Float.round(2) %></span>
+        | <span class="gen_3"><%= @social.gen_3 |> Float.round(2) %></span>
       </p>
     </div>
     """
