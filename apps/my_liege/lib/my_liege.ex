@@ -32,6 +32,19 @@ defmodule MyLiege do
     Agent.get(server, & &1)
   end
 
+  def update(values, server \\ MyLiege.Realm)
+
+  def update(values, server) when is_map(values) do
+    Agent.update(
+      server,
+      &Enum.reduce(&1, values, fn {{keys, value}, realm} -> put_in(realm, keys, value) end)
+    )
+  end
+
+  def update({keys, value}, server) when is_list(keys) do
+    Agent.update(server, &put_in(&1, keys, value))
+  end
+
   def sim_step(server \\ MyLiege.Realm) do
     realm = Agent.get(server, & &1)
     realm = Simulation.sim({realm, %{}})
