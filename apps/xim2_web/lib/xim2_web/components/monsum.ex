@@ -51,6 +51,15 @@ defmodule Monsum do
     """
   end
 
+  attr :class, :string, default: ""
+  slot :inner_block, required: true
+
+  def small_title(assigns) do
+    ~H"""
+    <h4 class={["text-lg mb-2", @class]}><%= render_slot(@inner_block) %></h4>
+    """
+  end
+
   attr :small, :string, required: true, doc: "smaller 768px"
   attr :medium, :string, default: nil, doc: "min 768px"
   attr :large, :string, default: nil, doc: "min 1024px"

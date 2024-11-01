@@ -76,7 +76,7 @@ defmodule Xim2Web.MyLiegeLive.Index do
   def population(assigns) do
     ~H"""
     <.action_box class="mb-2">
-      <h4 class="text-lg mb-2 font-semibold">Population</h4>
+      <.small_title>Population</.small_title>
       <.social_stratum social={@realm.working} name="working" />
       <.social_stratum social={@realm.poverty} name="poverty" />
     </.action_box>
