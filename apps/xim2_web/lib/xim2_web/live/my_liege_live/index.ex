@@ -77,8 +77,30 @@ defmodule Xim2Web.MyLiegeLive.Index do
     ~H"""
     <.action_box class="mb-2">
       <.small_title>Population</.small_title>
-      <.social_stratum social={@realm.working} name="working" />
-      <.social_stratum social={@realm.poverty} name="poverty" />
+      <div class="flex gap-x-7">
+        <div>
+          <.social_stratum social={@realm.working} name="working" />
+          <.social_stratum social={@realm.poverty} name="poverty" />
+        </div>
+        <div>
+          <table>
+            <tbody>
+              <tr>
+                <td><strong>Birthrate:</strong></td>
+                <td><%= @realm.birth_rate %></td>
+              </tr>
+              <tr>
+                <td><strong>Deathrate:</strong></td>
+                <td><%= @realm.death_rate %></td>
+              </tr>
+              <tr>
+                <td><strong>Disease:</strong></td>
+                <td><%= @realm.disease_rate %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </.action_box>
     """
   end
