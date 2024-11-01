@@ -52,7 +52,7 @@ defmodule Xim2Web.MyLiegeLive.Index do
     <.main_section title="My Liege" back={~p"/"}>
       <%= if @realm do %>
         <.food_form form={@form} />
-        <.population realm={@realm} />
+        <.population realm={@realm} edit_items={[:birth_rate]} />
       <% else %>
         <p>Loading...</p>
       <% end %>
@@ -83,11 +83,13 @@ defmodule Xim2Web.MyLiegeLive.Index do
           <.social_stratum social={@realm.poverty} name="poverty" />
         </div>
         <div>
-          <table>
+          <table id="population-properties">
             <tbody>
               <tr>
                 <td><strong>Birthrate:</strong></td>
-                <td><%= @realm.birth_rate %></td>
+                <td>
+                  <.editable_property realm={@realm} property={:birth_rate} edit_items={@edit_items} />
+                </td>
               </tr>
               <tr>
                 <td><strong>Deathrate:</strong></td>
@@ -102,6 +104,33 @@ defmodule Xim2Web.MyLiegeLive.Index do
         </div>
       </div>
     </.action_box>
+    """
+  end
+
+  def editable_property(assigns) do
+    value = get_in(assigns.realm, List.wrap(assigns.property))
+    form = %{value: value, property: assigns.property} |> to_form()
+    assigns = assign(assigns, value: value, form: form)
+
+    ~H"""
+    <div class="relative">
+      <span><%= @value %></span>
+      <%= if Enum.member?(@edit_items, @property) do %>
+        <div class="absolute -right-8 -bottom-2 w-full border">
+          <.form
+            :let={form}
+            for={@form}
+            as={:realm}
+            phx-submit="change_property"
+            class="flex items-end"
+          >
+            <.input field={form[:property]} value={@property} type="hidden" />
+            <.input field={form[:value]} value={@value} class="my-1" />
+            <.button class="ml-2" id="button-change">C</.button>
+          </.form>
+        </div>
+      <% end %>
+    </div>
     """
   end
 
