@@ -235,6 +235,8 @@ defmodule Monsum do
     values: ~w(checkbox color date datetime-local email file hidden month number password
                range radio search select tel text textarea time url week)
 
+  attr :input_class, :string, default: nil
+
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
 
@@ -337,6 +339,7 @@ defmodule Monsum do
         class={[
           "mt-2 block w-full rounded-lg bg-slate-800 text-sky-100 focus:ring-0 sm:text-sm sm:leading-6",
           "phx-no-feedback:border-slate-500 phx-no-feedback:focus:border-sky-600 phx-no-feedback:focus:bg-sky-950",
+          @input_class,
           @errors == [] && "border-slate-500 focus:border-sky-600 focus:bg-sky-950",
           @errors != [] && "border-orange-400 focus:border-orange-300"
         ]}
