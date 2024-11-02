@@ -4,6 +4,12 @@ defmodule MyLiege.Simulation.Population do
   """
   alias MyLiege.{Population, Simulation}
 
+  @doc """
+  After the some time period peopel die and grow.
+  The remaining one need to be fed.
+  Important: the last function in row is the dominant one.
+  In this case `feed_population`, this makes food the main factor that determines how the big the populaiton can grow.
+  """
   def sim_population(
         {change,
          %{
@@ -17,9 +23,9 @@ defmodule MyLiege.Simulation.Population do
     change = Map.merge(change, %{working: working, poverty: poverty})
 
     {change, %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate}, %{}}
+    |> shrink_population()
     |> grow_population()
     |> feed_population()
-    |> shrink_population()
     |> then(fn {change, _, _} -> {change, data, global} end)
   end
 
