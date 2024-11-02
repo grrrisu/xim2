@@ -6,6 +6,7 @@ defmodule Xim2Web.MyLiegeLive.Index do
 
   def mount(_params, _session, socket) do
     socket = if connected?(socket), do: prepare_realm(socket), else: assign(socket, realm: nil)
+    socket = assign(socket, edit_items: [], page_title: "My Liege")
     {:ok, socket}
   end
 
@@ -26,6 +27,22 @@ defmodule Xim2Web.MyLiegeLive.Index do
 
   def handle_event("create", %{}, socket) do
     {:noreply, assign(socket, realm: MyLiege.create())}
+  end
+
+  def handle_event(
+        "edit-property",
+        %{"property" => property},
+        %{assigns: %{edit_items: edit_items}} = socket
+      ) do
+    {:noreply, assign(socket, edit_items: [String.to_atom(property) | edit_items])}
+  end
+
+  def handle_event(
+        "change_property",
+        %{"realm" => %{"property" => "birth_rate", "value" => "0.4"}},
+        socket
+      ) do
+    {:noreply, socket}
   end
 
   def handle_change(realm, socket) do
@@ -52,7 +69,7 @@ defmodule Xim2Web.MyLiegeLive.Index do
     <.main_section title="My Liege" back={~p"/"}>
       <%= if @realm do %>
         <.food_form form={@form} />
-        <.population realm={@realm} edit_items={[:birth_rate]} />
+        <.population realm={@realm} edit_items={@edit_items} />
       <% else %>
         <p>Loading...</p>
       <% end %>
@@ -83,52 +100,69 @@ defmodule Xim2Web.MyLiegeLive.Index do
           <.social_stratum social={@realm.poverty} name="poverty" />
         </div>
         <div>
-          <table id="population-properties">
-            <tbody>
-              <tr>
-                <td><strong>Birthrate:</strong></td>
-                <td>
-                  <.editable_property realm={@realm} property={:birth_rate} edit_items={@edit_items} />
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Deathrate:</strong></td>
-                <td><%= @realm.death_rate %></td>
-              </tr>
-              <tr>
-                <td><strong>Disease:</strong></td>
-                <td><%= @realm.disease_rate %></td>
-              </tr>
-            </tbody>
-          </table>
+          <.property_table realm={@realm} edit_items={@edit_items}>
+            <:row label="Birthrate" property={:birth_rate} />
+            <:row label="Deathrate" property={:death_rate} />
+            <:row label="Disease" property={:disease_rate} />
+          </.property_table>
         </div>
       </div>
     </.action_box>
     """
   end
 
+  def property_table(assigns) do
+    ~H"""
+    <table class="">
+      <tbody>
+        <tr :for={row <- @row}>
+          <td><strong><%= row.label %></strong></td>
+          <td>
+            <.editable_property realm={@realm} property={row.property} edit_items={@edit_items} />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    """
+  end
+
   def editable_property(assigns) do
     value = get_in(assigns.realm, List.wrap(assigns.property))
-    form = %{value: value, property: assigns.property} |> to_form()
-    assigns = assign(assigns, value: value, form: form)
+    form = %{"value" => value, "property" => assigns.property} |> to_form()
+
+    assigns =
+      assign(assigns,
+        value: value,
+        form: form,
+        edit: Enum.member?(assigns.edit_items, assigns.property)
+      )
 
     ~H"""
     <div class="relative">
-      <span><%= @value %></span>
-      <%= if Enum.member?(@edit_items, @property) do %>
-        <div class="absolute -right-8 -bottom-2 w-full border">
+      <%= if @edit do %>
+        <div class="absolute left-0 -bottom-6 w-32 rounded-md border border-sky-400 py-1 pr-1 bg-sky-800">
           <.form
             :let={form}
             for={@form}
             as={:realm}
             phx-submit="change_property"
-            class="flex items-end"
+            class="flex items-center"
           >
+            <.icon name="la-angle-left" class="align-middle" />
             <.input field={form[:property]} value={@property} type="hidden" />
-            <.input field={form[:value]} value={@value} class="my-1" />
-            <.button class="ml-2" id="button-change">C</.button>
+            <.input
+              field={form[:value]}
+              value={@value}
+              size="5"
+              input_class="mt-0 py-1 px-2 text-right"
+            />
+            <.button class="py-1 px-2 ml-2" id="button-change">
+              <.icon name="la-upload" />
+            </.button>
           </.form>
         </div>
+      <% else %>
+        <span><%= @value %></span><a href="#" phx-click="edit-property" phx-value-property={@property}> <.icon name="la-edit" /></a>
       <% end %>
     </div>
     """
