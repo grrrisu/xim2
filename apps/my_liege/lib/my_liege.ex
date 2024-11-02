@@ -4,7 +4,7 @@ defmodule MyLiege do
   alias MyLiege.{Population, Simulation}
 
   @test_data %{
-    storage: %{food: 107},
+    storage: %{food: 94},
     working: %Population{
       gen_1: 10.0,
       gen_2: 10.0,
@@ -20,8 +20,8 @@ defmodule MyLiege do
       spending_power: 1
     },
     birth_rate: 0.4,
-    death_rate: 0.1,
-    disease_rate: 0.1
+    death_rate: 0.05,
+    disease_rate: 0.08
   }
 
   def create(server \\ MyLiege.Realm) do

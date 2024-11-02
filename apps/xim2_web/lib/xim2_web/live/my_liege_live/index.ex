@@ -142,20 +142,15 @@ defmodule Xim2Web.MyLiegeLive.Index do
       <%= if @edit do %>
         <div class="absolute left-0 -bottom-6 w-32 rounded-md border border-sky-400 py-1 pr-1 bg-sky-800">
           <.form
-            :let={form}
+            :let={f}
             for={@form}
             as={:realm}
             phx-submit="change_property"
             class="flex items-center"
           >
             <.icon name="la-angle-left" class="align-middle" />
-            <.input field={form[:property]} value={@property} type="hidden" />
-            <.input
-              field={form[:value]}
-              value={@value}
-              size="5"
-              input_class="mt-0 py-1 px-2 text-right"
-            />
+            <.input field={f[:property]} value={@property} type="hidden" />
+            <.input field={f[:value]} value={@value} size="5" input_class="mt-0 py-1 px-2 text-right" />
             <.button class="py-1 px-2 ml-2" id="button-change">
               <.icon name="la-upload" />
             </.button>
