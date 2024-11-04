@@ -8,7 +8,8 @@ defmodule MyLiege.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {MyLiege.Realm, name: MyLiege.Realm}
+      {MyLiege.Realm, name: MyLiege.Realm},
+      {Task.Supervisor, name: MyLiege.TaskSupervisor}
     ]
 
     opts = [strategy: :one_for_one, name: MyLiege.Supervisor]
