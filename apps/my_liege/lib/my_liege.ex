@@ -32,6 +32,10 @@ defmodule MyLiege do
     Agent.get(server, & &1)
   end
 
+  def get_property(property, server \\ MyLiege.Realm) when is_binary(property) do
+    Agent.get(server, &get_in(&1, property_path(property)))
+  end
+
   def update(values, server \\ MyLiege.Realm)
 
   def update(values, server) when is_map(values) do
@@ -39,6 +43,11 @@ defmodule MyLiege do
       server,
       &Enum.reduce(&1, values, fn {{keys, value}, realm} -> put_in(realm, keys, value) end)
     )
+  end
+
+  def update({property, value}, server) when is_binary(property) and is_binary(value) do
+    {value, _} = Float.parse(value)
+    Agent.update(server, &put_in(&1, property_path(property), value))
   end
 
   def update({keys, value}, server) when is_list(keys) do
@@ -50,5 +59,11 @@ defmodule MyLiege do
     realm = Simulation.sim({realm, %{}})
     Agent.update(server, fn _old -> realm end)
     realm
+  end
+
+  def property_path(property) do
+    property
+    |> String.split(".")
+    |> Enum.map(&String.to_atom(&1))
   end
 end
