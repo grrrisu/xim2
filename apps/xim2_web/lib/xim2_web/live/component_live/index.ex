@@ -153,6 +153,18 @@ defmodule Xim2Web.ComponentLive.Index do
         </.main_section>
       </div>
     </.flexbox_col>
+
+    <.flexbox_col class="border border-gray-500 w-full min-h-screen">
+      <div>
+        <h3>main_box</h3>
+        <.main_box>
+          <:header>Header</:header>
+          <div class="bg-sky-500 text-center">One</div>
+          <div class="bg-sky-500 text-center">Two</div>
+          <div class="bg-sky-500 text-center">Three</div>
+        </.main_box>
+      </div>
+    </.flexbox_col>
     """
   end
 

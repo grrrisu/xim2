@@ -4,7 +4,8 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
 
   import Xim2Web.ProjectComponents
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
+    dbg(params)
     socket = if connected?(socket), do: prepare_realm(socket), else: assign(socket, realm: nil)
     socket = assign(socket, edit_items: [], page_title: "My Liege")
     {:ok, socket}

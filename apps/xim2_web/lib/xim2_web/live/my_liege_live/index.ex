@@ -13,14 +13,21 @@ defmodule Xim2Web.MyLiegeLive.Index do
   def render(assigns) do
     ~H"""
     <.main_section title="My Liege" back={~p"/"}>
-      <.title>Scenarios</.title>
-      <div class="flex flex-wrap place-content-evenly items-stretch">
-        <.hero_card link={~p"/my_liege/scenario"} class="mb-6 mx-3 basis-1/5">
+      <.main_box>
+        <:header>
+          <.title>Scenarios</.title>
+        </:header>
+        <.hero_card link={~p"/my_liege/scenario?population"} class="mb-6 mx-3 basis-1/5">
           <:icon><.icon name="la-users" class="la-2x" /></:icon>
           <:title>Population</:title>
           Sim birth and death, diseases and feeding poeple
         </.hero_card>
-      </div>
+        <.hero_card link={~p"/my_liege/scenario?factories"} class="mb-6 mx-3 basis-1/5">
+          <:icon><.icon name="la-industry" class="la-2x" /></:icon>
+          <:title>Factories</:title>
+          Farms, wood, tools, black smiths
+        </.hero_card>
+      </.main_box>
     </.main_section>
     """
   end
