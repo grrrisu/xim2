@@ -5,44 +5,43 @@
 />
 
 <.flash_group flash={@flash} />
-<div class="min-h-[65vh] mx-auto p-6 rounded-t-lg w-11/12 drop-shadow-2xl bg-sky-950 border-2 border-sky-500 opacity-95 absolute left-[4.1666666667%] top-[30vh]">
-  <.main_title>Xim 2</.main_title>
-
-  <div class="flex flex-wrap place-content-evenly items-stretch">
-    <.hero_card link={~p"/grid"} class="mb-6 mx-3 basis-1/5">
-      <:icon><.icon name="la-th" class="la-2x" /></:icon>
-      <:title>Grid</:title>
-      A simple Grid with overlay
-    </.hero_card>
-    <.hero_card link={~p"/monitor"} class="mb-6 mx-3 basis-1/5">
-      <:icon><.icon name="la-eye" class="la-2x" /></:icon>
-      <:title>Sim Monitor</:title>
-      Observe the queues
-    </.hero_card>
-    <.hero_card link={~p"/biotope"} class="mb-6 mx-3 basis-1/5">
-      <:icon><.icon name="la-leaf" class="la-2x" /></:icon>
-      <:title>Biotope</:title>
-      The Biotope, Vegetation
-    </.hero_card>
-    <.hero_card link={~p"/astrorunner"} class="mb-6 mx-3 basis-1/5">
-      <:icon><.icon name="la-rocket" class="la-2x" /></:icon>
-      <:title>Astrorunner</:title>
-      Digital version of the board game.
-    </.hero_card>
-    <.hero_card link={~p"/my_liege"} class="mb-6 mx-3 basis-1/5">
-      <:icon><.icon name="la-fort-awesome" package="lab" class="la-2x" /></:icon>
-      <:title>My Liege</:title>
-      Small world simulation
-    </.hero_card>
-    <.hero_card link={~p"/colors"} class="mb-6 mx-3 basis-1/5">
-      <:icon><.icon name="la-palette" class="la-2x" /></:icon>
-      <:title>Colors</:title>
-      The colors and mood pictures
-    </.hero_card>
-    <.hero_card link={~p"/components"} class="mb-6 mx-3 basis-1/5">
-      <:icon><.icon name="la-window-restore" class="la-2x" /></:icon>
-      <:title>Components</:title>
-      Monsum and project components
-    </.hero_card>
-  </div>
-</div>
+<.main_box class="min-h-[65vh] mx-auto  w-11/12 opacity-95 absolute left-[4.1666666667%] top-[30vh]">
+  <:header>
+    <.main_title>Xim 2</.main_title>
+  </:header>
+  <.hero_card link={~p"/grid"} class="mb-6 mx-3 basis-1/5">
+    <:icon><.icon name="la-th" class="la-2x" /></:icon>
+    <:title>Grid</:title>
+    A simple Grid with overlay
+  </.hero_card>
+  <.hero_card link={~p"/monitor"} class="mb-6 mx-3 basis-1/5">
+    <:icon><.icon name="la-eye" class="la-2x" /></:icon>
+    <:title>Sim Monitor</:title>
+    Observe the queues
+  </.hero_card>
+  <.hero_card link={~p"/biotope"} class="mb-6 mx-3 basis-1/5">
+    <:icon><.icon name="la-leaf" class="la-2x" /></:icon>
+    <:title>Biotope</:title>
+    The Biotope, Vegetation
+  </.hero_card>
+  <.hero_card link={~p"/astrorunner"} class="mb-6 mx-3 basis-1/5">
+    <:icon><.icon name="la-rocket" class="la-2x" /></:icon>
+    <:title>Astrorunner</:title>
+    Digital version of the board game.
+  </.hero_card>
+  <.hero_card link={~p"/my_liege"} class="mb-6 mx-3 basis-1/5">
+    <:icon><.icon name="la-fort-awesome" package="lab" class="la-2x" /></:icon>
+    <:title>My Liege</:title>
+    Small world simulation
+  </.hero_card>
+  <.hero_card link={~p"/colors"} class="mb-6 mx-3 basis-1/5">
+    <:icon><.icon name="la-palette" class="la-2x" /></:icon>
+    <:title>Colors</:title>
+    The colors and mood pictures
+  </.hero_card>
+  <.hero_card link={~p"/components"} class="mb-6 mx-3 basis-1/5">
+    <:icon><.icon name="la-window-restore" class="la-2x" /></:icon>
+    <:title>Components</:title>
+    Monsum and project components
+  </.hero_card>
+</.main_box>

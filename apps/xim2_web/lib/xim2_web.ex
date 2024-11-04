@@ -86,6 +86,7 @@ defmodule Xim2Web do
       # Core UI components and translation
       import Monsum
       import Xim2Web.CoreComponents
+      import Xim2Web.ProjectComponents
       import Xim2Web.Gettext
 
       # Shortcut for generating JS commands
