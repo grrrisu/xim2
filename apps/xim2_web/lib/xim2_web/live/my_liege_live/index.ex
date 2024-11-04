@@ -16,7 +16,8 @@ defmodule Xim2Web.MyLiegeLive.Index do
   end
 
   def handle_event("sim_step", %{}, socket) do
-    {:noreply, handle_change(MyLiege.sim_step(), socket)}
+    :ok = MyLiege.sim_step()
+    {:noreply, socket}
   end
 
   def handle_event("create", %{}, socket) do
@@ -44,6 +45,10 @@ defmodule Xim2Web.MyLiegeLive.Index do
 
   def handle_change(realm, socket) do
     assign(socket, realm: realm)
+  end
+
+  def handle_info({:realm_updated, realm}, socket) do
+    {:noreply, assign(socket, realm: realm)}
   end
 
   def handle_info({_sim, _attr, _value} = event, socket) do

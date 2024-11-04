@@ -1,6 +1,7 @@
 defmodule MyLiege do
   @moduledoc false
 
+  alias Phoenix.PubSub
   alias MyLiege.{Population, Simulation}
 
   @test_data %{
@@ -55,10 +56,15 @@ defmodule MyLiege do
   end
 
   def sim_step(server \\ MyLiege.Realm) do
-    realm = Agent.get(server, & &1)
-    realm = Simulation.sim({realm, %{}})
-    Agent.update(server, fn _old -> realm end)
-    realm
+    {:ok, _pid} =
+      Task.Supervisor.start_child(MyLiege.TaskSupervisor, fn ->
+        realm = Agent.get(server, & &1)
+        realm = Simulation.sim({realm, %{}})
+        :ok = Agent.update(server, fn _old -> realm end)
+        :ok = PubSub.broadcast(Xim2Web.PubSub, "my_liege", {:realm_updated, realm})
+      end)
+
+    :ok
   end
 
   def property_path(property) do
