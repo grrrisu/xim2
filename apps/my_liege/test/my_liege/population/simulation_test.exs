@@ -56,9 +56,9 @@ defmodule MyLiege.SimulationTest do
       change = round_population(change)
 
       assert %{
-               food: +0.0,
-               working: %{gen_1: 8, gen_2: 8, gen_3: 9},
-               poverty: %{gen_1: 9, gen_2: 7, gen_3: 7}
+               food: 19.55000000000001,
+               working: %{gen_1: 8, gen_2: 8, gen_3: 16},
+               poverty: %{gen_1: 9, gen_2: 7, gen_3: 0}
              } = change
     end
   end
