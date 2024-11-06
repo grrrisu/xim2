@@ -22,24 +22,39 @@ defmodule MyLiege.Simulation.Population do
       ) do
     change = Map.merge(change, %{working: working, poverty: poverty})
 
-    {change, %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate}, %{}}
+    {{change, []}, %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate},
+     %{}}
+    |> log_change(:before)
     |> shrink_population()
+    |> log_change(:shrink_population)
     |> grow_population()
+    |> log_change(:grow_population)
     |> feed_population()
+    |> log_change(:feed_population)
+    |> notify_changes()
     |> then(fn {change, _, _} -> {change, data, global} end)
   end
 
+  def log_change({{change, log}, data, global}, sim_tag) do
+    {{change, [{sim_tag, change} | log]}, data, global}
+  end
+
+  def notify_changes({{change, log}, data, global}) do
+    Simulation.notify({:population_simulated, log})
+    {change, data, global}
+  end
+
   def grow_population(
-        {%{
-           working: working,
-           poverty: poverty
-         } = change, %{birth_rate: birth_rate} = data, %{} = global}
+        {{%{
+            working: working,
+            poverty: poverty
+          } = change, log}, %{birth_rate: birth_rate} = data, %{} = global}
       ) do
-    {%{
-       change
-       | working: grow_social_stratum(working, birth_rate),
-         poverty: grow_social_stratum(poverty, birth_rate * 2)
-     }, data, global}
+    {{%{
+        change
+        | working: grow_social_stratum(working, birth_rate),
+          poverty: grow_social_stratum(poverty, birth_rate * 2)
+      }, log}, data, global}
   end
 
   def grow_social_stratum(%{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population, birth_rate) do
@@ -52,16 +67,17 @@ defmodule MyLiege.Simulation.Population do
   end
 
   def shrink_population(
-        {%{
-           working: working,
-           poverty: poverty
-         } = change, %{death_rate: death_rate, disease_rate: disease_rate} = data, %{} = global}
+        {{%{
+            working: working,
+            poverty: poverty
+          } = change, log}, %{death_rate: death_rate, disease_rate: disease_rate} = data,
+         %{} = global}
       ) do
-    {%{
-       change
-       | working: shrink_social_stratum(working, {death_rate, disease_rate}),
-         poverty: shrink_social_stratum(poverty, {death_rate * 1.5, disease_rate * 1.5})
-     }, data, global}
+    {{%{
+        change
+        | working: shrink_social_stratum(working, {death_rate, disease_rate}),
+          poverty: shrink_social_stratum(poverty, {death_rate * 1.5, disease_rate * 1.5})
+      }, log}, data, global}
   end
 
   def shrink_social_stratum(
@@ -77,16 +93,13 @@ defmodule MyLiege.Simulation.Population do
   end
 
   def feed_population({
-        %{food: food, working: working, poverty: poverty} = change,
+        {%{food: food, working: working, poverty: poverty} = change, log},
         %{} = data,
         %{} = global
       }) do
     working_needed_food = Population.needed_food(working)
     poverty_needed_food = Population.needed_food(poverty)
     needed_food = working_needed_food + poverty_needed_food
-
-    Simulation.notify({:sim_population, :food, food})
-    Simulation.notify({:sim_population, :needed_food, needed_food})
 
     {food, working, poverty} =
       feed_population_with({food, working, poverty}, %{
@@ -96,7 +109,7 @@ defmodule MyLiege.Simulation.Population do
       })
 
     {
-      Map.merge(change, %{food: food, working: working, poverty: poverty}),
+      {Map.merge(change, %{food: food, working: working, poverty: poverty}), log},
       data,
       global
     }
@@ -114,7 +127,6 @@ defmodule MyLiege.Simulation.Population do
     possible = if possible < poverty.gen_3, do: possible, else: poverty.gen_3
 
     remaining_food = remaining_food - possible * food_diff
-    Simulation.notify({:sim_population, :remaining_food, remaining_food})
 
     {remaining_food, Map.put(working, :gen_3, working.gen_3 + possible),
      Map.put(poverty, :gen_3, poverty.gen_3 - possible)}

@@ -82,7 +82,9 @@ defmodule MyLiege.SimulationTest do
     end
 
     test "normal", %{change: change} do
-      {change, _data, _global} = Simulation.grow_population({change, %{birth_rate: 0.4}, %{}})
+      {{change, _log}, _data, _global} =
+        Simulation.grow_population({{change, []}, %{birth_rate: 0.4}, %{}})
+
       change = round_population(change)
 
       assert %{
@@ -111,8 +113,8 @@ defmodule MyLiege.SimulationTest do
     end
 
     test "normal", %{change: change} do
-      {change, _data, _global} =
-        Simulation.shrink_population({change, %{death_rate: 0.2, disease_rate: 0.1}, %{}})
+      {{change, _log}, _data, _global} =
+        Simulation.shrink_population({{change, []}, %{death_rate: 0.2, disease_rate: 0.1}, %{}})
 
       change = round_population(change)
 
@@ -158,7 +160,7 @@ defmodule MyLiege.SimulationTest do
 
     test "no food", %{change: change} do
       change = Map.put(change, :food, 0)
-      {change, _data, _global} = Simulation.feed_population({change, %{}, %{}})
+      {{change, _log}, _data, _global} = Simulation.feed_population({{change, []}, %{}, %{}})
       change = round_population(change)
 
       assert %{
@@ -170,7 +172,7 @@ defmodule MyLiege.SimulationTest do
 
     test "enough for working", %{change: change} do
       change = Map.put(change, :food, 10 + 20 + 30)
-      {change, _data, _global} = Simulation.feed_population({change, %{}, %{}})
+      {{change, _log}, _data, _global} = Simulation.feed_population({{change, []}, %{}, %{}})
       change = round_population(change)
 
       assert %{
@@ -182,7 +184,7 @@ defmodule MyLiege.SimulationTest do
 
     test "only half for working", %{change: change} do
       change = Map.put(change, :food, (10 + 20 + 30) / 2)
-      {change, _data, _global} = Simulation.feed_population({change, %{}, %{}})
+      {{change, _log}, _data, _global} = Simulation.feed_population({{change, []}, %{}, %{}})
       change = round_population(change)
 
       assert %{
@@ -194,7 +196,7 @@ defmodule MyLiege.SimulationTest do
 
     test "enough for poverty", %{change: change} do
       change = Map.put(change, :food, 10 + 20 + 30 + 10 + 10 + 10)
-      {change, _data, _global} = Simulation.feed_population({change, %{}, %{}})
+      {{change, _log}, _data, _global} = Simulation.feed_population({{change, []}, %{}, %{}})
       change = round_population(change)
 
       assert %{
@@ -206,7 +208,7 @@ defmodule MyLiege.SimulationTest do
 
     test "reduce poverty", %{change: change} do
       change = Map.put(change, :food, 10 + 20 + 30 + 10 + 10 + 10 + 8)
-      {change, _data, _global} = Simulation.feed_population({change, %{}, %{}})
+      {{change, _log}, _data, _global} = Simulation.feed_population({{change, []}, %{}, %{}})
       change = round_population(change)
 
       assert %{
@@ -218,7 +220,7 @@ defmodule MyLiege.SimulationTest do
 
     test "remaining food", %{change: change} do
       change = Map.put(change, :food, 10 + 20 + 30 + 10 + 10 + 10 + 50)
-      {change, _data, _global} = Simulation.feed_population({change, %{}, %{}})
+      {{change, _log}, _data, _global} = Simulation.feed_population({{change, []}, %{}, %{}})
       change = round_population(change)
 
       assert %{
