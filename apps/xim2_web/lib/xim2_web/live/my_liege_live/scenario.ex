@@ -52,12 +52,12 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     {:noreply, assign(socket, realm: realm)}
   end
 
-  def handle_info({_sim, _attr, _value} = event, socket) do
+  def handle_info({_sim, _attr, _value} = _event, socket) do
     # dbg(event)
     {:noreply, socket}
   end
 
-  def handle_info(msg, socket) do
+  def handle_info(_msg, socket) do
     # dbg(msg)
     {:noreply, socket}
   end
