@@ -3,12 +3,18 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   use Xim2Web, :live_view
 
   import Xim2Web.ProjectComponents
+  import Xim2Web.Monitor.Components
 
   def mount(params, _session, socket) do
     dbg(params)
     socket = if connected?(socket), do: prepare_realm(socket), else: assign(socket, realm: nil)
-    socket = assign(socket, edit_items: [], page_title: "My Liege")
-    {:ok, socket}
+
+    {:ok,
+     socket
+     |> assign(edit_items: [], page_title: "My Liege")
+     |> prepare_summary_chart("population-history-chart",
+       begin_at_zero: true
+     )}
   end
 
   def prepare_realm(socket) do
@@ -70,8 +76,20 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     ~H"""
     <.main_section title="My Liege" back={~p"/my_liege"} back_title="Scenarios">
       <%= if @realm do %>
-        <.storage realm={@realm} edit_items={@edit_items} />
-        <.population realm={@realm} edit_items={@edit_items} />
+        <div class="flex flex-row">
+          <div>
+            <.storage realm={@realm} edit_items={@edit_items} />
+            <.population realm={@realm} edit_items={@edit_items} />
+          </div>
+          <div>
+            <.action_box class="ml-2">
+              <.small_title>
+                <.icon name="la-chart-line" class="la-2x align-bottom mr-1" />Statistics
+              </.small_title>
+              <.chart title="Population" name="population-history-chart" />
+            </.action_box>
+          </div>
+        </div>
         <.actions />
       <% else %>
         <p>Loading...</p>

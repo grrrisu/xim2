@@ -26,6 +26,10 @@ defmodule Xim2Web.Monitor.Components do
     """
   end
 
+  attr :title, :string, required: true
+  attr :name, :string, required: true
+  attr :hook, :string, default: "Chart"
+
   def chart(assigns) do
     ~H"""
     <h3><%= @title %></h3>
@@ -33,6 +37,33 @@ defmodule Xim2Web.Monitor.Components do
       <canvas id={"#{@name}"} phx-hook={@hook}></canvas>
     </div>
     """
+  end
+
+  @doc """
+  options:
+    * stacked, default false
+    * begin_at_zero, default false
+    * fill, default false
+  """
+  def prepare_summary_chart(socket, chart, opts) do
+    socket
+    |> push_event("init-chart-#{chart}", %{
+      type: opts[:type] || "line",
+      options: %{
+        stacked: opts[:stacked] || false,
+        beginAtZero: opts[:begin_at_zero] || false
+      },
+      datasets: [
+        %{
+          label: "one",
+          borderColor: "rgb(16, 185, 129, 0.8)",
+          backgroundColor: "rgb(4, 120, 87, 0.8)",
+          fill: opts[:fill] || false,
+          lineTension: 0,
+          borderWidth: 2
+        }
+      ]
+    })
   end
 
   def push_chart_data(socket, event, results) do
