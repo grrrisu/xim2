@@ -18,18 +18,18 @@ defmodule Xim2Web.MonitorLive.Index do
     {:ok,
      socket
      |> assign(:page_title, "Monitor #{data}")
-     |> prepare_summary_chart("duration-summary-chart",
+     |> prepare_biotope_chart("duration-summary-chart",
        fill: true,
        stacked: true,
        begin_at_zero: true
      )
-     |> prepare_summary_chart("ok-summary-chart", fill: false, begin_at_zero: true)
-     |> prepare_summary_chart("changed-summary-chart",
+     |> prepare_biotope_chart("ok-summary-chart", fill: false, begin_at_zero: true)
+     |> prepare_biotope_chart("changed-summary-chart",
        fill: true,
        stacked: true,
        begin_at_zero: true
      )
-     |> prepare_summary_chart("errors-summary-chart",
+     |> prepare_biotope_chart("errors-summary-chart",
        type: "bar",
        fill: false,
        begin_at_zero: true
@@ -169,7 +169,7 @@ defmodule Xim2Web.MonitorLive.Index do
     |> String.to_atom()
   end
 
-  defp prepare_summary_chart(socket, chart, opts) do
+  defp prepare_biotope_chart(socket, chart, opts) do
     socket
     |> push_event("init-chart-#{chart}", %{
       type: opts[:type] || "line",

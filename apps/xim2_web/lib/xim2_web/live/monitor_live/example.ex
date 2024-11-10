@@ -135,25 +135,4 @@ defmodule Xim2Web.MonitorLive.Example do
     Monitor.create_data(@items)
     Monitor.prepare_queues(@timeout, @tasks)
   end
-
-  defp prepare_summary_chart(socket, chart, opts) do
-    socket
-    |> push_event("init-chart-#{chart}", %{
-      type: opts[:type] || "line",
-      options: %{
-        stacked: opts[:stacked] || false,
-        beginAtZero: opts[:begin_at_zero] || false
-      },
-      datasets: [
-        %{
-          label: "one",
-          borderColor: "rgb(16, 185, 129, 0.8)",
-          backgroundColor: "rgb(4, 120, 87, 0.8)",
-          fill: opts[:fill] || false,
-          lineTension: 0,
-          borderWidth: 2
-        }
-      ]
-    })
-  end
 end

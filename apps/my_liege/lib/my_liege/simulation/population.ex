@@ -40,7 +40,7 @@ defmodule MyLiege.Simulation.Population do
   end
 
   def notify_changes({{change, log}, data, global}) do
-    Simulation.notify({:population_simulated, log})
+    :ok = Simulation.notify({:population_simulated, log})
     {change, data, global}
   end
 
