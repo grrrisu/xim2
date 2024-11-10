@@ -58,6 +58,57 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     {:noreply, assign(socket, realm: realm)}
   end
 
+  """
+    struct name, value, children
+
+    name: population,
+    value: 100,
+    children:
+      name: working,
+      value: 40
+      children:
+        name: gen_1
+        value: 8
+
+
+  """
+
+  def aggregate(changes, [properties | []]) do
+    dbg(properties)
+    dbg(changes)
+    Enum.map(properties, &aggregate(Map.get(changes, &1), &1))
+  end
+
+  def aggregate(changes, [properties | children]) do
+    dbg(properties)
+    dbg(children)
+    dbg(changes)
+
+    Enum.map(properties, fn property ->
+      children = aggregate(Map.get(changes, property), children)
+
+      %{
+        name: property,
+        value: Enum.reduce(children, 0.0, fn child, sum -> sum + Map.get(child, :value) end),
+        children: children
+      }
+    end)
+  end
+
+  def aggregate(value, property) do
+    %{name: property, value: value}
+  end
+
+  def handle_info({:population_simulated, changes}, socket) do
+    changes
+    |> List.first()
+    |> then(fn {_key, value} -> value end)
+    |> aggregate([[:working, :poverty], [:gen_1, :gen_2, :gen_3]])
+    |> dbg()
+
+    {:noreply, socket}
+  end
+
   def handle_info({_sim, _attr, _value} = _event, socket) do
     # dbg(event)
     {:noreply, socket}
