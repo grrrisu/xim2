@@ -3,10 +3,9 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   use Xim2Web, :live_view
 
   import Xim2Web.ProjectComponents
-  import Xim2Web.Monitor.Components
 
-  def mount(params, _session, socket) do
-    dbg(params)
+  def mount(_params, _session, socket) do
+    # dbg(params)
     socket = if connected?(socket), do: prepare_realm(socket), else: assign(socket, realm: nil)
 
     {:ok,
