@@ -135,4 +135,15 @@ defmodule Xim2Web.MonitorLive.Example do
     Monitor.create_data(@items)
     Monitor.prepare_queues(@timeout, @tasks)
   end
+
+  defp prepare_summary_chart(socket, chart_id, opts) do
+    socket
+    |> prepare_chart(
+      chart_id,
+      [
+        %{label: "example", fill: opts[:fill] || false}
+      ],
+      opts
+    )
+  end
 end
