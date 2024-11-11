@@ -26,9 +26,17 @@ defmodule MyLiege.Simulation do
     # |> handle_dead_workers()
   end
 
-  def apply_changes({change, data, _global}) do
+  def apply_changes({change, %{population: population, storage: _storage} = data, _global}) do
     # maybe notifing
-    Map.merge(data, change)
+    # Map.merge(storage, %{food: food})
+    %{
+      data
+      | population: %{
+          population
+          | working: change.population.working,
+            poverty: change.population.poverty
+        }
+    }
   end
 
   def harvest({change, data, global}) do

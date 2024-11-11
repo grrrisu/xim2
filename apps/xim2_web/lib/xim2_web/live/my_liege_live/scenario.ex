@@ -74,16 +74,10 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   """
 
   def aggregate(changes, [properties | []]) do
-    dbg(properties)
-    dbg(changes)
     Enum.map(properties, &aggregate(Map.get(changes, &1), &1))
   end
 
   def aggregate(changes, [properties | children]) do
-    dbg(properties)
-    dbg(children)
-    dbg(changes)
-
     Enum.map(properties, fn property ->
       children = aggregate(Map.get(changes, property), children)
 
@@ -102,9 +96,8 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   def handle_info({:population_simulated, changes}, socket) do
     changes
     |> List.first()
-    |> then(fn {_key, value} -> value end)
-    |> aggregate([[:working, :poverty], [:gen_1, :gen_2, :gen_3]])
-    |> dbg()
+    |> then(fn {_key, value} -> %{population: value} end)
+    |> aggregate([[:population], [:working, :poverty], [:gen_1, :gen_2, :gen_3]])
 
     {:noreply, socket}
   end
@@ -127,19 +120,17 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     ~H"""
     <.main_section title="My Liege" back={~p"/my_liege"} back_title="Scenarios">
       <%= if @realm do %>
-        <div class="flex flex-row">
+        <div class="flex flex-row gap-2">
           <div>
             <.storage realm={@realm} edit_items={@edit_items} />
-            <.population realm={@realm} edit_items={@edit_items} />
+            <.population data={@realm.population} edit_items={@edit_items} />
           </div>
-          <div>
-            <.action_box class="ml-2">
-              <.small_title>
-                <.icon name="la-chart-line" class="la-2x align-bottom mr-1" />Statistics
-              </.small_title>
-              <.chart title="Population" name="population-history-chart" />
-            </.action_box>
-          </div>
+          <.action_box class="mb-2">
+            <.small_title>
+              <.icon name="la-chart-line" class="la-2x align-bottom mr-1" />Statistics
+            </.small_title>
+            <.chart title="Population" name="population-history-chart" />
+          </.action_box>
         </div>
         <.actions />
       <% else %>
@@ -177,14 +168,14 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
       <.small_title>Population</.small_title>
       <div class="flex gap-x-7">
         <div>
-          <.social_stratum social={@realm.working} name="working" />
-          <.social_stratum social={@realm.poverty} name="poverty" />
+          <.social_stratum social={@data.working} name="working" />
+          <.social_stratum social={@data.poverty} name="poverty" />
         </div>
         <div>
-          <.property_table realm={@realm} edit_items={@edit_items}>
-            <:row label="Birthrate" property="birth_rate" />
-            <:row label="Deathrate" property="death_rate" />
-            <:row label="Disease" property="disease_rate" />
+          <.property_table realm={@data} edit_items={@edit_items}>
+            <:row label="Birthrate" property="population.birth_rate" />
+            <:row label="Deathrate" property="population.death_rate" />
+            <:row label="Disease" property="population.disease_rate" />
           </.property_table>
         </div>
       </div>
@@ -222,7 +213,7 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     ~H"""
     <div class="relative" id={@id}>
       <%= if @edit do %>
-        <div class="absolute left-0 -bottom-6 w-32 rounded-md border border-sky-400 py-1 pr-1 bg-sky-800">
+        <div class="absolute z-10 left-0 -bottom-6 w-32 rounded-md border border-sky-400 py-1 pr-1 bg-sky-800">
           <.form
             :let={f}
             for={@form}
