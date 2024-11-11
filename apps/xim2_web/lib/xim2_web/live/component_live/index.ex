@@ -79,6 +79,15 @@ defmodule Xim2Web.ComponentLive.Index do
         </.flexbox_col>
       </div>
       <div>
+        <h3>boxes</h3>
+        <.boxes>
+          <:box><span class="bg-sky-500 text-center">One</span></:box>
+          <:box><span class="bg-sky-500 text-center">Two</span></:box>
+          <:box><span class="bg-sky-500 text-center">Three</span></:box>
+          <:box><span class="bg-sky-500 text-center">Four</span></:box>
+        </.boxes>
+      </div>
+      <div>
         <h3>main_title</h3>
         <.main_title>Main Title</.main_title>
       </div>
@@ -120,6 +129,10 @@ defmodule Xim2Web.ComponentLive.Index do
           <:title>Components</:title>
           Monsum and project components
         </.hero_card>
+      </div>
+      <div>
+        <h3>info_card</h3>
+        <.info_card value="888" icon="la-cubes" />
       </div>
       <div>
         <h3>action_box with start_button and reset_button</h3>

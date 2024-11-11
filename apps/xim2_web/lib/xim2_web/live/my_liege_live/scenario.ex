@@ -109,19 +109,16 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     ~H"""
     <.main_section title="My Liege" back={~p"/my_liege"} back_title="Scenarios">
       <%= if @realm do %>
-        <div class="flex flex-row gap-2">
-          <div>
-            <.storage realm={@realm} edit_items={@edit_items} />
-            <.population data={@realm.population} edit_items={@edit_items} />
-          </div>
-          <.action_box class="mb-2">
-            <.small_title>
-              <.icon name="la-chart-line" class="la-2x align-bottom mr-1" />Statistics
-            </.small_title>
-            <.chart title="Population" name="population-history-chart" />
-          </.action_box>
-        </div>
-        <.actions />
+        <.flexbox_col>
+          <.actions />
+          <.boxes>
+            <:box>
+              <.storage realm={@realm} edit_items={@edit_items} />
+              <.population data={@realm.population} edit_items={@edit_items} />
+            </:box>
+            <:box><.statistic /></:box>
+          </.boxes>
+        </.flexbox_col>
       <% else %>
         <p>Loading...</p>
       <% end %>
@@ -168,6 +165,17 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
           </.property_table>
         </div>
       </div>
+    </.action_box>
+    """
+  end
+
+  def statistic(assigns) do
+    ~H"""
+    <.action_box class="mb-2">
+      <.small_title>
+        <.icon name="la-chart-line" class="la-2x align-bottom mr-1" />Statistics
+      </.small_title>
+      <.chart title="Population" name="population-history-chart" />
     </.action_box>
     """
   end
