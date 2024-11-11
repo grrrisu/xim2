@@ -85,6 +85,7 @@ defmodule Xim2Web do
       import Phoenix.HTML
       # Core UI components and translation
       import Monsum
+      import Monsum.Chart
       import Xim2Web.CoreComponents
       import Xim2Web.ProjectComponents
       import Xim2Web.Gettext

@@ -18,6 +18,32 @@ defmodule Monsum do
     """
   end
 
+  attr :width, :string, default: "basis-1/2"
+  attr :class, :string, default: ""
+  slot :box
+
+  def boxes(assigns) do
+    ~H"""
+    <div class={["flex flex-row gap-2", @class]}>
+      <div :for={box <- @box} class={["", @width]}>
+        <%= render_slot(box) %>
+      </div>
+    </div>
+    """
+  end
+
+  attr :value, :any, required: true
+  attr :icon, :string, required: true
+
+  def info_card(assigns) do
+    ~H"""
+    <div>
+      <span class="align-super"><%= @value %></span>
+      <.icon name={@icon} class="la-2x" />
+    </div>
+    """
+  end
+
   attr :class, :string, default: ""
   slot :inner_block, required: true
 
