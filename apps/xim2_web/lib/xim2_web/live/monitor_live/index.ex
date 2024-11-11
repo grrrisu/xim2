@@ -171,38 +171,26 @@ defmodule Xim2Web.MonitorLive.Index do
 
   defp prepare_biotope_chart(socket, chart, opts) do
     socket
-    |> push_event("init-chart-#{chart}", %{
-      type: opts[:type] || "line",
-      options: %{
-        stacked: opts[:stacked] || false,
-        beginAtZero: opts[:begin_at_zero] || false
-      },
-      datasets: [
+    |> prepare_chart(
+      chart,
+      [
         %{
           label: "Vegetation",
           borderColor: "rgb(16, 185, 129, 0.8)",
-          backgroundColor: "rgb(4, 120, 87, 0.8)",
-          fill: opts[:fill] || false,
-          lineTension: 0,
-          borderWidth: 2
+          backgroundColor: "rgb(4, 120, 87, 0.8)"
         },
         %{
           label: "Herbivore",
           borderColor: "rgb(249, 115, 22, 0.8)",
-          backgroundColor: "rgb(194, 65, 12, 0.8)",
-          fill: opts[:fill] || false,
-          lineTension: 0,
-          borderWidth: 2
+          backgroundColor: "rgb(194, 65, 12, 0.8)"
         },
         %{
           label: "Predator",
           borderColor: "rgb(241, 65, 94, 0.8)",
-          backgroundColor: "rgb(180, 14, 41, 0.8)",
-          fill: opts[:fill] || false,
-          lineTension: 0,
-          borderWidth: 2
+          backgroundColor: "rgb(180, 14, 41, 0.8)"
         }
-      ]
-    })
+      ],
+      opts
+    )
   end
 end

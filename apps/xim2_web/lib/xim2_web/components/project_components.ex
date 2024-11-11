@@ -19,9 +19,9 @@ defmodule Xim2Web.ProjectComponents do
         <.main_title><%= @title %></.main_title>
         <.back navigate={@back} class="mt-16"><%= @back_title %></.back>
       </div>
-      <div>
+      <main>
         <%= render_slot(@inner_block) %>
-      </div>
+      </main>
       <div><%= render_slot(@footer) %></div>
     </.flexbox_col>
     """

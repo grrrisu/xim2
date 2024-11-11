@@ -45,24 +45,22 @@ defmodule Xim2Web.Monitor.Components do
     * begin_at_zero, default false
     * fill, default false
   """
-  def prepare_summary_chart(socket, chart, opts) do
+  @dataset_opts %{
+    borderColor: "rgb(16, 185, 129, 0.8)",
+    backgroundColor: "rgb(4, 120, 87, 0.8)",
+    fill: false,
+    lineTension: 0,
+    borderWidth: 2
+  }
+  def prepare_chart(socket, chart_id, datasets \\ [%{label: "one"}], opts) do
     socket
-    |> push_event("init-chart-#{chart}", %{
+    |> push_event("init-chart-#{chart_id}", %{
       type: opts[:type] || "line",
       options: %{
         stacked: opts[:stacked] || false,
         beginAtZero: opts[:begin_at_zero] || false
       },
-      datasets: [
-        %{
-          label: "one",
-          borderColor: "rgb(16, 185, 129, 0.8)",
-          backgroundColor: "rgb(4, 120, 87, 0.8)",
-          fill: opts[:fill] || false,
-          lineTension: 0,
-          borderWidth: 2
-        }
-      ]
+      datasets: Enum.map(datasets, &Map.merge(@dataset_opts, &1))
     })
   end
 

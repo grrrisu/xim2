@@ -12,7 +12,9 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     {:ok,
      socket
      |> assign(edit_items: [], page_title: "My Liege")
-     |> prepare_summary_chart("population-history-chart",
+     |> prepare_chart(
+       "population-history-chart",
+       [%{label: "population"}],
        begin_at_zero: true
      )}
   end
