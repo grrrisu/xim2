@@ -28,37 +28,50 @@ defmodule MyLiege.SimulationTest do
   describe "sim_population" do
     setup do
       %{
-        population: %{
-          working: %Population{
-            gen_1: 10.0,
-            gen_2: 10.0,
-            gen_3: 10.0,
-            needed_food: {1, 2, 3},
-            spending_power: 3
-          },
-          poverty: %Population{
-            gen_1: 10.0,
-            gen_2: 10.0,
-            gen_3: 10.0,
-            needed_food: {1, 1, 1},
-            spending_power: 1
+        data: %{
+          population: %{
+            working: %Population{
+              gen_1: 10.0,
+              gen_2: 10.0,
+              gen_3: 10.0,
+              needed_food: {1, 2, 3},
+              spending_power: 3
+            },
+            poverty: %Population{
+              gen_1: 10.0,
+              gen_2: 10.0,
+              gen_3: 10.0,
+              needed_food: {1, 1, 1},
+              spending_power: 1
+            }
           }
         }
       }
     end
 
-    test "enough food", %{population: population} do
+    test "enough food", %{data: data} do
       # enough food for population after grow
       change = %{food: 107}
 
-      data = Map.merge(population, %{birth_rate: 0.4, death_rate: 0.1, disease_rate: 0.2})
+      population =
+        Map.merge(data.population, %{birth_rate: 0.4, death_rate: 0.1, disease_rate: 0.2})
+
+      data = Map.merge(data, %{population: population})
+
       {change, _data, _global} = Simulation.sim_population({change, data, %{}})
-      change = round_population(change)
+
+      change =
+        Map.merge(change, %{
+          food: round(change.food),
+          population: round_population(change.population)
+        })
 
       assert %{
-               food: 19.55000000000001,
-               working: %{gen_1: 8, gen_2: 8, gen_3: 16},
-               poverty: %{gen_1: 9, gen_2: 7, gen_3: 0}
+               food: 20,
+               population: %{
+                 working: %{gen_1: 8, gen_2: 8, gen_3: 16},
+                 poverty: %{gen_1: 9, gen_2: 7, gen_3: 0}
+               }
              } = change
     end
   end

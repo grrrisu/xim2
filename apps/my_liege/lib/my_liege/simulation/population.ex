@@ -13,17 +13,19 @@ defmodule MyLiege.Simulation.Population do
   def sim_population(
         {change,
          %{
-           working: working,
-           poverty: poverty,
-           birth_rate: birth_rate,
-           death_rate: death_rate,
-           disease_rate: disease_rate
+           population: %{
+             working: working,
+             poverty: poverty,
+             birth_rate: birth_rate,
+             death_rate: death_rate,
+             disease_rate: disease_rate
+           }
          } = data, global}
       ) do
     change = Map.merge(change, %{working: working, poverty: poverty})
 
     {{change, []}, %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate},
-     %{}}
+     global}
     |> log_change(:before)
     |> shrink_population()
     |> log_change(:shrink_population)
@@ -32,7 +34,11 @@ defmodule MyLiege.Simulation.Population do
     |> feed_population()
     |> log_change(:feed_population)
     |> notify_changes()
-    |> then(fn {change, _, _} -> {change, data, global} end)
+    |> add_population_changes(data)
+  end
+
+  def add_population_changes({%{food: food, working: working, poverty: poverty}, _, global}, data) do
+    {%{food: food, population: %{working: working, poverty: poverty}}, data, global}
   end
 
   def log_change({{change, log}, data, global}, sim_tag) do
