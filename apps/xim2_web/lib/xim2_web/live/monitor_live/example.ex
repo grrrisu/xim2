@@ -114,9 +114,9 @@ defmodule Xim2Web.MonitorLive.Example do
        x_axis: results.one.time |> DateTime.to_iso8601(),
        duration: results.one.duration
      })
-     |> push_chart_data("update-chart-duration-summary-chart", [results.one.duration])
-     |> push_chart_data("update-chart-ok-summary-chart", [results.one.ok])
-     |> push_chart_data("update-chart-errors-summary-chart", [results.one.error])}
+     |> push_chart_data("duration-summary-chart", [results.one.duration])
+     |> push_chart_data("ok-summary-chart", [results.one.ok])
+     |> push_chart_data("errors-summary-chart", [results.one.error])}
   end
 
   def handle_info({namespace, topic, _payload}, %{assigns: %{pubsub_topic: namespace}} = socket) do

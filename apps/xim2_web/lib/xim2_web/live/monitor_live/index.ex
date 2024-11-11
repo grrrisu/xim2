@@ -89,7 +89,7 @@ defmodule Xim2Web.MonitorLive.Index do
       ) do
     {:noreply,
      socket
-     |> push_chart_data("update-chart-changed-summary-chart", [
+     |> push_chart_data("changed-summary-chart", [
        Enum.count(results.vegetation),
        Enum.count(results.herbivore),
        Enum.count(results.predator)
@@ -123,9 +123,9 @@ defmodule Xim2Web.MonitorLive.Index do
     {:noreply,
      socket
      |> insert_total_duration(results)
-     |> push_chart_data("update-chart-duration-summary-chart", biotope_results(results, :time))
-     |> push_chart_data("update-chart-ok-summary-chart", biotope_results(results, :ok))
-     |> push_chart_data("update-chart-errors-summary-chart", biotope_results(results, :error))}
+     |> push_chart_data("duration-summary-chart", biotope_results(results, :time))
+     |> push_chart_data("ok-summary-chart", biotope_results(results, :ok))
+     |> push_chart_data("errors-summary-chart", biotope_results(results, :error))}
   end
 
   def handle_info({namespace, topic, _payload}, %{assigns: %{pubsub_topic: namespace}} = socket) do

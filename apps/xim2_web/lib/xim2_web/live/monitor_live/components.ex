@@ -66,9 +66,9 @@ defmodule Xim2Web.Monitor.Components do
     })
   end
 
-  def push_chart_data(socket, event, results) do
+  def push_chart_data(socket, chart_id, results) do
     socket
-    |> push_event(event, %{
+    |> push_event("update-chart-" <> chart_id, %{
       x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
       results: results
     })

@@ -58,20 +58,26 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     {:noreply, assign(socket, realm: realm)}
   end
 
-  """
-    struct name, value, children
+  def handle_info({:population_simulated, changes}, socket) do
+    results =
+      changes
+      |> List.first()
+      |> then(fn {_key, value} -> %{population: value} end)
+      |> aggregate([[:population], [:working, :poverty], [:gen_1, :gen_2, :gen_3]])
+      |> List.first()
 
-    name: population,
-    value: 100,
-    children:
-      name: working,
-      value: 40
-      children:
-        name: gen_1
-        value: 8
+    {:noreply, socket |> push_chart_data("population-history-chart", [results.value])}
+  end
 
+  def handle_info({_sim, _attr, _value} = _event, socket) do
+    # dbg(event)
+    {:noreply, socket}
+  end
 
-  """
+  def handle_info(_msg, socket) do
+    # dbg(msg)
+    {:noreply, socket}
+  end
 
   def aggregate(changes, [properties | []]) do
     Enum.map(properties, &aggregate(Map.get(changes, &1), &1))
@@ -91,25 +97,6 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
 
   def aggregate(value, property) do
     %{name: property, value: value}
-  end
-
-  def handle_info({:population_simulated, changes}, socket) do
-    changes
-    |> List.first()
-    |> then(fn {_key, value} -> %{population: value} end)
-    |> aggregate([[:population], [:working, :poverty], [:gen_1, :gen_2, :gen_3]])
-
-    {:noreply, socket}
-  end
-
-  def handle_info({_sim, _attr, _value} = _event, socket) do
-    # dbg(event)
-    {:noreply, socket}
-  end
-
-  def handle_info(_msg, socket) do
-    # dbg(msg)
-    {:noreply, socket}
   end
 
   def property_form(property, value) do
