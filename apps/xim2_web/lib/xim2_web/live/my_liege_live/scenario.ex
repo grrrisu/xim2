@@ -10,7 +10,7 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
 
     {:ok,
      socket
-     |> assign(edit_items: [], page_title: "My Liege")
+     |> assign(edit_items: [], page_title: "My Liege", deltas: nil)
      |> prepare_chart(
        "population-history-chart",
        [%{label: "population"}],
@@ -60,7 +60,7 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   end
 
   def handle_info({:population_simulated, changes}, socket) do
-    dbg(changes)
+    # dbg(changes)
 
     results =
       changes
@@ -69,7 +69,19 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
       |> aggregate([[:population], [:working, :poverty], [:gen_1, :gen_2, :gen_3]])
       |> List.first()
 
-    {:noreply, socket |> push_chart_data("population-history-chart", [results.value])}
+    deltas =
+      changes
+      |> List.first()
+      |> then(fn {_key, _value, delta} -> %{population: delta} end)
+      |> aggregate([[:population], [:working, :poverty], [:gen_1, :gen_2, :gen_3]])
+      |> List.first()
+
+    dbg(deltas)
+
+    {:noreply,
+     socket
+     |> push_event("update-json-log-output", deltas)
+     |> push_chart_data("population-history-chart", [results.value])}
   end
 
   def handle_info({_sim, _attr, _value} = _event, socket) do
@@ -117,7 +129,7 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
               <.storage realm={@realm} edit_items={@edit_items} />
               <.population data={@realm.population} edit_items={@edit_items} />
             </:box>
-            <:box><.statistic /></:box>
+            <:box><.statistic deltas={@deltas} /></:box>
           </.boxes>
         </.flexbox_col>
       <% else %>
@@ -171,12 +183,19 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   end
 
   def statistic(assigns) do
+    {:ok, output} = Jason.encode(assigns.deltas)
+    assigns = assign(assigns, log_output: output)
+
     ~H"""
     <.action_box class="mb-2">
       <.small_title>
         <.icon name="la-chart-line" class="la-2x align-bottom mr-1" />Statistics
       </.small_title>
       <.chart title="Population" name="population-history-chart" />
+    </.action_box>
+    <.action_box class="mb-2">
+      <small_title>Delta Output</small_title>
+      <pre id="log-output" class="text-xs" phx-hook="Json" phx-update="ignore"></pre>
     </.action_box>
     """
   end
