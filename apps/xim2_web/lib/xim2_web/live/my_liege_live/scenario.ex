@@ -60,10 +60,12 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   end
 
   def handle_info({:population_simulated, changes}, socket) do
+    dbg(changes)
+
     results =
       changes
       |> List.first()
-      |> then(fn {_key, value} -> %{population: value} end)
+      |> then(fn {_key, value, _delta} -> %{population: value} end)
       |> aggregate([[:population], [:working, :poverty], [:gen_1, :gen_2, :gen_3]])
       |> List.first()
 

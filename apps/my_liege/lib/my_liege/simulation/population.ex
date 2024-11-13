@@ -24,8 +24,8 @@ defmodule MyLiege.Simulation.Population do
       ) do
     change = Map.merge(change, %{working: working, poverty: poverty})
 
-    {{change, []}, %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate},
-     global}
+    {{change, [], nil},
+     %{birth_rate: birth_rate, death_rate: death_rate, disease_rate: disease_rate}, global}
     |> log_change(:before)
     |> shrink_population()
     |> log_change(:shrink_population)
@@ -41,8 +41,27 @@ defmodule MyLiege.Simulation.Population do
     {%{food: food, population: %{working: working, poverty: poverty}}, data, global}
   end
 
-  def log_change({{change, log}, data, global}, sim_tag) do
-    {{change, [{sim_tag, change} | log]}, data, global}
+  def log_change({{change, [], nil}, data, global}, sim_tag) do
+    {{change, [{sim_tag, change, nil}]}, data, global}
+  end
+
+  def log_change({{change, [before | _] = log}, data, global}, sim_tag) do
+    {{change, [{sim_tag, change, calculate_delta(change, before)} | log]}, data, global}
+  end
+
+  def calculate_delta(change, {_sim_tag, before, _delta}) do
+    %{
+      working: %{
+        gen_1: change.working.gen_1 - before.working.gen_1,
+        gen_2: change.working.gen_2 - before.working.gen_2,
+        gen_3: change.working.gen_3 - before.working.gen_3
+      },
+      poverty: %{
+        gen_1: change.poverty.gen_1 - before.poverty.gen_1,
+        gen_2: change.poverty.gen_2 - before.poverty.gen_2,
+        gen_3: change.poverty.gen_3 - before.poverty.gen_3
+      }
+    }
   end
 
   def notify_changes({{change, log}, data, global}) do
