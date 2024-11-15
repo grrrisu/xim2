@@ -10,7 +10,7 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
 
     {:ok,
      socket
-     |> assign(edit_items: [], page_title: "My Liege", deltas: nil)
+     |> assign(edit_items: [], page_title: "My Liege", deltas: nil, changes: nil, all: nil)
      |> prepare_chart(
        "population-history-chart",
        [%{label: "population"}],
@@ -76,10 +76,20 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
       |> aggregate([[:population], [:working, :poverty], [:gen_1, :gen_2, :gen_3]])
       |> List.first()
 
-    dbg(deltas)
+    all =
+      changes
+      |> Enum.map(fn {key, value, _delta} ->
+        {key,
+         aggregate(%{population: value}, [
+           [:population],
+           [:working, :poverty],
+           [:gen_1, :gen_2, :gen_3]
+         ])}
+      end)
 
     {:noreply,
      socket
+     |> assign(deltas: deltas, changes: changes, all: all)
      |> push_event("update-json-log-output", deltas)
      |> push_chart_data("population-history-chart", [results.value])}
   end
@@ -92,6 +102,11 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   def handle_info(_msg, socket) do
     # dbg(msg)
     {:noreply, socket}
+  end
+
+  # last for deltas is nil
+  def aggregate(nil, _) do
+    nil
   end
 
   def aggregate(changes, [properties | []]) do
@@ -130,6 +145,19 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
               <.population data={@realm.population} edit_items={@edit_items} />
             </:box>
             <:box><.statistic deltas={@deltas} /></:box>
+          </.boxes>
+          <.boxes>
+            <:box>
+              <.sim_steps_table changes={@all} />
+            </:box>
+          </.boxes>
+          <.boxes>
+            <:box>
+              <.accumlation item={@deltas} />
+            </:box>
+            <:box>
+              <.json_ouput id="log-output" />
+            </:box>
           </.boxes>
         </.flexbox_col>
       <% else %>
@@ -182,6 +210,82 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     """
   end
 
+  def sim_steps_table(%{changes: nil} = assigns) do
+    ~H"""
+    Wait for first simulation
+    """
+  end
+
+  def sim_steps_table(%{changes: changes} = assigns) do
+    assigns =
+      assign(assigns,
+        sim_steps: ["structure" | Enum.map(changes, fn {step, _} -> step end)],
+        changes: Enum.map(changes, fn {_, [change]} -> change end)
+      )
+
+    ~H"""
+    <table class="w-full">
+      <thead>
+        <th :for={sim_step <- @sim_steps}><%= sim_step %></th>
+      </thead>
+      <tbody class="border-t border-sky-400">
+        <.changes_row changes={@changes} path={[]} />
+      </tbody>
+    </table>
+    """
+  end
+
+  def changes_row(%{path: path, changes: changes} = assigns) do
+    assigns =
+      assign(assigns,
+        name: changes |> List.first() |> get_in(path ++ [:name]),
+        children: changes |> List.first() |> get_in(path ++ [:children]) || [],
+        indention: "ml-#{Enum.count(path)}"
+      )
+
+    ~H"""
+    <tr class="border-b border-sky-700">
+      <td><span class={@indention}><%= @name %></span></td>
+      <td :for={change <- @changes} class="text-right">
+        <%= get_in(change, @path ++ [:value]) |> Float.round(2) %>
+      </td>
+    </tr>
+    <.changes_row
+      :for={{_, i} <- Enum.with_index(@children)}
+      changes={@changes}
+      path={@path ++ [:children, Access.at(i)]}
+    />
+    """
+  end
+
+  attr :item, :map, required: true
+  attr :class, :string, default: ""
+
+  def accumlation(%{item: nil} = assigns) do
+    ~H"""
+    Wait for first simulation
+    """
+  end
+
+  def accumlation(%{item: item} = assigns) do
+    assigns =
+      assign(assigns,
+        name: item.name,
+        value: item.value |> Float.round(2),
+        children: Map.get(item, :children, [])
+      )
+
+    ~H"""
+    <div class={@class}>
+      <div class="flex flex-row border-b border-sky-700">
+        <div class="mr-2"><%= @name %>:</div>
+        <div><%= @value %></div>
+      </div>
+      <.accumlation :for={child <- @children} item={child} class="pl-3" />
+    </div>
+    """
+  end
+
   def statistic(assigns) do
     {:ok, output} = Jason.encode(assigns.deltas)
     assigns = assign(assigns, log_output: output)
@@ -193,9 +297,14 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
       </.small_title>
       <.chart title="Population" name="population-history-chart" />
     </.action_box>
+    """
+  end
+
+  def json_ouput(assigns) do
+    ~H"""
     <.action_box class="mb-2">
       <small_title>Delta Output</small_title>
-      <pre id="log-output" class="text-xs" phx-hook="Json" phx-update="ignore"></pre>
+      <pre id={@id} class="text-xs" phx-hook="Json" phx-update="ignore"></pre>
     </.action_box>
     """
   end

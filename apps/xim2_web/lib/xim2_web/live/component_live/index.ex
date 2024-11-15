@@ -81,10 +81,18 @@ defmodule Xim2Web.ComponentLive.Index do
       <div>
         <h3>boxes</h3>
         <.boxes>
-          <:box><span class="bg-sky-500 text-center">One</span></:box>
-          <:box><span class="bg-sky-500 text-center">Two</span></:box>
-          <:box><span class="bg-sky-500 text-center">Three</span></:box>
-          <:box><span class="bg-sky-500 text-center">Four</span></:box>
+          <:box>
+            <div class="bg-sky-500 text-center">One</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Two</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Three</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Four</div>
+          </:box>
         </.boxes>
       </div>
       <div>
