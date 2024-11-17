@@ -19,7 +19,10 @@ defmodule Xim2Web.ComponentLive.Index do
        top_cards: ["A", "B", "C", "D", "E"],
        bottom_cards: []
      )
-     |> stream(:grid, prepare_grid())}
+     |> stream(:grid, prepare_grid())
+     |> push_event("update-json-example-json", %{
+       population: %{working: %{gen_1: 10, gen_2: 20, gen_3: 30}}
+     })}
   end
 
   @spec handle_event(<<_::88, _::_*48>>, map(), map()) :: {:noreply, any()}
@@ -128,6 +131,12 @@ defmodule Xim2Web.ComponentLive.Index do
             large={~p"/images/water-searching.jpg"}
             class="mx-auto max-h-40"
           />
+        </div>
+      </div>
+      <div>
+        <h3>json_ouput</h3>
+        <div>
+          <.json_ouput id="example-json" />
         </div>
       </div>
       <div>
