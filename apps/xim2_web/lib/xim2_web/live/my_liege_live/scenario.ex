@@ -156,7 +156,7 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
               <.accumlation item={@deltas} />
             </:box>
             <:box>
-              <.json_ouput id="log-output" />
+              <.json_log_output />
             </:box>
           </.boxes>
         </.flexbox_col>
@@ -300,11 +300,11 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
     """
   end
 
-  def json_ouput(assigns) do
+  def json_log_output(assigns) do
     ~H"""
     <.action_box class="mb-2">
       <small_title>Delta Output</small_title>
-      <pre id={@id} class="text-xs" phx-hook="Json" phx-update="ignore"></pre>
+      <.json_ouput id="log-output" />
     </.action_box>
     """
   end
