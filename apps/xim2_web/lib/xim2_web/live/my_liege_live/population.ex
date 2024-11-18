@@ -1,4 +1,4 @@
-defmodule Xim2Web.MyLiegeLive.Scenario do
+defmodule Xim2Web.MyLiegeLive.Population do
   alias Phoenix.PubSub
   use Xim2Web, :live_view
 
@@ -67,8 +67,6 @@ defmodule Xim2Web.MyLiegeLive.Scenario do
   end
 
   def handle_info({:population_simulated, changes}, socket) do
-    # dbg(changes)
-
     results =
       changes
       |> List.first()
