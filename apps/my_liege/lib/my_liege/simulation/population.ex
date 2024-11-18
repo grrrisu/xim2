@@ -42,14 +42,15 @@ defmodule MyLiege.Simulation.Population do
   end
 
   def log_change({{change, [], nil}, data, global}, sim_tag) do
-    {{change, [{sim_tag, change, nil}]}, data, global}
+    empty_population = %{working: %Population{}, poverty: %Population{}}
+    {{change, [{sim_tag, change, calculate_delta(change, empty_population)}]}, data, global}
   end
 
-  def log_change({{change, [before | _] = log}, data, global}, sim_tag) do
+  def log_change({{change, [{_sim_tag, before, _delta} | _] = log}, data, global}, sim_tag) do
     {{change, [{sim_tag, change, calculate_delta(change, before)} | log]}, data, global}
   end
 
-  def calculate_delta(change, {_sim_tag, before, _delta}) do
+  def calculate_delta(change, before) do
     %{
       working: %{
         gen_1: change.working.gen_1 - before.working.gen_1,
