@@ -8,11 +8,9 @@ defmodule MyLiege.Simulation.Factory do
   def sim_factory({change, data, global}) do
     # {{change, [], nil}, data, global}
     change =
-      Enum.map(data.factories, fn factory ->
+      Enum.reduce(data.factories, {change.storage, []}, fn factory, {storage, factories} ->
         blueprint = get_in(global, [:blueprints, factory.type])
-        sim_production(factory, blueprint)
-      end)
-      |> Enum.reduce({change.storage, []}, fn {output, factory}, {storage, factories} ->
+        {output, factory} = sim_production(factory, blueprint, storage)
         %{storage: aggregate_storage(storage, output), factories: [factory | factories]}
       end)
       |> then(fn new_changes ->
@@ -31,19 +29,36 @@ defmodule MyLiege.Simulation.Factory do
     end)
   end
 
-  def sim_production(%{workers: []} = factory, _blueprint) do
-    {[], factory}
+  def sim_production(%{workers: []} = factory, _blueprint, _storage) do
+    {%{}, factory}
   end
 
   def sim_production(
         %{workers: [_ | _] = workers, work_done: work_done} = factory,
-        %{production_time: production_time} = blueprint
+        %{production_time: production_time, input: input} = blueprint,
+        storage
       ) do
-    case work_done + calculate_work(workers) do
-      work_done when production_time <= work_done -> {blueprint.output, %{factory | work_done: 0}}
-      work_done -> {[], %{factory | work_done: work_done}}
+    with true <- input_available?(storage, input),
+         more_work when production_time <= more_work <-
+           work_done + calculate_work(workers) do
+      {produce_output(blueprint), %{factory | work_done: 0}}
+    else
+      false -> {%{}, %{factory | work_done: work_done}}
+      more_work -> {%{}, %{factory | work_done: more_work}}
     end
   end
 
+  def input_available?(storage, input) do
+    Enum.all?(input, fn {key, value} -> Map.get(storage, key, 0) >= value end)
+  end
+
   def calculate_work(workers), do: Enum.count(workers)
+
+  def produce_output(%{input: input, output: output}) when map_size(input) == 0, do: output
+
+  def produce_output(%{input: input, output: output}) do
+    Enum.reduce(input, output, fn {key, value}, output ->
+      Map.put(output, key, -value)
+    end)
+  end
 end
