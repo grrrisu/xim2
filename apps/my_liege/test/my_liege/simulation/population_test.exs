@@ -1,4 +1,4 @@
-defmodule MyLiege.SimulationTest do
+defmodule MyLiege.Simulation.PopulationTest do
   use ExUnit.Case, async: true
 
   alias MyLiege.Simulation.Population, as: Simulation
