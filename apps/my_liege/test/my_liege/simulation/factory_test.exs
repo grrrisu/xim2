@@ -26,9 +26,17 @@ defmodule MyLiege.Simulation.FactoryTest do
     end
 
     test "enough resources", %{data: data, global: global} do
-      {change, _data, _global} = Simulation.sim_factory({{%{}, [], nil}, data, global})
+      {change, _data, _global} =
+        Simulation.sim_factory({%{storage: %{food: 50}}, data, global})
 
-      assert change == %{storage: %{food: 400}, factories: [%{work_done: 0}]}
+      assert %{storage: %{food: 450}, factories: [%{work_done: 0}]} = change
+    end
+  end
+
+  describe "aggregate storage" do
+    test "add new types" do
+      storage = Simulation.aggregate_storage(%{food: 10}, %{food: 5, wood: 5})
+      assert %{food: 15, wood: 5} = storage
     end
   end
 
