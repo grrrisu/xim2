@@ -6,17 +6,29 @@ defmodule MyLiege.Simulation.Factory do
   # alias MyLiege.Simulation
 
   def sim_factory({change, data, global}) do
-    # change = Map.merge(change, %{factories: data.factories})
-
-    Enum.map(data.factories, fn factory ->
-      blueprint = get_in(global, [:blueprints, factory.type])
-      sim_production(factory, blueprint)
-    end)
-
-    # Enum.reduce outputs produced
-    # put them in the storage
+    # {{change, [], nil}, data, global}
+    change =
+      Enum.map(data.factories, fn factory ->
+        blueprint = get_in(global, [:blueprints, factory.type])
+        sim_production(factory, blueprint)
+      end)
+      |> Enum.reduce({change.storage, []}, fn {output, factory}, {storage, factories} ->
+        %{storage: aggregate_storage(storage, output), factories: [factory | factories]}
+      end)
+      |> then(fn new_changes ->
+        Map.merge(change, new_changes)
+      end)
 
     {change, data, global}
+  end
+
+  def aggregate_storage(storage, changes) do
+    Enum.reduce(changes, storage, fn {key, value}, storage ->
+      case Map.get(storage, key) do
+        nil -> Map.put_new(storage, key, value)
+        before -> Map.put(storage, key, before + value)
+      end
+    end)
   end
 
   def sim_production(%{workers: []} = factory, _blueprint) do
