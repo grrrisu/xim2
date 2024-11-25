@@ -14,27 +14,30 @@ defmodule MyLiege.Simulation do
 
   alias MyLiege.Simulation.Population
 
-  def sim({data, global}) do
+  def sim(%{data: data, global: global} = realm) do
     # gather amount of workers in factories for sim_population
     # if working population after sim_population is smaller than the amount of factory workers, we need to remove dead workers from the factories
     # if working (and maybe also poverty) <= 0 -> GAME over no population
     {%{}, data, global}
     |> harvest()
     |> Population.sim_population()
-    |> apply_changes()
+    |> apply_changes(realm)
 
     # |> handle_dead_workers()
   end
 
-  def apply_changes({change, %{population: population, storage: _storage} = data, _global}) do
+  def apply_changes({change, %{population: population, storage: _storage} = data, _global}, realm) do
     # maybe notifing
     # Map.merge(storage, %{food: food})
     %{
-      data
-      | population: %{
-          population
-          | working: change.population.working,
-            poverty: change.population.poverty
+      realm
+      | data: %{
+          data
+          | population: %{
+              population
+              | working: change.population.working,
+                poverty: change.population.poverty
+            }
         }
     }
   end

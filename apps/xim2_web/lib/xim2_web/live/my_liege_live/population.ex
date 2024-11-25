@@ -27,7 +27,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
 
   def prepare_realm(socket) do
     PubSub.subscribe(Xim2Web.PubSub, "my_liege")
-    handle_change(MyLiege.create(), socket)
+    handle_change(MyLiege.create(:population), socket)
   end
 
   def handle_event("sim_step", %{}, socket) do
@@ -36,7 +36,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
   end
 
   def handle_event("create", %{}, socket) do
-    {:noreply, assign(socket, realm: MyLiege.create())}
+    {:noreply, assign(socket, realm: MyLiege.create(:population))}
   end
 
   def handle_event(
@@ -158,7 +158,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
           <.boxes>
             <:box>
               <.storage realm={@realm} edit_items={@edit_items} />
-              <.population data={@realm.population} edit_items={@edit_items} />
+              <.population data={@realm.data.population} edit_items={@edit_items} />
             </:box>
             <:box><.statistic deltas={@deltas} /></:box>
           </.boxes>
@@ -191,7 +191,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
         <.icon name="la-warehouse" class="la-2x align-bottom mr-1" />Storage
       </.small_title>
       <.property_table realm={@realm} edit_items={@edit_items}>
-        <:row label="Food" property="storage.food" />
+        <:row label="Food" property="data.storage.food" />
       </.property_table>
     </.action_box>
     """
@@ -217,9 +217,9 @@ defmodule Xim2Web.MyLiegeLive.Population do
         </div>
         <div>
           <.property_table realm={@data} edit_items={@edit_items}>
-            <:row label="Birthrate" property="population.birth_rate" />
-            <:row label="Deathrate" property="population.death_rate" />
-            <:row label="Disease" property="population.disease_rate" />
+            <:row label="Birthrate" property="data.population.birth_rate" />
+            <:row label="Deathrate" property="data.population.death_rate" />
+            <:row label="Disease" property="data.population.disease_rate" />
           </.property_table>
         </div>
       </div>

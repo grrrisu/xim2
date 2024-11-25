@@ -2,33 +2,11 @@ defmodule MyLiege do
   @moduledoc false
 
   alias Phoenix.PubSub
-  alias MyLiege.{Population, Simulation}
+  alias MyLiege.{Scenario, Simulation}
 
-  @test_data %{
-    storage: %{food: 94},
-    population: %{
-      working: %Population{
-        gen_1: 10.0,
-        gen_2: 10.0,
-        gen_3: 10.0,
-        needed_food: {1, 2, 3},
-        spending_power: 3
-      },
-      poverty: %Population{
-        gen_1: 10.0,
-        gen_2: 10.0,
-        gen_3: 10.0,
-        needed_food: {1, 1, 1},
-        spending_power: 1
-      },
-      birth_rate: 0.4,
-      death_rate: 0.05,
-      disease_rate: 0.08
-    }
-  }
-
-  def create(server \\ MyLiege.Realm) do
-    Agent.get_and_update(server, fn _ -> {@test_data, @test_data} end)
+  def create(scenario, server \\ MyLiege.Realm) do
+    data = Scenario.get(scenario)
+    Agent.get_and_update(server, fn _ -> {data, data} end)
   end
 
   def get_realm(server \\ MyLiege.Realm) do
@@ -60,8 +38,11 @@ defmodule MyLiege do
   def sim_step(server \\ MyLiege.Realm) do
     {:ok, _pid} =
       Task.Supervisor.start_child(MyLiege.TaskSupervisor, fn ->
-        realm = Agent.get(server, & &1)
-        realm = Simulation.sim({realm, %{}})
+        realm =
+          server
+          |> Agent.get(& &1)
+          |> Simulation.sim()
+
         :ok = Agent.update(server, fn _old -> realm end)
         :ok = PubSub.broadcast(Xim2Web.PubSub, "my_liege", {:realm_updated, realm})
       end)

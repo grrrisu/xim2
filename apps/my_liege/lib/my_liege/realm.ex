@@ -6,6 +6,6 @@ defmodule MyLiege.Realm do
   use Agent
 
   def start_link(opts) do
-    Agent.start_link(fn -> %{} end, name: opts[:name])
+    Agent.start_link(fn -> %{data: %{}, global: %{}} end, name: opts[:name])
   end
 end
