@@ -12,7 +12,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
      socket
      |> assign(
        edit_items: [],
-       page_title: "My Liege",
+       page_title: "My Liege - Population",
        deltas: nil,
        changes: nil,
        step_totals: nil,
@@ -151,7 +151,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
 
   def render(assigns) do
     ~H"""
-    <.main_section title="My Liege" back={~p"/my_liege"} back_title="Scenarios">
+    <.main_section title="My Lieg - Population" back={~p"/my_liege"} back_title="Scenarios">
       <%= if @realm do %>
         <.flexbox_col>
           <.actions />
