@@ -20,7 +20,7 @@ defmodule Xim2Web.MyLiegeLive.Index do
         <.hero_card link={~p"/my_liege/population"} class="mb-6 mx-3 basis-1/5">
           <:icon><.icon name="la-users" class="la-2x" /></:icon>
           <:title>Population</:title>
-          Sim birth and death, diseases and feeding poeple
+          Sim birth and death, diseases and feeding people
         </.hero_card>
         <.hero_card link={~p"/my_liege/"} class="mb-6 mx-3 basis-1/5">
           <:icon><.icon name="la-industry" class="la-2x" /></:icon>

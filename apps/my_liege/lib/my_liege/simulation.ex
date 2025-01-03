@@ -45,7 +45,7 @@ defmodule MyLiege.Simulation do
   end
 
   def handle_dead_workers(_population_result, _data) do
-    # if idle population after sim_population is negative, we need to remove poeple from the factories
+    # if idle population after sim_population is negative, we need to remove people from the factories
     # if working + (negative) idle < 0 -> GAME over no population
   end
 
