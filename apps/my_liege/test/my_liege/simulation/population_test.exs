@@ -20,4 +20,21 @@ defmodule MyLiege.Simulation.PopulationTest do
              gen_3: %Generation{people: 40, grow_rem: 20}
            } = population
   end
+
+  test "population shrink" do
+    population = %{
+      gen_1: %Generation{people: 20, disease_rem: 100},
+      gen_2: %Generation{people: 20, disease_rem: 100},
+      gen_3: %Generation{people: 40, disease_rem: 200, age_rem: 200}
+    }
+
+    population = Simulation.shrink(population)
+
+    # after half a year gen_1 and gen_3 loose 1 each to diseases
+    assert %{
+             gen_1: %Generation{people: 19, disease_rem: 0},
+             gen_2: %Generation{people: 20, disease_rem: 120},
+             gen_3: %Generation{people: 39, disease_rem: 0, age_rem: 240}
+           } = population
+  end
 end
