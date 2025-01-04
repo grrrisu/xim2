@@ -9,31 +9,39 @@ defmodule MyLiege.Simulation.Population do
 
   """
 
+  import MyLiege.Simulation.Unit
+
   @working %{
-    gen_1: %{input: 40, output: 1},
-    gen_2: %{input: 48, output: 1},
-    gen_3: %{input: 60, output: 1}
+    gen_1: %{
+      grow: %{needed: 40, output: 1},
+      disease: %{needed: 120, output: -1}
+    },
+    gen_2: %{
+      grow: %{needed: 48, output: 1},
+      disease: %{needed: 240, output: -1}
+    },
+    gen_3: %{
+      grow: %{needed: 60, output: 1},
+      disease: %{needed: 240, output: -1},
+      age: %{needed: 480, output: -1}
+    }
   }
 
-  def grow_gen(%{people: people, work_done: work_done} = population, config) do
-    grow_output(population, config, people + work_done)
-  end
-
-  def grow_output(population, %{input: input}, new_work) when new_work < input do
-    {%{population | work_done: new_work}, 0}
-  end
-
-  def grow_output(population, %{input: input, output: output}, new_work) when new_work >= input do
-    {%{population | work_done: new_work - input}, output}
-  end
-
   def grow(%{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population) do
-    {gen_1, output_1} = grow_gen(gen_1, @working.gen_1)
-    {gen_2, output_2} = grow_gen(gen_2, @working.gen_2)
-    {gen_3, output_3} = grow_gen(gen_3, @working.gen_3)
+    {gen_1, output_1} = grow_generation(gen_1, @working.gen_1.grow)
+    {gen_2, output_2} = grow_generation(gen_2, @working.gen_2.grow)
+    {gen_3, output_3} = grow_generation(gen_3, @working.gen_3.grow)
     gen_1 = %{gen_1 | people: gen_1.people - output_1 + output_3}
     gen_2 = %{gen_2 | people: gen_2.people - output_2 + output_1}
     gen_3 = %{gen_3 | people: gen_3.people + output_2}
     %{population | gen_1: gen_1, gen_2: gen_2, gen_3: gen_3}
+  end
+
+  defp grow_generation(%{people: people, grow_rem: grow_rem} = generation, config) do
+    {grow_rem, output} = process_input(people, grow_rem, config)
+    {%{generation | grow_rem: grow_rem}, output}
+  end
+
+  def shrink(%{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population) do
   end
 end

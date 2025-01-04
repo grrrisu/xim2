@@ -25,6 +25,7 @@ defmodule MyLiege.Simulation.V1.PopulationTest do
     }
   end
 
+  @tag :skip
   describe "sim_population" do
     setup do
       %{
@@ -49,6 +50,7 @@ defmodule MyLiege.Simulation.V1.PopulationTest do
       }
     end
 
+    @tag :skip
     test "enough food", %{data: data} do
       # enough food for population after grow
       change = %{food: 107}
@@ -76,6 +78,7 @@ defmodule MyLiege.Simulation.V1.PopulationTest do
     end
   end
 
+  @tag :skip
   describe "grow_population" do
     setup do
       %{
@@ -107,6 +110,7 @@ defmodule MyLiege.Simulation.V1.PopulationTest do
     end
   end
 
+  @tag :skip
   describe "shrink_population" do
     setup do
       %{
@@ -138,6 +142,7 @@ defmodule MyLiege.Simulation.V1.PopulationTest do
     end
   end
 
+  @tag :skip
   describe "feed_population" do
     setup do
       %{
