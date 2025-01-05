@@ -3,27 +3,21 @@ defmodule MyLiege do
 
   alias Phoenix.PubSub
   alias MyLiege.{Population, Simulation}
+  alias MyLiege.Population.Generation
 
   @test_data %{
-    storage: %{food: 94},
+    storage: %{food: 0},
     population: %{
       working: %Population{
-        gen_1: 10.0,
-        gen_2: 10.0,
-        gen_3: 10.0,
-        needed_food: {1, 2, 3},
-        spending_power: 3
+        gen_1: %Generation{people: 20},
+        gen_2: %Generation{people: 20},
+        gen_3: %Generation{people: 40}
       },
       poverty: %Population{
-        gen_1: 10.0,
-        gen_2: 10.0,
-        gen_3: 10.0,
-        needed_food: {1, 1, 1},
-        spending_power: 1
-      },
-      birth_rate: 0.4,
-      death_rate: 0.05,
-      disease_rate: 0.08
+        gen_1: %Generation{people: 30},
+        gen_2: %Generation{people: 30},
+        gen_3: %Generation{people: 60}
+      }
     }
   }
 

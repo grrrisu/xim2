@@ -363,9 +363,9 @@ defmodule Xim2Web.MyLiegeLive.Population do
         <.icon name="la-users" class="la-2x align-middle mr-1" /><%= @title %>
       </strong>
       <p>
-        <span class="gen_1"><%= @social.gen_1 |> Float.round(2) %></span>
-        | <span class="gen_2"><%= @social.gen_2 |> Float.round(2) %></span>
-        | <span class="gen_3"><%= @social.gen_3 |> Float.round(2) %></span>
+        <span class="gen_1"><%= @social.gen_1.people %></span>
+        | <span class="gen_2"><%= @social.gen_2.people %></span>
+        | <span class="gen_3"><%= @social.gen_3.people %></span>
       </p>
     </div>
     """

@@ -2,7 +2,29 @@ defmodule MyLiege.Simulation.PopulationTest do
   use ExUnit.Case, async: true
 
   alias MyLiege.Simulation.Population, as: Simulation
+  alias MyLiege.Population
   alias MyLiege.Population.Generation
+
+  test "sim population" do
+    data = %{
+      population: %{
+        working: %Population{
+          gen_1: %Generation{people: 20},
+          gen_2: %Generation{people: 20},
+          gen_3: %Generation{people: 40}
+        },
+        poverty: %Population{
+          gen_1: %Generation{people: 30},
+          gen_2: %Generation{people: 30},
+          gen_3: %Generation{people: 60}
+        }
+      }
+    }
+
+    {change, _, _} = Simulation.sim_population({%{}, data, %{}})
+
+    assert %{working: %Population{}, poverty: %Population{}} = Map.get(change, :population)
+  end
 
   test "population grow" do
     population = %{

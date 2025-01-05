@@ -9,6 +9,7 @@ defmodule MyLiege.Simulation.Population do
           gen_3: 40 people, -2 disease, -1 dies, +2 population grow -> needs 3 plus 2 = 5 -> produces for gen_1 (12/8) * 40 = 60
 
   """
+  alias MyLiege.Population
 
   import MyLiege.Simulation.Unit
 
@@ -32,6 +33,22 @@ defmodule MyLiege.Simulation.Population do
         age: %{needed: 480, output: 1}
       }
     }
+  end
+
+  def sim_population({change, data, global}) do
+    population =
+      Enum.reduce(data.population, change, fn {social_class, population}, change ->
+        change
+        |> Map.put(social_class, sim_social_class(population))
+      end)
+
+    {Map.put(change, :population, population), data, global}
+  end
+
+  def sim_social_class(%Population{} = population) do
+    population
+    |> grow()
+    |> shrink()
   end
 
   def grow(%{gen_1: gen_1, gen_2: gen_2, gen_3: gen_3} = population) do
