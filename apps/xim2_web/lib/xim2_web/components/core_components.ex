@@ -17,7 +17,7 @@ defmodule Xim2Web.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  use Gettext, backend: Xim2Web.Gettext
+  import Xim2Web.Gettext
 
   @doc """
   Renders a modal.
