@@ -30,7 +30,7 @@ defmodule MyLiege.Simulation.Population do
       gen_3: %{
         grow: %{needed: needed_per_year(8, 40), output: 1},
         disease: %{needed: needed_per_year(2, 40), output: 1},
-        age: %{needed: 480, output: 1}
+        age: %{needed: needed_per_year(1, 40), output: 1}
       }
     }
   end

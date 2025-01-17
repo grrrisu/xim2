@@ -8,21 +8,23 @@ defmodule Xim2Web.MyLiegeLive.Population do
     # dbg(params)
     socket = if connected?(socket), do: prepare_realm(socket), else: assign(socket, realm: nil)
 
-    {:ok,
-     socket
-     |> assign(
-       edit_items: [],
-       page_title: "My Liege",
-       deltas: nil,
-       changes: nil,
-       step_totals: nil,
-       step_deltas: nil
-     )
-     |> prepare_chart(
-       "population-history-chart",
-       [%{label: "population"}],
-       begin_at_zero: true
-     )}
+    {
+      :ok,
+      socket
+      |> assign(
+        edit_items: [],
+        page_title: "My Liege"
+        #  deltas: nil,
+        #  changes: nil,
+        #  step_totals: nil,
+        #  step_deltas: nil
+      )
+      #  |> people(
+      #    "population-history-chart",
+      #    [%{label: "population"}],
+      #    begin_at_zero: true
+      #  )
+    }
   end
 
   def prepare_realm(socket) do
@@ -160,9 +162,9 @@ defmodule Xim2Web.MyLiegeLive.Population do
               <.storage realm={@realm} edit_items={@edit_items} />
               <.population data={@realm.population} edit_items={@edit_items} />
             </:box>
-            <:box><.statistic deltas={@deltas} /></:box>
+            <%!-- <:box><.statistic deltas={@deltas} /></:box> --%>
           </.boxes>
-          <.boxes>
+          <%!-- <.boxes>
             <:box>
               <.action_box class="mb-2">
                 <.sim_steps_table changes={@step_totals} />
@@ -175,7 +177,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
             <:box>
               <.json_log_output />
             </:box>
-          </.boxes>
+          </.boxes> --%>
         </.flexbox_col>
       <% else %>
         <p>Loading...</p>
