@@ -1,5 +1,12 @@
 # Xim2.Umbrella
 
+### Develope
+
+#### Setup
+
+cd `apps/xim2_web/assets` and `npm install`
+back to root path `mix phx.server`
+
 ### New Sub Application
 
 go to `./apps`and issue the mix new command like this:
