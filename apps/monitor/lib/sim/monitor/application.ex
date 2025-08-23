@@ -3,13 +3,17 @@ defmodule Sim.Monitor.Application do
 
   use Application
 
-  alias Ximula.AccessData
+  alias Ximula.Gatekeeper.Server, as: Gatekeeper
   alias Ximula.Sim.Loop
 
   @impl true
   def start(_type, _args) do
     children = [
-      {AccessData, name: Sim.Monitor.Data, data: nil},
+      %{
+        id: Sim.Monitor.DataAgent,
+        start: {Agent, :start_link, [fn -> nil end, [name: Sim.Monitor.Data]]}
+      },
+      {Gatekeeper, name: Sim.Monitor.Gatekeeper, context: %{agent: Sim.Monitor.Data}},
       {Loop, name: Sim.Monitor.Loop, supervisor: Sim.Monitor.Loop.Task.Supervisor},
       {Task.Supervisor, name: Sim.Monitor.Simulator.Task.Supervisor},
       {Task.Supervisor, name: Sim.Monitor.Loop.Task.Supervisor}

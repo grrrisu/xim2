@@ -5,40 +5,47 @@ defmodule Sim.Monitor.Data do
 
   alias Phoenix.PubSub
 
-  alias Ximula.AccessData
+  alias Ximula.Gatekeeper.Agent, as: Gatekeeper
   alias Ximula.Simulator
 
   def create(server, size) do
     data = 0..(size - 1) |> Enum.reduce(%{}, &Map.put_new(&2, &1, %{value: 0}))
-    :ok = AccessData.set(server, fn _data -> data end)
+    :ok = Agent.update(server, fn _data -> data end)
   end
 
   def created?(server) do
-    AccessData.get(server, fn data -> !is_nil(data) end)
+    Gatekeeper.get(server, fn data -> !is_nil(data) end)
   end
 
   def get(server, key) do
-    AccessData.get(server, &Map.get(&1, key))
+    Gatekeeper.get(server, &Map.get(&1, key))
   end
 
-  def change(key, {:data, data}, {:timeout, timeout}) do
-    value = AccessData.lock(key, data, fn data -> get_in(data, [key, :value]) end)
+  def change(key, {:gatekeeper, gatekeeper}, {:timeout, timeout}) do
+    value = Gatekeeper.lock(gatekeeper, key, fn data, key -> get_in(data, [key, :value]) end)
 
     timeout |> div(1000) |> Process.sleep()
 
-    AccessData.update(key, data, fn data ->
+    Gatekeeper.update(gatekeeper, key, value, fn data, {key, value} ->
       put_in(data, [key, :value], value + 1)
     end)
 
     {key, value}
   end
 
-  def change(one, two), do: raise(inspect([one, two]))
+  # def change(one, two), do: raise(inspect([one, two]))
 
-  def run_queue(queue, timeout: timeout, tasks: tasks, data: data, supervisor: supervisor) do
+  def run_queue(queue,
+        timeout: timeout,
+        tasks: tasks,
+        gatekeeper: gatekeeper,
+        supervisor: supervisor
+      ) do
     Simulator.benchmark(fn ->
-      get_items(data)
-      |> Simulator.sim({__MODULE__, :change, data: data, timeout: timeout}, supervisor,
+      get_items(gatekeeper)
+      |> Simulator.sim(
+        {__MODULE__, :change, gatekeeper: gatekeeper, timeout: timeout},
+        supervisor,
         max_concurrency: tasks
       )
 
@@ -52,7 +59,7 @@ defmodule Sim.Monitor.Data do
   end
 
   defp get_items(server) do
-    size = AccessData.get(server, &Enum.count(&1))
+    size = Gatekeeper.get(server, &Enum.count(&1))
     0..(size - 1)
   end
 
