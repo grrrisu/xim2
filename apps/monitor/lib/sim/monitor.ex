@@ -6,16 +6,17 @@ defmodule Sim.Monitor do
 
   alias Sim.Monitor.Data
 
-  @data_server Sim.Monitor.Data
+  @data_agent Sim.Monitor.Data
+  @data_gatekeeper Sim.Monitor.Gatekeeper
   @loop_server Sim.Monitor.Loop
   @simulator_task_supervisor Sim.Monitor.Simulator.Task.Supervisor
 
   def create_data(size) do
-    Data.create(@data_server, size)
+    Data.create(@data_agent, size)
   end
 
   def get_data(key) do
-    Data.get(@data_server, key)
+    Data.get(@data_gatekeeper, key)
   end
 
   def prepare_queues(timeout, tasks) do
@@ -26,7 +27,7 @@ defmodule Sim.Monitor do
          [
            timeout: timeout,
            tasks: tasks,
-           data: @data_server,
+           gatekeeper: @data_gatekeeper,
            supervisor: @simulator_task_supervisor
          ]},
       interval: 1_000
@@ -34,7 +35,7 @@ defmodule Sim.Monitor do
   end
 
   def start() do
-    if Data.created?(@data_server) do
+    if Data.created?(@data_gatekeeper) do
       :ok = Loop.start_sim(@loop_server)
     else
       {:error, "data not yet created"}
