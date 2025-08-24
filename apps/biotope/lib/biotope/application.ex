@@ -5,12 +5,13 @@ defmodule Biotope.Application do
 
   use Application
 
-  alias Ximula.AccessData
+  alias Ximula.Gatekeeper.Server, as: Gatekeeper
 
   @impl true
   def start(_type, _args) do
     children = [
-      {AccessData, name: Biotope.Data},
+      Biotope.Data.agent_spec(Biotope.Data),
+      {Gatekeeper, name: Biotope.Gatekeeper, context: %{agent: Biotope.Data}},
       {Ximula.Sim.Loop, name: Biotope.Sim.Loop, supervisor: Biotope.Sim.Loop.Task.Supervisor},
       {Task.Supervisor, name: Biotope.Simulator.Task.Supervisor},
       {Task.Supervisor, name: Biotope.Sim.Loop.Task.Supervisor}
