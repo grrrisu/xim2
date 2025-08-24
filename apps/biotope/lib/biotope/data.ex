@@ -5,25 +5,12 @@ defmodule Biotope.Data do
   alias Biotope.Sim.Vegetation
   alias Biotope.Sim.Animal.{Herbivore, Predator}
 
-  def agent_spec(module, opts \\ []) do
-    %{
-      id: module,
-      start: {Agent, :start_link, [fn -> opts[:data] end, [name: opts[:name] || module]]}
-    }
-  end
-
   def start_link(opts) do
     Agent.start_link(fn -> nil end, name: opts[:name] || __MODULE__)
   end
 
   def all(data) do
     Gatekeeper.get(data, & &1)
-  end
-
-  def set(gatekeeper, fun) do
-    Ximula.Gatekeeper.get_context(gatekeeper)
-    |> Map.get(:agent)
-    |> Agent.update(fun)
   end
 
   def get(layer, data) do
@@ -51,11 +38,11 @@ defmodule Biotope.Data do
   end
 
   def lock_field({x, y}, layer, data) do
-    Gatekeeper.lock(data, {x, y}, fn biotope, _key -> field({x, y}, layer, biotope) end)
+    Gatekeeper.lock(data, {x, y}, fn biotope -> field({x, y}, layer, biotope) end)
   end
 
   def lock_herbivore(position, data) do
-    Gatekeeper.lock(data, position, fn biotope, _key ->
+    Gatekeeper.lock(data, position, fn biotope ->
       %{
         vegetation: field(position, :vegetation, biotope),
         herbivore: entity(position, :herbivore, biotope)
@@ -64,7 +51,7 @@ defmodule Biotope.Data do
   end
 
   def lock_predator(position, data) do
-    Gatekeeper.lock(data, position, fn biotope, _key ->
+    Gatekeeper.lock(data, position, fn biotope ->
       %{
         herbivore: entity(position, :herbivore, biotope),
         predator: entity(position, :predator, biotope)
@@ -97,14 +84,14 @@ defmodule Biotope.Data do
     if created?(data) do
       {:error, "already exists"}
     else
-      :ok = set(data, fn _ -> create_biotope(width, height) end)
+      :ok = Gatekeeper.direct_set(data, fn _ -> create_biotope(width, height) end)
       {:ok, all(data)}
     end
   end
 
   def update(%Vegetation{} = vegetation, position, data) do
     :ok =
-      Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = data, _key_value ->
+      Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = data ->
         %{data | vegetation: Grid.put(grid, position, vegetation)}
       end)
 
@@ -113,7 +100,7 @@ defmodule Biotope.Data do
 
   def update({%Vegetation{} = vegetation, %Herbivore{} = herbivore}, position, data) do
     :ok =
-      Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = biotope, _key_value ->
+      Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = biotope ->
         biotope
         |> Map.put(:vegetation, Grid.put(grid, position, vegetation))
         |> put_in([:herbivore, position], herbivore)
@@ -122,7 +109,7 @@ defmodule Biotope.Data do
 
   def update({%Herbivore{} = herbivore, %Predator{} = predator}, position, data) do
     :ok =
-      Gatekeeper.update(data, position, nil, fn biotope, _key_value ->
+      Gatekeeper.update(data, position, nil, fn biotope ->
         biotope
         |> put_in([:herbivore, position], herbivore)
         |> put_in([:predator, position], predator)
@@ -130,7 +117,7 @@ defmodule Biotope.Data do
   end
 
   def clear(data) do
-    set(data, fn _ -> nil end)
+    Gatekeeper.direct_set(data, fn _ -> nil end)
   end
 
   defp create_biotope(width, height) do
