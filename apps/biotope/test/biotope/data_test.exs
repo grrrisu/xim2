@@ -1,13 +1,12 @@
 defmodule Biotope.DataTest do
   use ExUnit.Case, async: true
 
-  alias Ximula.AccessData
   alias Ximula.Grid
   alias Biotope.Data
-  # alias Biotope.Sim.Vegetation
 
   setup do
-    %{data: start_link_supervised!(AccessData)}
+    agent = start_link_supervised!(Ximula.Gatekeeper.Agent.agent_spec(Data, name: __MODULE__))
+    %{data: start_link_supervised!({Ximula.Gatekeeper.Server, context: %{agent: agent}})}
   end
 
   describe "create" do
