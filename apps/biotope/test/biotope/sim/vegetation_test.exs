@@ -1,7 +1,6 @@
 defmodule Biotope.Sim.VegetationTest do
   use ExUnit.Case, async: true
 
-  alias Ximula.AccessData
   alias Biotope.Data
   alias Biotope.Sim.Vegetation
 
@@ -11,7 +10,9 @@ defmodule Biotope.Sim.VegetationTest do
   end
 
   test "sim" do
-    data = start_supervised!(AccessData)
+    agent = start_link_supervised!(Ximula.Gatekeeper.Agent.agent_spec(Data, name: __MODULE__))
+    data = start_link_supervised!({Ximula.Gatekeeper.Server, context: %{agent: agent}})
+
     {:ok, _biotope} = Data.create(1, 1, data)
 
     assert %{vegetation: %{change: %{position: {0, 0}, size: size}}} =

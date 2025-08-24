@@ -3,13 +3,13 @@ defmodule Biotope.SimulationTest do
 
   alias Phoenix.PubSub
 
-  alias Ximula.AccessData
   alias Ximula.Sim.Queue
   alias Biotope.Simulation
   alias Biotope.Sim.Vegetation
 
   setup do
-    data = start_link_supervised!(AccessData)
+    agent = start_link_supervised!(Ximula.Gatekeeper.Agent.agent_spec(Data, name: __MODULE__))
+    data = start_link_supervised!({Ximula.Gatekeeper.Server, context: %{agent: agent}})
     Biotope.create(1, 2, data)
     %{data: data}
   end
