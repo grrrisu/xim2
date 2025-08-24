@@ -10,7 +10,7 @@ defmodule Sim.Monitor.Data do
 
   def create(server, size) do
     data = 0..(size - 1) |> Enum.reduce(%{}, &Map.put_new(&2, &1, %{value: 0}))
-    :ok = Agent.update(server, fn _data -> data end)
+    :ok = Gatekeeper.direct_set(server, fn _data -> data end)
   end
 
   def created?(server) do
@@ -22,11 +22,11 @@ defmodule Sim.Monitor.Data do
   end
 
   def change(key, {:gatekeeper, gatekeeper}, {:timeout, timeout}) do
-    value = Gatekeeper.lock(gatekeeper, key, fn data, key -> get_in(data, [key, :value]) end)
+    value = Gatekeeper.lock(gatekeeper, key, fn data -> get_in(data, [key, :value]) end)
 
     timeout |> div(1000) |> Process.sleep()
 
-    Gatekeeper.update(gatekeeper, key, value, fn data, {key, value} ->
+    Gatekeeper.update(gatekeeper, key, value, fn data ->
       put_in(data, [key, :value], value + 1)
     end)
 

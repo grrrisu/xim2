@@ -10,7 +10,7 @@ defmodule Biotope.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      Biotope.Data.agent_spec(Biotope.Data),
+      Ximula.Gatekeeper.Agent.agent_spec(Biotope.Data),
       {Gatekeeper, name: Biotope.Gatekeeper, context: %{agent: Biotope.Data}},
       {Ximula.Sim.Loop, name: Biotope.Sim.Loop, supervisor: Biotope.Sim.Loop.Task.Supervisor},
       {Task.Supervisor, name: Biotope.Simulator.Task.Supervisor},

@@ -9,10 +9,7 @@ defmodule Sim.Monitor.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      %{
-        id: Sim.Monitor.DataAgent,
-        start: {Agent, :start_link, [fn -> nil end, [name: Sim.Monitor.Data]]}
-      },
+      Ximula.Gatekeeper.Agent.agent_spec(Sim.Monitor.Data),
       {Gatekeeper, name: Sim.Monitor.Gatekeeper, context: %{agent: Sim.Monitor.Data}},
       {Loop, name: Sim.Monitor.Loop, supervisor: Sim.Monitor.Loop.Task.Supervisor},
       {Task.Supervisor, name: Sim.Monitor.Simulator.Task.Supervisor},
