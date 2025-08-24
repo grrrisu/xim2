@@ -1,16 +1,29 @@
 defmodule Biotope.Data do
   alias Ximula.{Grid, Torus}
-  alias Ximula.AccessData
+  alias Ximula.Gatekeeper.Agent, as: Gatekeeper
 
   alias Biotope.Sim.Vegetation
   alias Biotope.Sim.Animal.{Herbivore, Predator}
+
+  def agent_spec(module, opts \\ []) do
+    %{
+      id: module,
+      start: {Agent, :start_link, [fn -> opts[:data] end, [name: opts[:name] || module]]}
+    }
+  end
 
   def start_link(opts) do
     Agent.start_link(fn -> nil end, name: opts[:name] || __MODULE__)
   end
 
   def all(data) do
-    AccessData.get(data, & &1)
+    Gatekeeper.get(data, & &1)
+  end
+
+  def set(gatekeeper, fun) do
+    Ximula.Gatekeeper.get_context(gatekeeper)
+    |> Map.get(:agent)
+    |> Agent.update(fun)
   end
 
   def get(layer, data) do
@@ -21,7 +34,7 @@ defmodule Biotope.Data do
   end
 
   def get_grid_dimensions(data) do
-    AccessData.get(data, fn biotope ->
+    Gatekeeper.get(data, fn biotope ->
       biotope
       |> Map.get(:vegetation)
       |> then(fn grid -> {Grid.width(grid), Grid.height(grid)} end)
@@ -34,15 +47,15 @@ defmodule Biotope.Data do
   end
 
   def get_field({x, y}, layer, data) do
-    AccessData.get(data, fn biotope -> field({x, y}, layer, biotope) end)
+    Gatekeeper.get(data, fn biotope -> field({x, y}, layer, biotope) end)
   end
 
   def lock_field({x, y}, layer, data) do
-    AccessData.lock({x, y}, data, fn biotope -> field({x, y}, layer, biotope) end)
+    Gatekeeper.lock(data, {x, y}, fn biotope, _key -> field({x, y}, layer, biotope) end)
   end
 
   def lock_herbivore(position, data) do
-    AccessData.lock(position, data, fn biotope ->
+    Gatekeeper.lock(data, position, fn biotope, _key ->
       %{
         vegetation: field(position, :vegetation, biotope),
         herbivore: entity(position, :herbivore, biotope)
@@ -51,7 +64,7 @@ defmodule Biotope.Data do
   end
 
   def lock_predator(position, data) do
-    AccessData.lock(position, data, fn biotope ->
+    Gatekeeper.lock(data, position, fn biotope, _key ->
       %{
         herbivore: entity(position, :herbivore, biotope),
         predator: entity(position, :predator, biotope)
@@ -68,7 +81,7 @@ defmodule Biotope.Data do
   end
 
   def get_layer_positions(layer, data) do
-    AccessData.get(data, fn biotope ->
+    Gatekeeper.get(data, fn biotope ->
       case Map.get(biotope, layer) do
         nil -> []
         entities -> Map.keys(entities)
@@ -77,21 +90,21 @@ defmodule Biotope.Data do
   end
 
   def created?(data) do
-    AccessData.get(data, &(!is_nil(&1)))
+    Gatekeeper.get(data, &(!is_nil(&1)))
   end
 
   def create(width, height, data) do
     if created?(data) do
       {:error, "already exists"}
     else
-      :ok = AccessData.set(data, fn _ -> create_biotope(width, height) end)
+      :ok = set(data, fn _ -> create_biotope(width, height) end)
       {:ok, all(data)}
     end
   end
 
   def update(%Vegetation{} = vegetation, position, data) do
     :ok =
-      AccessData.update(position, data, fn %{vegetation: grid} = data ->
+      Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = data, _key_value ->
         %{data | vegetation: Grid.put(grid, position, vegetation)}
       end)
 
@@ -100,7 +113,7 @@ defmodule Biotope.Data do
 
   def update({%Vegetation{} = vegetation, %Herbivore{} = herbivore}, position, data) do
     :ok =
-      AccessData.update(position, data, fn %{vegetation: grid} = biotope ->
+      Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = biotope, _key_value ->
         biotope
         |> Map.put(:vegetation, Grid.put(grid, position, vegetation))
         |> put_in([:herbivore, position], herbivore)
@@ -109,7 +122,7 @@ defmodule Biotope.Data do
 
   def update({%Herbivore{} = herbivore, %Predator{} = predator}, position, data) do
     :ok =
-      AccessData.update(position, data, fn biotope ->
+      Gatekeeper.update(data, position, nil, fn biotope, _key_value ->
         biotope
         |> put_in([:herbivore, position], herbivore)
         |> put_in([:predator, position], predator)
@@ -117,7 +130,7 @@ defmodule Biotope.Data do
   end
 
   def clear(data) do
-    AccessData.set(data, fn _ -> nil end)
+    set(data, fn _ -> nil end)
   end
 
   defp create_biotope(width, height) do
