@@ -4,7 +4,7 @@ defmodule Xim2Web.MixProject do
   def project do
     [
       app: :xim2_web,
-      version: "0.1.0",
+      version: "0.1.1",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -13,7 +13,8 @@ defmodule Xim2Web.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      compilers: [:phoenix_live_view] ++ Mix.compilers()
     ]
   end
 
@@ -36,22 +37,29 @@ defmodule Xim2Web.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.7.9"},
+      {:phoenix, "~> 1.8.0"},
       {:phoenix_ecto, "~> 4.4"},
-      {:phoenix_html, "~> 3.3"},
+      {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.20.1"},
+      {:phoenix_live_view, "~> 1.1.8"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.2"},
       {:phoenix_pubsub, "~> 2.1"},
-      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
-      {:telemetry_metrics, "~> 0.6"},
+      {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.3.0", runtime: Mix.env() == :dev},
+      {:heroicons,
+       github: "tailwindlabs/heroicons",
+       tag: "v2.2.0",
+       sparse: "optimized",
+       app: false,
+       compile: false,
+       depth: 1},
+      {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},
       {:number, "~> 1.0.1"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"},
+      {:bandit, "~> 1.5"},
       {:xim2, in_umbrella: true},
       {:biotope, in_umbrella: true},
       {:monitor, in_umbrella: true},

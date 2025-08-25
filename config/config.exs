@@ -11,7 +11,8 @@ import Config
 
 # Configure Mix tasks and generators
 config :xim2,
-  ecto_repos: [Xim2.Repo]
+  ecto_repos: [Xim2.Repo],
+  generators: [timestamp_type: :utc_datetime]
 
 # Configures the mailer
 #
@@ -29,7 +30,7 @@ config :xim2_web,
 # Configures the endpoint
 config :xim2_web, Xim2Web.Endpoint,
   url: [host: "localhost"],
-  adapter: Phoenix.Endpoint.Cowboy2Adapter,
+  adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: Xim2Web.ErrorHTML, json: Xim2Web.ErrorJSON],
     layout: false
@@ -39,20 +40,19 @@ config :xim2_web, Xim2Web.Endpoint,
 
 # Configure esbuild (the version is required)
 config :esbuild,
-  version: "0.17.11",
+  version: "0.25.4",
   default: [
     args:
-      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+      ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets --external:/fonts/* --external:/images/* --alias:@=.),
     cd: Path.expand("../apps/xim2_web/assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+    env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
   ]
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.4.12",
+  version: "4.1.7",
   default: [
     args: ~w(
-      --config=tailwind.config.js
       --input=css/app.css
       --output=../priv/static/assets/app.css
     ),
@@ -67,7 +67,7 @@ config :number,
   ]
 
 # Configures Elixir's Logger
-config :logger, :console,
+config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
