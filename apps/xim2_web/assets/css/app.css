@@ -1,21 +1,21 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+@source "../css";
+@source "../js";
+@source "../../lib/xim2_web";
 
-@import "line-awesome.min.css";
+@variant phx-click-loading ([".phx-click-loading&", ".phx-click-loading &"]);
+@variant phx-submit-loading ([".phx-submit-loading&", ".phx-submit-loading &"]);
+@variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
 
-@layer utilities {
-  a {
-    @apply text-sky-300 hover:text-sky-500;
-  }
+@plugin "../vendor/heroicons";
+@import "../vendor/line-awesome.min.css";
 
-  a.button {
-    @apply phx-submit-loading:opacity-75 rounded-lg bg-slate-900 border border-sky-300 hover:bg-slate-800 py-2 px-3 font-semibold leading-6 text-sky-300 active:text-sky-100 focus:ring-1 focus:ring-offset-1 focus:outline-none focus:ring-offset-sky-200;
-  }
+a {
+  @apply text-sky-300 hover:text-sky-500;
 }
 
-.while-submitting { display: none; }
-.inputs { display: block; }
+a.button {
+  @apply phx-submit-loading:opacity-75 rounded-lg bg-slate-900 border border-sky-300 hover:bg-slate-800 py-2 px-3 font-semibold leading-6 text-sky-300 active:text-sky-100 focus:ring-1 focus:ring-offset-1 focus:outline-none focus:ring-offset-sky-200;
+}
 
-.phx-submit-loading .while-submitting { display: block; }
-.phx-submit-loading .inputs { display: none; }

@@ -10,7 +10,7 @@ defmodule Xim2Web.ProjectComponents do
   attr :back, :string, default: nil, doc: "~p\"/path/to/parent\""
   attr :back_title, :string, default: "Home"
   slot :inner_block, required: true
-  slot :footer, default: nil
+  slot :footer, required: false
 
   def main_section(assigns) do
     ~H"""
