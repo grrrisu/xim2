@@ -243,7 +243,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
     ~H"""
     <table class="w-full">
       <thead>
-        <th :for={sim_step <- @sim_steps}><%= sim_step %></th>
+        <th :for={sim_step <- @sim_steps}>{sim_step}</th>
       </thead>
       <tbody class="border-t border-sky-400">
         <.sim_steps_row changes={@changes} path={[]} />
@@ -262,9 +262,9 @@ defmodule Xim2Web.MyLiegeLive.Population do
 
     ~H"""
     <tr class="border-b border-sky-700">
-      <td><span class={@indention}><%= @name %></span></td>
+      <td><span class={@indention}>{@name}</span></td>
       <td :for={change <- @changes} class="text-right">
-        <%= get_in(change, @path ++ [:value]) |> Float.round(2) %>
+        {get_in(change, @path ++ [:value]) |> Float.round(2)}
       </td>
     </tr>
     <.sim_steps_row
@@ -303,7 +303,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
     <table class="">
       <tbody>
         <tr :for={row <- @row}>
-          <td><strong><%= row.label %></strong></td>
+          <td><strong>{row.label}</strong></td>
           <td>
             <.editable_property realm={@realm} property={row.property} edit_items={@edit_items} />
           </td>
@@ -345,7 +345,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
           </.form>
         </div>
       <% else %>
-        <span><%= @value %></span>
+        <span>{@value}</span>
         <a href="#" phx-click="edit_property" phx-value-property={@property}>
           <.icon name="la-edit" />
         </a>
@@ -360,12 +360,12 @@ defmodule Xim2Web.MyLiegeLive.Population do
     ~H"""
     <div class="mb-2" id={"social_stratum_#{@name}"}>
       <strong>
-        <.icon name="la-users" class="la-2x align-middle mr-1" /><%= @title %>
+        <.icon name="la-users" class="la-2x align-middle mr-1" />{@title}
       </strong>
       <p>
-        <span class="gen_1"><%= @social.gen_1 |> Float.round(2) %></span>
-        | <span class="gen_2"><%= @social.gen_2 |> Float.round(2) %></span>
-        | <span class="gen_3"><%= @social.gen_3 |> Float.round(2) %></span>
+        <span class="gen_1">{@social.gen_1 |> Float.round(2)}</span>
+        | <span class="gen_2">{@social.gen_2 |> Float.round(2)}</span>
+        | <span class="gen_3">{@social.gen_3 |> Float.round(2)}</span>
       </p>
     </div>
     """

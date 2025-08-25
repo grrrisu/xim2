@@ -13,7 +13,7 @@ defmodule Monsum do
   def flexbox_col(assigns) do
     ~H"""
     <div class={["flex flex-col gap-y-4", @class]}>
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </div>
     """
   end
@@ -26,7 +26,7 @@ defmodule Monsum do
     ~H"""
     <div class={["flex flex-row gap-2", @class]}>
       <div :for={box <- @box} class={["", @width]}>
-        <%= render_slot(box) %>
+        {render_slot(box)}
       </div>
     </div>
     """
@@ -38,7 +38,7 @@ defmodule Monsum do
   def info_card(assigns) do
     ~H"""
     <div>
-      <span class="align-super"><%= @value %></span>
+      <span class="align-super">{@value}</span>
       <.icon name={@icon} class="la-2x" />
     </div>
     """
@@ -50,7 +50,7 @@ defmodule Monsum do
   def main_title(assigns) do
     ~H"""
     <h1 class={["text-slate-200 text-4xl font-light mb-6", @class]}>
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </h1>
     """
   end
@@ -61,7 +61,7 @@ defmodule Monsum do
   def title(assigns) do
     ~H"""
     <h2 class={["text-slate-200 text-2xl font-light mb-4", @class]}>
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </h2>
     """
   end
@@ -72,7 +72,7 @@ defmodule Monsum do
   def sub_title(assigns) do
     ~H"""
     <h3 class={["text-slate-200 text-xl font-light mb-2", @class]}>
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </h3>
     """
   end
@@ -82,7 +82,7 @@ defmodule Monsum do
 
   def small_title(assigns) do
     ~H"""
-    <h4 class={["text-lg mb-2", @class]}><%= render_slot(@inner_block) %></h4>
+    <h4 class={["text-lg mb-2", @class]}>{render_slot(@inner_block)}</h4>
     """
   end
 
@@ -134,13 +134,13 @@ defmodule Monsum do
       <.link navigate={@link} class="w-full">
         <div class="p-6">
           <span class="inline-block p-3 text-white bg-sky-600 rounded-full">
-            <%= render_slot(@icon) %>
+            {render_slot(@icon)}
           </span>
           <h2 class="text-xl font-semibold text-sky-300 capitalize">
-            <%= render_slot(@title) %>
+            {render_slot(@title)}
           </h2>
           <p class="text-sky-100">
-            <%= render_slot(@inner_block) %>
+            {render_slot(@inner_block)}
           </p>
         </div>
       </.link>
@@ -154,7 +154,7 @@ defmodule Monsum do
   def action_box(assigns) do
     ~H"""
     <div class={["rounded-md border border-sky-500 py-2 px-4 bg-sky-950", @class]}>
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </div>
     """
   end
@@ -203,7 +203,7 @@ defmodule Monsum do
     <div class={@class}>
       <.link navigate={@navigate} class="text-sm font-semibold leading-6">
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
-        <%= render_slot(@inner_block) %>
+        {render_slot(@inner_block)}
       </.link>
     </div>
     """
@@ -235,7 +235,7 @@ defmodule Monsum do
       ]}
       {@rest}
     >
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </button>
     """
   end
@@ -320,9 +320,9 @@ defmodule Monsum do
           class="rounded border-zinc-300 text-zinc-900 focus:ring-0"
           {@rest}
         />
-        <%= @label %>
+        {@label}
       </label>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -330,7 +330,7 @@ defmodule Monsum do
   def input(%{type: "select"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id}>{@label}</.label>
       <select
         id={@id}
         name={@name}
@@ -338,10 +338,10 @@ defmodule Monsum do
         multiple={@multiple}
         {@rest}
       >
-        <option :if={@prompt} value=""><%= @prompt %></option>
-        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
+        <option :if={@prompt} value="">{@prompt}</option>
+        {Phoenix.HTML.Form.options_for_select(@options, @value)}
       </select>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -349,7 +349,7 @@ defmodule Monsum do
   def input(%{type: "textarea"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id}>{@label}</.label>
       <textarea
         id={@id}
         name={@name}
@@ -361,7 +361,7 @@ defmodule Monsum do
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -370,7 +370,7 @@ defmodule Monsum do
   def input(assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id}>{@label}</.label>
       <input
         type={@type}
         name={@name}
@@ -385,7 +385,7 @@ defmodule Monsum do
         ]}
         {@rest}
       />
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -399,7 +399,7 @@ defmodule Monsum do
   def label(assigns) do
     ~H"""
     <label for={@for} class="block font-semibold leading-6 text-sky-100">
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </label>
     """
   end
@@ -413,7 +413,7 @@ defmodule Monsum do
     ~H"""
     <p class="mt-3 flex gap-3 text-sm leading-6 text-orange-400 phx-no-feedback:hidden">
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </p>
     """
   end

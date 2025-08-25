@@ -16,13 +16,13 @@ defmodule Xim2Web.ProjectComponents do
     ~H"""
     <.flexbox_col>
       <div>
-        <.main_title><%= @title %></.main_title>
-        <.back navigate={@back} class="mt-16"><%= @back_title %></.back>
+        <.main_title>{@title}</.main_title>
+        <.back navigate={@back} class="mt-16">{@back_title}</.back>
       </div>
       <main>
-        <%= render_slot(@inner_block) %>
+        {render_slot(@inner_block)}
       </main>
-      <div><%= render_slot(@footer) %></div>
+      <div>{render_slot(@footer)}</div>
     </.flexbox_col>
     """
   end
@@ -38,10 +38,10 @@ defmodule Xim2Web.ProjectComponents do
       @class
     ]}>
       <div>
-        <%= render_slot(@header) %>
+        {render_slot(@header)}
       </div>
       <div class="flex flex-wrap place-content-evenly items-stretch">
-        <%= render_slot(@inner_block) %>
+        {render_slot(@inner_block)}
       </div>
     </div>
     """

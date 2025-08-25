@@ -136,11 +136,11 @@ defmodule Xim2Web.AstrorunnerLive.Index do
         mounted={card_slide_in()}
         remove={card_fade_out()}
       >
-        <:title><%= card.title %></:title>
+        <:title>{card.title}</:title>
         <:picture>
           <.picture small={~p"/images/astrorunner/#{card.image}"} />
         </:picture>
-        <:body_title><%= card.type %></:body_title>
+        <:body_title>{card.type}</:body_title>
         <:body>
           <.card_action
             :for={{key, value} <- card.rules}
@@ -149,7 +149,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
             card_id={card.id}
             activated={@activated}
           />
-          <%= card.text %>
+          {card.text}
         </:body>
       </.card>
     </div>
@@ -174,7 +174,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
       phx-value-rule={@click_value}
       phx-value-card={@card_id}
     >
-      + <%= @value %><.icon name={@icon} class="la-lg" />
+      + {@value}<.icon name={@icon} class="la-lg" />
     </div>
     """
   end

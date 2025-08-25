@@ -18,10 +18,10 @@ defmodule Xim2Web.Monitor.Components do
         class="divide-y divide-sky-800 border-t border-sky-600 text-sm leading-6 text-sky-300"
       >
         <tr :for={{dom_id, item} <- @durations} id={dom_id}>
-          <td class="text-right"><%= Calendar.strftime(item.time, "%H:%M:%S:%f") %></td>
-          <td class="text-right"><%= item.duration |> number_format() %></td>
+          <td class="text-right">{Calendar.strftime(item.time, "%H:%M:%S:%f")}</td>
+          <td class="text-right">{item.duration |> number_format()}</td>
           <td :if={@items} class="text-right">
-            <%= (item.duration - @items * @timeout / @tasks) |> number_format() %>
+            {(item.duration - @items * @timeout / @tasks) |> number_format()}
           </td>
         </tr>
       </tbody>
@@ -47,9 +47,9 @@ defmodule Xim2Web.Monitor.Components do
         class="divide-y divide-sky-800 border-t border-sky-600 text-sm leading-6 text-sky-300"
       >
         <tr :for={{dom_id, item} <- @error_messages} id={dom_id}>
-          <td class="text-right"><%= Calendar.strftime(item.time, "%H:%M:%S:%f") %></td>
-          <td class="text-center"><%= item.entity %></td>
-          <td class="text-left"><%= item.message %></td>
+          <td class="text-right">{Calendar.strftime(item.time, "%H:%M:%S:%f")}</td>
+          <td class="text-center">{item.entity}</td>
+          <td class="text-left">{item.message}</td>
         </tr>
       </tbody>
     </table>
