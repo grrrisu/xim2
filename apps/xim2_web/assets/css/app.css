@@ -4,13 +4,28 @@
 @source "../js";
 @source "../../lib/xim2_web";
 
-@variant phx-click-loading ([".phx-click-loading&", ".phx-click-loading &"]);
-@variant phx-submit-loading ([".phx-submit-loading&", ".phx-submit-loading &"]);
-@variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
-
 @plugin "../vendor/heroicons";
 @import "../vendor/line-awesome.min.css";
 
+/* daisyUI Tailwind Plugin. You can update this file by fetching the latest version with:
+   curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
+   Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
+@plugin "../vendor/daisyui" {
+  themes: false;
+}
+
+/* Add variants based on LiveView classes */
+@custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+
+/* Use the data attribute for dark mode  */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* Make LiveView wrapper divs transparent for layout */
+[data-phx-session], [data-phx-teleported-src] { display: contents }
+
+/* This file is for your main application CSS */
 a {
   @apply text-sky-300 hover:text-sky-500;
 }
