@@ -46,12 +46,12 @@ defmodule Monsum.GridCompnent do
           grid_height={@grid_height}
           grid_width={@grid_width}
         >
-          <%= render_slot(@fields, {dom_id, cell}) %>
+          {render_slot(@fields, {dom_id, cell})}
         </.grid_container>
         <%= for layer <- @layer do %>
           <div id={layer.id} phx-update="stream" class="absolute top-0 h-full w-full">
             <%= for {dom_id, item} <- layer.items do %>
-              <%= render_slot(layer, {dom_id, item}) %>
+              {render_slot(layer, {dom_id, item})}
             <% end %>
           </div>
         <% end %>
@@ -88,7 +88,7 @@ defmodule Monsum.GridCompnent do
       style={"grid-template-columns: repeat(#{@grid_width},1fr); grid-template-rows: repeat(#{@grid_height},1fr);"}
     >
       <%= for {dom_id, cell} <- @grid do %>
-        <%= render_slot(@inner_block, {dom_id, cell}) %>
+        {render_slot(@inner_block, {dom_id, cell})}
       <% end %>
     </div>
     """

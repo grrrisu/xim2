@@ -13,7 +13,7 @@ defmodule Monsum.Chart do
 
   def chart(assigns) do
     ~H"""
-    <h3><%= @title %></h3>
+    <h3>{@title}</h3>
     <div id={"#{@name}-container"} phx-update="ignore" class="relative">
       <canvas id={"#{@name}"} phx-hook={@hook}></canvas>
     </div>

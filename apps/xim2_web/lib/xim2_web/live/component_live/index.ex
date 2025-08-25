@@ -209,7 +209,7 @@ defmodule Xim2Web.ComponentLive.Index do
               id={dom_id}
               class="text-slate-900 text-center content-center border-t border-r border-gray-900"
             >
-              Position [<%= x %>,<%= y %>]: <%= value %>
+              Position [{x},{y}]: {value}
             </div>
           </:fields>
         </.grid>
@@ -243,12 +243,12 @@ defmodule Xim2Web.ComponentLive.Index do
       <p>card_slide_in() and card_fade_out()</p>
       <div class="flex">
         <.anibox :for={{card, index} <- Enum.with_index(@top_cards)} index={index} name="top">
-          <span class="text-xl text-slate-950"><%= card %></span>
+          <span class="text-xl text-slate-950">{card}</span>
         </.anibox>
       </div>
       <div class="flex">
         <.anibox :for={{card, index} <- Enum.with_index(@bottom_cards)} index={index} name="bottom">
-          <span class="text-xl text-slate-950"><%= card %></span>
+          <span class="text-xl text-slate-950">{card}</span>
         </.anibox>
       </div>
     </.flexbox_col>
@@ -264,7 +264,7 @@ defmodule Xim2Web.ComponentLive.Index do
       phx-click={JS.push("remove-card", value: %{index: @index})}
       class="relative h-40 w-32 text-center border border-gray-500 bg-sky-200 mr-4"
     >
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </div>
     """
   end

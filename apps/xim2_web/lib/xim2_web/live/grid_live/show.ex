@@ -98,7 +98,7 @@ defmodule Xim2Web.GridLive.Show do
       id={@id}
       class={["text-xs text-slate-900 bg-gray-200 border-t border-r border-gray-900 cell", @class]}
     >
-      <%= "#{@x}:#{@y}" %> | <%= @value %>
+      {"#{@x}:#{@y}"} | {@value}
     </div>
     """
   end

@@ -117,7 +117,7 @@ defmodule Xim2Web.BiotopeLive.Index do
 
     ~H"""
     <div id={@id} class="bg-emerald-700 border border-emerald-950">
-      <%= @size %>
+      {@size}
     </div>
     """
   end
@@ -133,7 +133,7 @@ defmodule Xim2Web.BiotopeLive.Index do
       style={"left: #{@x}px; top: #{@y}px; width: #{@step}px; height: #{@step}px"}
     >
       <span class="bg-sky-500 p-2">
-        <%= @herbivore.size %>
+        {@herbivore.size}
       </span>
     </div>
     """

@@ -40,18 +40,18 @@ defmodule Monsum.BoardgameComponents do
       <div class={["border border-gray-800 h-full", @class]}>
         <div class="flex flex-col h-full">
           <div class="text-center font-bold py-px border-b border-gray-800">
-            <%= render_slot(@title) %>
+            {render_slot(@title)}
           </div>
           <div class="grow flex flex-col justify-stretch">
             <div class="h-1/2 overflow-hidden">
-              <%= render_slot(@picture) %>
+              {render_slot(@picture)}
             </div>
             <div class="h-1/2 flex flex-col">
               <div class="text-center font-bold border-y border-gray-800">
-                <%= render_slot(@body_title) %>
+                {render_slot(@body_title)}
               </div>
               <div class="grow p-2">
-                <%= render_slot(@body) %>
+                {render_slot(@body)}
               </div>
             </div>
           </div>
