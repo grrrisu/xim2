@@ -151,7 +151,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
 
   def render(assigns) do
     ~H"""
-    <.main_section title="My Liege" back={~p"/my_liege"} back_title="Scenarios">
+    <.main_section flash={@flash} title="My Liege" back={~p"/my_liege"} back_title="Scenarios">
       <%= if @realm do %>
         <.flexbox_col>
           <.actions />

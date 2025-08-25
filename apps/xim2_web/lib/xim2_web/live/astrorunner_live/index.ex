@@ -76,7 +76,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section title="Astrorunner" back={~p"/"}>
+    <.main_section flash={@flash} title="Astrorunner" back={~p"/"}>
       <%= if board_setup?(@global_board) do %>
         <.job_market cards={@global_board.cards} />
         <.player_board tableau={@my_tableau} player={@player} />

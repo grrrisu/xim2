@@ -44,7 +44,7 @@ defmodule Xim2Web.MonitorLive.Example do
 
   def render(assigns) do
     ~H"""
-    <.main_section title={@page_title} back={~p"/"}>
+    <.main_section flash={@flash} title={@page_title} back={~p"/"}>
       <.boxes width="w-1/4">
         <:box>
           <.info_card value={@schedulers} icon="la-microchip" />

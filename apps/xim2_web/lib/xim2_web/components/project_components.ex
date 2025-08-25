@@ -5,8 +5,10 @@ defmodule Xim2Web.ProjectComponents do
   use Phoenix.Component
 
   import Monsum
+  alias Xim2Web.Layouts
 
   attr :title, :string, default: nil, doc: "Page Title"
+  attr :flash, :map, default: %{}, doc: "Flash messages"
   attr :back, :string, default: nil, doc: "~p\"/path/to/parent\""
   attr :back_title, :string, default: "Home"
   slot :inner_block, required: true
@@ -14,16 +16,18 @@ defmodule Xim2Web.ProjectComponents do
 
   def main_section(assigns) do
     ~H"""
-    <.flexbox_col>
-      <div>
-        <.main_title>{@title}</.main_title>
-        <.back navigate={@back} class="mt-16">{@back_title}</.back>
-      </div>
-      <main>
-        {render_slot(@inner_block)}
-      </main>
-      <div>{render_slot(@footer)}</div>
-    </.flexbox_col>
+    <Layouts.app flash={@flash}>
+      <.flexbox_col>
+        <div>
+          <.main_title>{@title}</.main_title>
+          <.back navigate={@back} class="mt-16">{@back_title}</.back>
+        </div>
+        <main>
+          {render_slot(@inner_block)}
+        </main>
+        <div>{render_slot(@footer)}</div>
+      </.flexbox_col>
+    </Layouts.app>
     """
   end
 

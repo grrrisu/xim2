@@ -12,7 +12,7 @@ defmodule Xim2Web.MyLiegeLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section title="My Liege" back={~p"/"}>
+    <.main_section flash={@flash} title="My Liege" back={~p"/"}>
       <.main_box>
         <:header>
           <.title>Scenarios</.title>
