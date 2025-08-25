@@ -1,0 +1,68 @@
+/*
+Monsum Theme for Daisy
+version 0.1.1
+*/
+
+/* additional colors */
+@theme {
+  --color-carnation-50: rgb(254 236 239);
+  --color-carnation-100: rgb(252 217 223);
+  --color-carnation-200: rgb(249 179 191);
+  --color-carnation-300: rgb(246 141 159);
+  --color-carnation-400: rgb(244 103 127);
+  --color-carnation-500: rgb(241 65 94);
+  --color-carnation-600: rgb(232 17 53);
+  --color-carnation-700: rgb(180 14 41);
+  --color-carnation-800: rgb(128 10 29);
+  --color-carnation-900: rgb(76 6 17);
+  --color-carnation-950: rgb(50 4 11);
+}
+
+/* DaisyUI theme using standard CSS custom properties */
+@plugin "./daisyui-theme" {
+  name: "monsum";
+  default: true;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: rgb(15 23 42);
+  --color-base-200: rgb(12 74 110);
+  --color-base-300: rgb(7 89 133);
+  --color-base-content: rgb(226 232 240);
+  --color-primary: rgb(249 115 22);
+  --color-primary-content: rgb(255 247 237);
+  --color-secondary: rgb(34 211 238);
+  --color-secondary-content: rgb(8 51 68);
+  --color-accent: rgb(3 105 161);
+  --color-accent-content: rgb(240 249 255);
+  --color-neutral: rgb(100 116 139);
+  --color-neutral-content: rgb(248 250 252);
+  --color-info: rgb(14 165 233);
+  --color-info-content: rgb(240 249 255);
+  --color-success: rgb(16 185 129);
+  --color-success-content: rgb(236 253 245);
+  --color-warning: rgb(234 179 8);
+  --color-warning-content: rgb(66 32 6);
+  --color-error: rgb(232 17 53);
+  --color-error-content: rgb(254 236 239);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Your custom component styles */
+.input-monsum {
+  @apply mt-2 block w-full rounded-sm bg-slate-800 text-sky-100 focus:outline-0 focus:ring-0 sm:text-sm sm:leading-6 border border-slate-500 focus:border-sky-600 focus:bg-sky-950;
+}
+
+.input-monsum-error {
+  @apply border-orange-400 focus:border-orange-300;
+}
+
+.button-monsum {
+  @apply hover:brightness-125 active:text-white/80;
+}
