@@ -4,7 +4,7 @@ defmodule Xim2Web.PageController do
   def home(conn, _params) do
     # The home page is often custom made,
     # so skip the default app layout.
-    render(conn, :home, layout: false)
+    render(conn, :home)
   end
 
   def colors(conn, _params) do

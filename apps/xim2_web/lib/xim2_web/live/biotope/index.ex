@@ -76,7 +76,7 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def render(%{new: true} = assigns) do
     ~H"""
-    <.main_section title="Biotope" back={~p"/"}>
+    <.main_section flash={@flash} title="Biotope" back={~p"/"}>
       <.live_component id="biotope-form" module={Form} />
     </.main_section>
     """
@@ -84,7 +84,7 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def render(%{new: false} = assigns) do
     ~H"""
-    <.main_section title="Biotope" back={~p"/"}>
+    <.main_section flash={@flash} title="Biotope" back={~p"/"}>
       <.action_box class="mb-2">
         <.start_button running={@running} />
         <.reset_button />

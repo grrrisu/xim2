@@ -41,7 +41,7 @@ defmodule Xim2Web.ComponentLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section title="Components" back={~p"/"}>
+    <.main_section flash={@flash} title="Components" back={~p"/"}>
       <div class="flex">
         <a phx-click="change-components" phx-value-components="monsum" class="mr-4" href="#">
           Monsum

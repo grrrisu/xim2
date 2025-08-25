@@ -39,8 +39,7 @@ defmodule Xim2Web do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: Xim2Web.Layouts]
+        formats: [:html, :json]
 
       import Plug.Conn
       import Xim2Web.Gettext
@@ -51,8 +50,7 @@ defmodule Xim2Web do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {Xim2Web.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -86,6 +84,8 @@ defmodule Xim2Web do
       # Core UI components and translation
       import Monsum
       import Monsum.Chart
+
+      alias Xim2Web.Layouts
       import Xim2Web.CoreComponents
       import Xim2Web.ProjectComponents
       import Xim2Web.Gettext

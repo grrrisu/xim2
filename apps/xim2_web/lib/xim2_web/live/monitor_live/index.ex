@@ -48,7 +48,7 @@ defmodule Xim2Web.MonitorLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section title={@page_title} back={~p"/"}>
+    <.main_section flash={@flash} title={@page_title} back={~p"/"}>
       <.boxes width="w-1/2">
         <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box>
