@@ -46,6 +46,9 @@ defmodule Xim2Web.ComponentLive.Index do
         <a phx-click="change-components" phx-value-components="monsum" class="mr-4" href="#">
           Monsum
         </a>
+        <a phx-click="change-components" phx-value-components="daisyui" class="mr-4" href="#">
+          DaisyUI
+        </a>
         <a phx-click="change-components" phx-value-components="grid" class="mr-4" href="#">Grid</a>
         <a phx-click="change-components" phx-value-components="boardgame" class="mr-4" href="#">
           Boardgame
@@ -57,6 +60,7 @@ defmodule Xim2Web.ComponentLive.Index do
           Transitions
         </a>
       </div>
+      <.daisyui_components :if={@components == "daisyui"} changeset={@changeset} />
       <.monsum_components :if={@components == "monsum"} changeset={@changeset} />
       <.project_components :if={@components == "project"} />
       <.grid_components :if={@components == "grid"} grid={@streams.grid} />
@@ -67,6 +71,51 @@ defmodule Xim2Web.ComponentLive.Index do
         bottom_cards={@bottom_cards}
       />
     </.main_section>
+    """
+  end
+
+  def daisyui_components(assigns) do
+    ~H"""
+    <.flexbox_col class="border border-gray-500 w-full min-h-screen">
+      <div>
+        <h3>Buttons</h3>
+        <button class="btn btn-neutral">Neutral</button>
+        <button class="btn btn-primary">Primary</button>
+        <button class="btn btn-secondary">Secondary</button>
+        <button class="btn btn-accent">Accent</button>
+        <button class="btn btn-info">Info</button>
+        <button class="btn btn-success">Success</button>
+        <button class="btn btn-warning">Warning</button>
+        <button class="btn btn-error">Error</button>
+      </div>
+      <div>
+        <h3>Text</h3>
+        <div class="bg-neutral text-neutral-content p-4">
+          Neutral color
+        </div>
+        <div class="bg-primary text-primary-content p-4">
+          Primary color
+        </div>
+        <div class="bg-secondary text-secondary-content p-4">
+          Secondary color
+        </div>
+        <div class="bg-accent text-accent-content p-4">
+          Accent color
+        </div>
+        <div class="bg-info text-info-content p-4">
+          Info color
+        </div>
+        <div class="bg-success text-success-content p-4">
+          Success color
+        </div>
+        <div class="bg-warning text-warning-content p-4">
+          Warning color
+        </div>
+        <div class="bg-error text-error-content p-4">
+          Error color
+        </div>
+      </div>
+    </.flexbox_col>
     """
   end
 
