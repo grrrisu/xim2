@@ -1,4 +1,4 @@
-defmodule Monsum do
+defmodule MonsumLocal do
   @moduledoc """
   uses tailwindcss, expects the following global classes:
   see assets/css/app.css
@@ -6,37 +6,9 @@ defmodule Monsum do
   use Phoenix.Component
 
   import Xim2Web.CoreComponents
+  import Monsum.MainComponents
 
   # --- start daisyfied ---
-
-  @doc """
-  Renders a button with navigation support.
-
-  ## Examples
-
-      <.button>Send!</.button>
-      <.button phx-click="go" class="btn-primary">Send!</.button>
-      <.button navigate={~p"/"}>Home</.button>
-  """
-  attr :rest, :global, include: ~w(href navigate patch)
-  attr :class, :string, default: ""
-  slot :inner_block, required: true
-
-  def button(%{rest: rest} = assigns) do
-    if rest[:href] || rest[:navigate] || rest[:patch] do
-      ~H"""
-      <.link class={["btn", @class]} {@rest}>
-        {render_slot(@inner_block)}
-      </.link>
-      """
-    else
-      ~H"""
-      <button class={["btn", @class]} {@rest}>
-        {render_slot(@inner_block)}
-      </button>
-      """
-    end
-  end
 
   # --- end daisyfied ---
 
@@ -241,37 +213,6 @@ defmodule Monsum do
     </div>
     """
   end
-
-  # @doc """
-  # Renders a button.
-
-  # ## Examples
-
-  #     <.button>Send!</.button>
-  #     <.button phx-click="go" class="ml-2">Send!</.button>
-  # """
-  # attr :type, :string, default: nil
-  # attr :class, :string, default: nil
-  # attr :rest, :global, include: ~w(disabled form name value)
-
-  # slot :inner_block, required: true
-
-  # def button(assigns) do
-  #   ~H"""
-  #   <button
-  #     type={@type}
-  #     class={[
-  #       "phx-submit-loading:opacity-75 rounded-lg bg-orange-500 hover:bg-orange-400 py-2 px-3",
-  #       "font-semibold leading-6 text-slate-900 active:text-white/80 ",
-  #       "focus:ring-1 focus:ring-offset-1 focus:outline-none focus:ring-offset-orange-200",
-  #       @class
-  #     ]}
-  #     {@rest}
-  #   >
-  #     {render_slot(@inner_block)}
-  #   </button>
-  #   """
-  # end
 
   @doc """
   Renders an input with label and error messages.

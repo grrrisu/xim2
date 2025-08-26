@@ -43,7 +43,7 @@ defmodule Xim2Web.BiotopeLive.Form do
           <.input field={@form[:height]} label="Height" errors={f.errors} />
           <div class="mt-8 flex items-end gap-6">
             <.button>Create</.button>
-            <.link patch={~p"/biotope"} class="button">Cancel</.link>
+            <.button patch={~p"/"} class="btn-secondary btn-outline">Cancel</.button>
           </div>
         </div>
       </.form>
