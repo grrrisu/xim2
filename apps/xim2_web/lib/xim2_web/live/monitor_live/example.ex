@@ -44,7 +44,7 @@ defmodule Xim2Web.MonitorLive.Example do
 
   def render(assigns) do
     ~H"""
-    <.main_section flash={@flash} title={@page_title} back={~p"/"}>
+    <Layouts.app flash={@flash} title={@page_title} back={~p"/"}>
       <.boxes width="w-1/4">
         <:box>
           <.info_card value={@schedulers} icon="la-microchip" />
@@ -83,7 +83,7 @@ defmodule Xim2Web.MonitorLive.Example do
           <.start_button running={@running} />
         </.action_box>
       </:footer>
-    </.main_section>
+    </Layouts.app>
     """
   end
 

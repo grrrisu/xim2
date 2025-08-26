@@ -76,15 +76,15 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def render(%{new: true} = assigns) do
     ~H"""
-    <.main_section flash={@flash} title="Biotope" back={~p"/"}>
+    <Layouts.app flash={@flash} title="Biotope" back={~p"/"}>
       <.live_component id="biotope-form" module={Form} />
-    </.main_section>
+    </Layouts.app>
     """
   end
 
   def render(%{new: false} = assigns) do
     ~H"""
-    <.main_section flash={@flash} title="Biotope" back={~p"/"}>
+    <Layouts.app flash={@flash} title="Biotope" back={~p"/"}>
       <.action_box class="mb-2">
         <.start_button running={@running} />
         <.reset_button />
@@ -108,7 +108,7 @@ defmodule Xim2Web.BiotopeLive.Index do
           <.herbivore id={dom_id} herbivore={herbivore} step={160} />
         </:layer>
       </.grid>
-    </.main_section>
+    </Layouts.app>
     """
   end
 
