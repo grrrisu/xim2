@@ -23,14 +23,9 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* Make LiveView wrapper divs transparent for layout */
-[data-phx-session], [data-phx-teleported-src] { display: contents }
+[data-phx-session],
+[data-phx-teleported-src] {
+  display: contents
+}
 
 /* This file is for your main application CSS */
-a:not(.btn) {
-  @apply text-sky-300 hover:text-sky-500;
-}
-
-a.button {
-  @apply phx-submit-loading:opacity-75 rounded-lg bg-slate-900 border border-sky-300 hover:bg-slate-800 py-2 px-3 font-semibold leading-6 text-sky-300 active:text-sky-100 focus:ring-1 focus:ring-offset-1 focus:outline-none focus:ring-offset-sky-200;
-}
-
