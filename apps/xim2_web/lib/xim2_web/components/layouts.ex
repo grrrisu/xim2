@@ -14,7 +14,7 @@ defmodule Xim2Web.Layouts do
     ~H"""
     <.flexbox_col class="px-4 sm:px-6 lg:px-8">
       <header>
-        <div>Xim 2</div>
+        <h2>Xim 2</h2>
         <.main_title>{@title}</.main_title>
         <.back navigate={@back} class="mt-16">{@back_title}</.back>
       </header>

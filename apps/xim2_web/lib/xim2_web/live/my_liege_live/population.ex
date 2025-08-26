@@ -2,8 +2,6 @@ defmodule Xim2Web.MyLiegeLive.Population do
   alias Phoenix.PubSub
   use Xim2Web, :live_view
 
-  import Xim2Web.ProjectComponents
-
   def mount(_params, _session, socket) do
     # dbg(params)
     socket = if connected?(socket), do: prepare_realm(socket), else: assign(socket, realm: nil)

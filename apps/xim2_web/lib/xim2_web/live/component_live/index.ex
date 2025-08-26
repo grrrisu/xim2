@@ -79,14 +79,14 @@ defmodule Xim2Web.ComponentLive.Index do
     <.flexbox_col class="border border-gray-500 w-full min-h-screen">
       <div>
         <h3>Buttons</h3>
-        <button class="btn btn-neutral">Neutral</button>
-        <button class="btn btn-primary">Primary</button>
-        <button class="btn btn-secondary">Secondary</button>
-        <button class="btn btn-accent">Accent</button>
-        <button class="btn btn-info">Info</button>
-        <button class="btn btn-success">Success</button>
-        <button class="btn btn-warning">Warning</button>
-        <button class="btn btn-error">Error</button>
+        <.button class="btn-neutral">Neutral</.button>
+        <.button class="btn-primary btn-outline">Primary Outline</.button>
+        <.button class="btn-secondary">Secondary</.button>
+        <.button class="btn-accent" href="#">Accent Link</.button>
+        <.button class="btn-info" navigate="#">Info Navigate</.button>
+        <.button class="btn-success" patch="#">Success Patch</.button>
+        <.button class="btn-warning" href="#">Warning</.button>
+        <.button class="btn-error">Error</.button>
       </div>
       <div>
         <h3>Text</h3>

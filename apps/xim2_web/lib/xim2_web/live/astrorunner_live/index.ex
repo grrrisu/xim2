@@ -2,7 +2,6 @@ defmodule Xim2Web.AstrorunnerLive.Index do
   alias Phoenix.PubSub
   use Xim2Web, :live_view
 
-  import Xim2Web.ProjectComponents
   import Monsum.BoardgameComponents
 
   def mount(_params, _session, socket) do

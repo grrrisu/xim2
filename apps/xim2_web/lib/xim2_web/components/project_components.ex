@@ -4,9 +4,6 @@ defmodule Xim2Web.ProjectComponents do
   """
   use Phoenix.Component
 
-  import Monsum
-  alias Xim2Web.Layouts
-
   attr :class, :string, default: ""
   slot :header, required: false
   slot :inner_block, required: true

@@ -5,7 +5,6 @@ defmodule Xim2Web.MonitorLive.Index do
 
   alias Phoenix.PubSub
 
-  import Xim2Web.ProjectComponents
   import Xim2Web.Monitor.Components
 
   @items 500

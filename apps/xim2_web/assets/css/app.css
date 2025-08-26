@@ -26,7 +26,7 @@
 [data-phx-session], [data-phx-teleported-src] { display: contents }
 
 /* This file is for your main application CSS */
-a {
+a:not(.btn) {
   @apply text-sky-300 hover:text-sky-500;
 }
 
