@@ -12,7 +12,7 @@ defmodule Xim2Web.MyLiegeLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section flash={@flash} title="My Liege" back={~p"/"}>
+    <Layouts.app flash={@flash} title="My Liege" back={~p"/"}>
       <.main_box>
         <:header>
           <.title>Scenarios</.title>
@@ -28,7 +28,7 @@ defmodule Xim2Web.MyLiegeLive.Index do
           Farms, wood, tools, black smiths
         </.hero_card>
       </.main_box>
-    </.main_section>
+    </Layouts.app>
     """
   end
 end

@@ -41,7 +41,7 @@ defmodule Xim2Web.ComponentLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section flash={@flash} title="Components" back={~p"/"}>
+    <Layouts.app flash={@flash} title="Components" back={~p"/"}>
       <div class="flex">
         <a phx-click="change-components" phx-value-components="monsum" class="mr-4" href="#">
           Monsum
@@ -70,7 +70,7 @@ defmodule Xim2Web.ComponentLive.Index do
         top_cards={@top_cards}
         bottom_cards={@bottom_cards}
       />
-    </.main_section>
+    </Layouts.app>
     """
   end
 
@@ -223,13 +223,13 @@ defmodule Xim2Web.ComponentLive.Index do
     ~H"""
     <.flexbox_col class="border border-gray-500 w-full min-h-screen">
       <div>
-        <h3>main_section</h3>
-        <.main_section title="Main Title" back={~p"/"}>
+        <h3>App Layout</h3>
+        <Layouts.app title="Main Title" back={~p"/"}>
           <div class="bg-sky-500 text-center">Main Section</div>
           <:footer>
             <div class="bg-sky-500 text-center">Footer</div>
           </:footer>
-        </.main_section>
+        </Layouts.app>
       </div>
     </.flexbox_col>
 

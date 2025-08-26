@@ -76,7 +76,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section flash={@flash} title="Astrorunner" back={~p"/"}>
+    <Layouts.app flash={@flash} title="Astrorunner" back={~p"/"}>
       <%= if board_setup?(@global_board) do %>
         <.job_market cards={@global_board.cards} />
         <.player_board tableau={@my_tableau} player={@player} />
@@ -86,7 +86,7 @@ defmodule Xim2Web.AstrorunnerLive.Index do
         <p class="mb-3">No game available.</p>
         <.button phx-click="setup_board">Setup Board</.button>
       <% end %>
-    </.main_section>
+    </Layouts.app>
     """
   end
 

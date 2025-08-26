@@ -66,7 +66,7 @@ defmodule Xim2Web.GridLive.Show do
 
   def render(assigns) do
     ~H"""
-    <.main_section flash={@flash} title="Grid" back={~p"/"}>
+    <Layouts.app flash={@flash} title="Grid" back={~p"/"}>
       <div class="border border-red-500 text-slate-900 bg-red-100">
         <div class="m-2">
           <p>Some text before the grid</p>
@@ -88,7 +88,7 @@ defmodule Xim2Web.GridLive.Show do
           </:fields>
         </.grid>
       </div>
-    </.main_section>
+    </Layouts.app>
     """
   end
 

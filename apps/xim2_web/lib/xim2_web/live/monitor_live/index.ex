@@ -48,7 +48,7 @@ defmodule Xim2Web.MonitorLive.Index do
 
   def render(assigns) do
     ~H"""
-    <.main_section flash={@flash} title={@page_title} back={~p"/"}>
+    <Layouts.app flash={@flash} title={@page_title} back={~p"/"}>
       <.boxes width="w-1/2">
         <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box>
@@ -65,7 +65,7 @@ defmodule Xim2Web.MonitorLive.Index do
           <.error_message_table error_messages={@streams.error_messages} />
         </:box>
       </.boxes>
-    </.main_section>
+    </Layouts.app>
     """
   end
 
