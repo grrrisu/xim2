@@ -153,14 +153,14 @@ defmodule Xim2Web.MyLiegeLive.Population do
       <%= if @realm do %>
         <.flexbox_col>
           <.actions />
-          <.boxes>
+          <.box_grid>
             <:box>
               <.storage realm={@realm} edit_items={@edit_items} />
               <.population data={@realm.population} edit_items={@edit_items} />
             </:box>
             <:box><.statistic deltas={@deltas} /></:box>
-          </.boxes>
-          <.boxes>
+          </.box_grid>
+          <.box_grid>
             <:box>
               <.action_box class="mb-2">
                 <.sim_steps_table changes={@step_totals} />
@@ -173,7 +173,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
             <:box>
               <.json_log_output />
             </:box>
-          </.boxes>
+          </.box_grid>
         </.flexbox_col>
       <% else %>
         <p>Loading...</p>

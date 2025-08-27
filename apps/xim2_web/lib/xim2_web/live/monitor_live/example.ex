@@ -44,7 +44,7 @@ defmodule Xim2Web.MonitorLive.Example do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} title={@page_title} back={~p"/"}>
-      <.boxes width="w-1/4">
+      <.box_grid cols="8">
         <:box>
           <.info_card value={@schedulers} icon="la-microchip" />
         </:box>
@@ -57,8 +57,8 @@ defmodule Xim2Web.MonitorLive.Example do
         <:box>
           <.info_card value={number_format(@tasks)} icon="la-cogs" />
         </:box>
-      </.boxes>
-      <.boxes width="w-1/2">
+      </.box_grid>
+      <.box_grid>
         <:box><.chart title="Duration" name="duration-chart" hook="Monitor" /></:box>
         <:box>
           <.duration_table
@@ -68,15 +68,15 @@ defmodule Xim2Web.MonitorLive.Example do
             timeout={@timeout}
           />
         </:box>
-      </.boxes>
-      <.boxes width="w-1/2">
+      </.box_grid>
+      <.box_grid>
         <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="# Items" name="ok-summary-chart" hook="Chart" /></:box>
-      </.boxes>
-      <.boxes width="w-1/2">
+      </.box_grid>
+      <.box_grid>
         <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="???" name="xxx-summary-chart" hook="Chart" /></:box>
-      </.boxes>
+      </.box_grid>
       <:footer>
         <.action_box class="mb-2">
           <.start_button running={@running} />

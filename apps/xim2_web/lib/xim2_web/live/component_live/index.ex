@@ -131,8 +131,9 @@ defmodule Xim2Web.ComponentLive.Index do
         </.flexbox_col>
       </div>
       <div>
-        <h3>boxes</h3>
-        <.boxes>
+        <h3>Rows</h3>
+        <h5>Cols default</h5>
+        <.box_grid>
           <:box>
             <div class="bg-sky-500 text-center">One</div>
           </:box>
@@ -145,7 +146,52 @@ defmodule Xim2Web.ComponentLive.Index do
           <:box>
             <div class="bg-sky-500 text-center">Four</div>
           </:box>
-        </.boxes>
+        </.box_grid>
+        <h5>Cols 3</h5>
+        <.box_grid cols="3">
+          <:box>
+            <div class="bg-sky-500 text-center">One</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Two</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Three</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Four</div>
+          </:box>
+        </.box_grid>
+        <h5>Cols 4</h5>
+        <.box_grid cols="4">
+          <:box>
+            <div class="bg-sky-500 text-center">One</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Two</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Three</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Four</div>
+          </:box>
+        </.box_grid>
+        <h5>Cols 8</h5>
+        <.box_grid cols="8">
+          <:box>
+            <div class="bg-sky-500 text-center">One</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Two</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Three</div>
+          </:box>
+          <:box>
+            <div class="bg-sky-500 text-center">Four</div>
+          </:box>
+        </.box_grid>
       </div>
       <div>
         <h3>main_title</h3>
