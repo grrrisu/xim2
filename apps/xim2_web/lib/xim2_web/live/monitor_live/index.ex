@@ -48,22 +48,22 @@ defmodule Xim2Web.MonitorLive.Index do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} title={@page_title} back={~p"/"}>
-      <.boxes width="w-1/2">
+      <.box_grid>
         <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box>
           <.duration_table durations={@streams.durations} items={nil} tasks={nil} timeout={nil} />
         </:box>
-      </.boxes>
-      <.boxes width="w-1/2">
+      </.box_grid>
+      <.box_grid>
         <:box><.chart title="Items calculated" name="ok-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="Items changed" name="changed-summary-chart" hook="Chart" /></:box>
-      </.boxes>
-      <.boxes width="w-1/2">
+      </.box_grid>
+      <.box_grid>
         <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
         <:box>
           <.error_message_table error_messages={@streams.error_messages} />
         </:box>
-      </.boxes>
+      </.box_grid>
     </Layouts.app>
     """
   end
