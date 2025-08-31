@@ -178,39 +178,65 @@ defmodule Xim2Web.CoreComponents do
   end
 
   @doc """
-  Renders a simple form.
+  Renders an input with label and error messages.
+
+  A `Phoenix.HTML.FormField` may be passed as argument,
+  which is used to retrieve the input name, id, and values.
+  Otherwise all attributes may be passed explicitly.
+
+  ## Types
+
+  This function accepts all HTML input types, considering that:
+
+    * You may also set `type="select"` to render a `<select>` tag
+
+    * `type="checkbox"` is used exclusively to render boolean values
+
+    * For live file uploads, see `Phoenix.Component.live_file_input/1`
+
+  See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
+  for more information. Unsupported types, such as hidden and radio,
+  are best written directly in your templates.
 
   ## Examples
 
-      <.simple_form for={@form} phx-change="validate" phx-submit="save">
-        <.input field={@form[:email]} label="Email"/>
-        <.input field={@form[:username]} label="Username" />
-        <:actions>
-          <.button>Save</.button>
-        </:actions>
-      </.simple_form>
+      <.input field={@form[:email]} type="email" />
+      <.input name="my-input" errors={["oh no!"]} />
   """
-  attr :for, :any, required: true, doc: "the datastructure for the form"
-  attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+  attr :id, :any, default: nil
+  attr :name, :any
+  attr :label, :string, default: nil
+  attr :value, :any
+
+  attr :type, :string,
+    default: "text",
+    values: ~w(checkbox color date datetime-local email file month number password
+               search select tel text textarea time url week)
+
+  attr :field, Phoenix.HTML.FormField,
+    doc: "a form field struct retrieved from the form, for example: @form[:email]"
+
+  attr :errors, :list, default: []
+  attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
+  attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
+  attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
+  attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
+  attr :class, :string, default: nil, doc: "the input class to use over defaults"
+  attr :error_class, :string, default: nil, doc: "the input error class to use over defaults"
 
   attr :rest, :global,
-    include: ~w(autocomplete name rel action enctype method novalidate target multipart),
-    doc: "the arbitrary HTML attributes to apply to the form tag"
+    include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
+                multiple pattern placeholder readonly required rows size step)
 
-  slot :inner_block, required: true
-  slot :actions, doc: "the slot for form actions, such as a submit button"
+  def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
+    errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
 
-  def simple_form(assigns) do
-    ~H"""
-    <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
-        {render_slot(@inner_block, f)}
-        <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
-          {render_slot(action, f)}
-        </div>
-      </div>
-    </.form>
-    """
+    assigns
+    |> assign(field: nil, id: assigns.id || field.id)
+    |> assign(:errors, Enum.map(errors, &translate_error(&1)))
+    |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
+    |> assign_new(:value, fn -> field.value end)
+    |> Monsum.Form.input()
   end
 
   @doc """
