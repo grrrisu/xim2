@@ -84,7 +84,6 @@ defmodule Xim2Web do
       # Core UI components and translation
       import Monsum.MainComponents
       import Monsum.Buttons
-      import MonsumLocal
       import Monsum.Chart
 
       alias Xim2Web.Layouts
