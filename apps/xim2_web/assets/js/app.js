@@ -20,14 +20,16 @@ import "phoenix_html";
 // Establish Phoenix Socket and LiveView configuration.
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
+import { hooks as colocatedHooks } from "phoenix-colocated/xim2_web";
+import MonsumHooks from "../vendor/monsum_hooks";
+import { MonitorHook, ChartHook } from "./monitor";
 import topbar from "../vendor/topbar";
 
-import { MonitorHook, ChartHook } from "./monitor";
-import { JsonHook } from "./hooks";
 Hooks = {
+  ...colocatedHooks,
+  ...MonsumHooks,
   Monitor: MonitorHook,
-  Chart: ChartHook,
-  Json: JsonHook,
+  Chart: ChartHook
 };
 
 let csrfToken = document
