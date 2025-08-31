@@ -16,6 +16,8 @@ defmodule Xim2Web.CoreComponents do
   """
   use Phoenix.Component
 
+  import Monsum.MainComponents
+
   alias Phoenix.LiveView.JS
   use Gettext, backend: Xim2Web.Gettext
 
@@ -364,21 +366,22 @@ defmodule Xim2Web.CoreComponents do
       <.icon name="la-frog" />
       <.icon name="la-spinner" class="la-spin" />
   """
-  attr :name, :string, required: true
-  attr :class, :string, default: nil
-  attr :package, :string, default: "las"
 
-  def icon(%{name: "hero-" <> _} = assigns) do
-    ~H"""
-    <span class={[@name, @class]} />
-    """
-  end
+  # attr :name, :string, required: true
+  # attr :class, :string, default: nil
+  # attr :package, :string, default: "las"
 
-  def icon(%{name: "la-" <> _} = assigns) do
-    ~H"""
-    <span class={[@package, @name, @class]} />
-    """
-  end
+  # def icon(%{name: "hero-" <> _} = assigns) do
+  #   ~H"""
+  #   <span class={[@name, @class]} />
+  #   """
+  # end
+
+  # def icon(%{name: "la-" <> _} = assigns) do
+  #   ~H"""
+  #   <span class={[@package, @name, @class]} />
+  #   """
+  # end
 
   ## JS Commands
 

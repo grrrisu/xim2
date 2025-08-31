@@ -54,8 +54,8 @@ defmodule Xim2Web.MixProject do
        app: false,
        compile: false,
        depth: 1},
-      {:monsum, github: "grrrisu/monsum", app: false, compile: false},
-      # {:monsum, path: "../monsum"}
+      # {:monsum, github: "grrrisu/monsum", app: false, compile: false},
+      {:monsum, path: "../../../monsum", override: true},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},

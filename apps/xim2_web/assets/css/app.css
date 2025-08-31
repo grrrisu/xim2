@@ -3,6 +3,8 @@
 @source "../css";
 @source "../js";
 @source "../../lib/xim2_web";
+/* @source "../../../../deps/monsum/lib"; */
+@source "../../../../../monsum/lib";
 
 @plugin "../vendor/heroicons";
 @import "../vendor/line-awesome.min.css";

@@ -17,9 +17,7 @@ defmodule Xim2Web.ProjectComponents do
       <div>
         {render_slot(@header)}
       </div>
-      <div class="flex flex-wrap place-content-evenly items-stretch">
-        {render_slot(@inner_block)}
-      </div>
+      {render_slot(@inner_block)}
     </div>
     """
   end
