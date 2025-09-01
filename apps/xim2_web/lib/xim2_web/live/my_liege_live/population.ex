@@ -326,7 +326,7 @@ defmodule Xim2Web.MyLiegeLive.Population do
     ~H"""
     <div class="relative" id={@id}>
       <%= if @edit do %>
-        <div class="absolute z-10 left-0 -bottom-6 w-32 rounded-md border border-sky-400 py-1 pr-1 bg-sky-800">
+        <div class="absolute z-10 left-2 -bottom-10 w-32 rounded-md border border-sky-400 py-1 pr-1 bg-sky-800">
           <.form
             :let={f}
             for={@form}
@@ -335,8 +335,8 @@ defmodule Xim2Web.MyLiegeLive.Population do
             class="flex items-center"
           >
             <.icon name="la-angle-left" class="align-middle" />
-            <.input field={f[:property]} value={@property} type="hidden" />
-            <.input field={f[:value]} value={@value} size="5" input_class="mt-0 py-1 px-2 text-right" />
+            <input name={f[:property].name} value={@property} type="hidden" />
+            <.input field={f[:value]} value={@value} size="5" />
             <.button class="py-1 px-2 ml-2" id="button-change">
               <.icon name="la-upload" />
             </.button>
