@@ -49,13 +49,10 @@ defmodule Biotope.Sim.AggregatorTest do
 
     %{
       summary:
-        Aggregator.aggregate_simulations(
-          [
-            %{ok: vegetation_results, error: [], simulation: :vegetation},
-            %{ok: herbivore_results, error: [], simulation: :herbivore}
-          ],
-          nil
-        )
+        Aggregator.aggregate_simulations([
+          %{ok: vegetation_results, error: [], simulation: :vegetation},
+          %{ok: herbivore_results, error: [], simulation: :herbivore}
+        ])
     }
   end
 

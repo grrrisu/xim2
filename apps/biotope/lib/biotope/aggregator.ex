@@ -7,7 +7,7 @@ defmodule Biotope.Aggregator do
     predator: []
   }
   """
-  def aggregate_simulations([%{simulation: _, ok: _, error: _} | _] = results, _queue) do
+  def aggregate_simulations([%{simulation: _, ok: _, error: _} | _] = results) do
     aggregate = %{vegetation: %{}, herbivore: %{}, predator: %{}}
 
     results

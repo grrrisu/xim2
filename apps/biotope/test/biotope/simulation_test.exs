@@ -3,7 +3,6 @@ defmodule Biotope.SimulationTest do
 
   alias Phoenix.PubSub
 
-  alias Ximula.Sim.Queue
   alias Biotope.Simulation
   alias Biotope.Sim.Vegetation
 
@@ -42,7 +41,7 @@ defmodule Biotope.SimulationTest do
   describe "notify queue events" do
     setup %{data: data} do
       PubSub.subscribe(Xim2.PubSub, "simulation:biotope")
-      Simulation.sim(%Queue{name: "test"}, data: data)
+      Simulation.sim(data: data)
       :ok
     end
 
@@ -58,7 +57,7 @@ defmodule Biotope.SimulationTest do
     test "received queue summary" do
       assert_received {:simulation_biotope, :queue_summary,
                        %{
-                         queue: "test",
+                         queue: :normal,
                          results: %{
                            vegetation: %{error: 0, ok: 2, time: _},
                            herbivore: %{error: 0, ok: 1, time: _},

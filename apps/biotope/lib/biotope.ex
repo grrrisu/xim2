@@ -36,7 +36,7 @@ defmodule Biotope do
   def prepare_sim_queues(loop \\ @loop, proxy \\ @proxy) do
     Loop.add_queue(loop, %Queue{
       name: :normal,
-      func: {Biotope.Simulation, :sim, [data: proxy]},
+      func: {Biotope.Simulation, :sim, [[data: proxy]]},
       interval: 200
     })
   end

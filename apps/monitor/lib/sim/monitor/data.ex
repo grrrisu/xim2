@@ -6,7 +6,7 @@ defmodule Sim.Monitor.Data do
   alias Phoenix.PubSub
 
   alias Ximula.Gatekeeper.Agent, as: Gatekeeper
-  alias Ximula.Simulator
+  alias Ximula.Sim.TaskRunner, as: Simulator
 
   def create(server, size) do
     data = 0..(size - 1) |> Enum.reduce(%{}, &Map.put_new(&2, &1, %{value: 0}))

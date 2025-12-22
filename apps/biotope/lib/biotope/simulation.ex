@@ -1,8 +1,7 @@
 defmodule Biotope.Simulation do
   alias Phoenix.PubSub
 
-  alias Ximula.Simulator
-  alias Ximula.Sim.Queue
+  alias Ximula.Sim.TaskRunner, as: Simulator
 
   alias Biotope.{Aggregator, Data}
   alias Biotope.Sim.{Vegetation, Animal}
@@ -14,11 +13,11 @@ defmodule Biotope.Simulation do
     predator: Animal.Predator
   }
 
-  def sim(%Queue{} = queue, opts) do
+  def sim(opts) do
     Enum.map(@simulations, &sim_simulation(&1, opts))
     |> Enum.map(fn {time, results} -> Map.put_new(results, :time, time) end)
-    |> aggregate_simulations(queue)
-    |> count_results(queue)
+    |> aggregate_simulations()
+    |> count_results()
     |> notify_queue_summary()
   end
 
@@ -66,16 +65,16 @@ defmodule Biotope.Simulation do
     }
   end
 
-  def aggregate_simulations(results, queue) do
-    summary = Aggregator.aggregate_simulations(results, queue)
+  def aggregate_simulations(results) do
+    summary = Aggregator.aggregate_simulations(results)
     :ok = notify(:entities_changed, summary)
     results
   end
 
   # [{1097, %{error: [], ok: [], simulation: Sim.Vegetation}}]
-  def count_results(results, queue) do
+  def count_results(results) do
     %{
-      queue: queue.name,
+      queue: :normal,
       results:
         Enum.reduce(results, %{}, fn %{error: error, ok: ok, simulation: simulation, time: time},
                                      sum ->
