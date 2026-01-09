@@ -1,95 +1,43 @@
 defmodule Biotope.Simulation do
-  alias Phoenix.PubSub
+  use Ximula.Sim
 
-  alias Ximula.Sim.TaskRunner, as: Simulator
+  alias Ximula.Sim.Change
+  alias Biotope.Simulation
+  alias Biotope.Sim.{Vegetation}
+  alias Biotope.StageAdapter
 
-  alias Biotope.{Aggregator, Data}
-  alias Biotope.Sim.{Vegetation, Animal}
-  alias Biotope.Simulator.Task.Supervisor
+  simulation do
+    default(gatekeeper: Biotope.Gatekeeper, pubsub: Xim2.PubSub)
 
-  @simulations %{
-    vegetation: Vegetation,
-    herbivore: Animal.Herbivore,
-    predator: Animal.Predator
-  }
+    pipeline(:biotop) do
+      notify(:metric)
 
-  def sim(opts) do
-    Enum.map(@simulations, &sim_simulation(&1, opts))
-    |> Enum.map(fn {time, results} -> Map.put_new(results, :time, time) end)
-    |> aggregate_simulations()
-    |> count_results()
-    |> notify_queue_summary()
+      stage(:vegetation, StageAdapter) do
+        notify_all(:metric)
+        notify_entity(:metric, &Simulation.notify_filter/1)
+        step(Vegetation, :sim, notify: {:metric, &Simulation.notify_filter/1})
+      end
+
+      # stage(:herbivore, StageAdapter) do
+      #   notify_all(:metric)
+      #   notify_entity(:metric, &Simulation.notify_filter/1)
+      #   step(Herbivore, :sim, notify: {:metric, &Simulation.notify_filter/1})
+      # end
+    end
+
+    queue :normal, 200 do
+      run_pipeline(:biotop, supervisor: Biotope.Simulator.Task.Supervisor) do
+        [{0, 0}]
+        # Biotope.get_grid_positions()
+      end
+    end
   end
 
-  def sim_simulation({sim_key, simulation}, opts) do
-    Simulator.benchmark(fn ->
-      get_data(sim_key, opts[:data])
-      |> sim_items(simulation, opts[:data])
-      |> handle_failed()
-      |> handle_results(sim_key)
-    end)
+  def notify_filter(%Change{} = change) do
+    Change.get(change, :position) == {0, 0}
   end
 
-  def sim_items(items, simulation, data) do
-    Simulator.sim(
-      items,
-      {simulation, :sim, [[data: data]]},
-      Supervisor
-    )
-  end
-
-  def get_data(:vegetation, data) do
-    Data.get_grid_dimensions(data)
-    |> Data.get_grid_positions()
-  end
-
-  def get_data(layer, data) do
-    Data.get_layer_positions(layer, data)
-  end
-
-  def handle_failed(%{exit: failed} = results) do
-    failed =
-      Enum.map(failed, fn {id, {exception, stacktrace}} ->
-        {id, Exception.normalize(:error, exception, stacktrace) |> Exception.message()}
-      end)
-
-    if Enum.any?(failed), do: notify(:simulation_errors, failed)
-    Map.put(results, :exit, failed)
-  end
-
-  def handle_results(%{ok: success, exit: failed}, simulation) do
-    %{
-      simulation: simulation,
-      ok: success,
-      error: failed
-    }
-  end
-
-  def aggregate_simulations(results) do
-    summary = Aggregator.aggregate_simulations(results)
-    :ok = notify(:entities_changed, summary)
-    results
-  end
-
-  # [{1097, %{error: [], ok: [], simulation: Sim.Vegetation}}]
-  def count_results(results) do
-    %{
-      queue: :normal,
-      results:
-        Enum.reduce(results, %{}, fn %{error: error, ok: ok, simulation: simulation, time: time},
-                                     sum ->
-          Map.put(sum, simulation, %{time: time, error: Enum.count(error), ok: Enum.count(ok)})
-        end)
-    }
-  end
-
-  def notify_queue_summary(results) do
-    :ok = notify(:queue_summary, results)
-    results
-  end
-
-  defp notify(topic, payload) do
-    :ok =
-      PubSub.broadcast(Xim2.PubSub, "simulation:biotope", {:simulation_biotope, topic, payload})
+  def notify_filter(field) do
+    field.position == {0, 0}
   end
 end

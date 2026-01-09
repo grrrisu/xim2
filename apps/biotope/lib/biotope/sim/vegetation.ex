@@ -1,5 +1,7 @@
 defmodule Biotope.Sim.Vegetation do
-  alias Biotope.Data
+  use Accessible
+
+  alias Ximula.Sim.Change
 
   alias Biotope.Sim.Vegetation
 
@@ -11,29 +13,9 @@ defmodule Biotope.Sim.Vegetation do
             display_size: 650,
             priority: :normal
 
-  def sim(position, data: data) do
-    %{key: position, data: data}
-    |> Map.put_new(:origin, Data.lock_field(position, :vegetation, data))
-    |> then(&Map.put_new(&1, :change, grow(&1.origin)))
-    |> then(&Map.put(&1, :change, set_position(&1.change, position)))
-    |> update_data()
-    |> result()
-  end
-
-  def set_position(change, position) do
-    Map.put_new(change, :position, position)
-  end
-
-  def update_data(%{key: position, data: data, origin: vegetation, change: change} = changeset) do
-    vegetation
-    |> Map.merge(change)
-    |> Data.update(position, data)
-
-    changeset
-  end
-
-  def result(%{change: change, origin: origin}) do
-    %{vegetation: %{change: change, origin: origin}}
+  def sim(%Change{} = change) do
+    delta = grow(change.data)
+    Change.change_by(change, :size, delta.size)
   end
 
   # vegetation grows by birth rate (alias grow rate) and shrinks by natural deaths (age),
@@ -58,7 +40,7 @@ defmodule Biotope.Sim.Vegetation do
     size * (birth_rate - death_rate) * (capacity - size) / capacity
   end
 
-  def grow(%Vegetation{size: size} = vegetation, step \\ 1) do
-    %{size: size + delta(vegetation) * step}
+  def grow(%Vegetation{} = vegetation, step \\ 1) do
+    %{size: delta(vegetation) * step}
   end
 end

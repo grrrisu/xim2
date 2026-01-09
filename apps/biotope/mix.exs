@@ -27,8 +27,9 @@ defmodule Biotope.MixProject do
   defp deps do
     [
       {:phoenix_pubsub, "~> 2.1"},
-      {:ximula, git: "https://github.com/grrrisu/ximula.git", override: true, app: false}
-      # {:ximula, path: "../../../ximula"}
+      {:accessible, "~> 0.3.0"},
+      # {:ximula, git: "https://github.com/grrrisu/ximula.git", override: true, app: false}
+      {:ximula, path: "../../../ximula"}
     ]
   end
 end
