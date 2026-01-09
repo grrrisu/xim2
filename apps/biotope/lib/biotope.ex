@@ -3,8 +3,8 @@ defmodule Biotope do
   Context for `Biotope`.
   """
 
-  alias Biotope.Data
-  alias Ximula.Sim.{Loop, Queue}
+  alias Biotope.{Data, Simulation}
+  alias Ximula.Sim.Loop
 
   @proxy Biotope.Gatekeeper
   @loop Biotope.Sim.Loop
@@ -33,12 +33,13 @@ defmodule Biotope do
     Loop.get_queues(loop)
   end
 
-  def prepare_sim_queues(loop \\ @loop, proxy \\ @proxy) do
-    Loop.add_queue(loop, %Queue{
-      name: :normal,
-      func: {Biotope.Simulation, :sim, [[data: proxy]]},
-      interval: 200
-    })
+  def prepare_sim_queues(loop \\ @loop) do
+    queues = Simulation.build_queues()
+
+    case Loop.add_queues(loop, queues) do
+      [_] -> :ok
+      error -> error
+    end
   end
 
   def start(loop \\ @loop) do

@@ -20,8 +20,17 @@ defmodule Biotope.Data do
     end
   end
 
+  def get_root!(data, fun) do
+    Gatekeeper.get(data, fn state ->
+      case state do
+        nil -> {:error, "no data set"}
+        state -> fun.(state)
+      end
+    end)
+  end
+
   def get_grid_dimensions(data) do
-    Gatekeeper.get(data, fn biotope ->
+    get_root!(data, fn biotope ->
       biotope
       |> Map.get(:vegetation)
       |> then(fn grid -> {Grid.width(grid), Grid.height(grid)} end)
@@ -34,7 +43,7 @@ defmodule Biotope.Data do
   end
 
   def get_field({x, y}, layer, data) do
-    Gatekeeper.get(data, fn biotope -> field({x, y}, layer, biotope) end)
+    get_root!(data, fn biotope -> field({x, y}, layer, biotope) end)
   end
 
   def lock_field({x, y}, layer, data) do
@@ -68,7 +77,7 @@ defmodule Biotope.Data do
   end
 
   def get_layer_positions(layer, data) do
-    Gatekeeper.get(data, fn biotope ->
+    get_root!(data, fn biotope ->
       case Map.get(biotope, layer) do
         nil -> []
         entities -> Map.keys(entities)
@@ -89,7 +98,7 @@ defmodule Biotope.Data do
     end
   end
 
-  def update(%Vegetation{} = vegetation, position, data) do
+  def update(%Vegetation{position: position} = vegetation, data) do
     :ok =
       Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = data ->
         %{data | vegetation: Grid.put(grid, position, vegetation)}
