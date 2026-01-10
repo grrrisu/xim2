@@ -26,7 +26,7 @@ defmodule Sim.Monitor.Data do
 
     timeout |> div(1000) |> Process.sleep()
 
-    Gatekeeper.update(gatekeeper, key, value, fn data ->
+    Gatekeeper.update(gatekeeper, key, fn data ->
       put_in(data, [key, :value], value + 1)
     end)
 

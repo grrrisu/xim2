@@ -100,7 +100,7 @@ defmodule Biotope.Data do
 
   def update(%Vegetation{position: position} = vegetation, data) do
     :ok =
-      Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = data ->
+      Gatekeeper.update(data, position, fn %{vegetation: grid} = data ->
         %{data | vegetation: Grid.put(grid, position, vegetation)}
       end)
 
@@ -109,7 +109,7 @@ defmodule Biotope.Data do
 
   def update({%Vegetation{} = vegetation, %Herbivore{} = herbivore}, position, data) do
     :ok =
-      Gatekeeper.update(data, position, nil, fn %{vegetation: grid} = biotope ->
+      Gatekeeper.update(data, position, fn %{vegetation: grid} = biotope ->
         biotope
         |> Map.put(:vegetation, Grid.put(grid, position, vegetation))
         |> put_in([:herbivore, position], herbivore)
@@ -118,7 +118,7 @@ defmodule Biotope.Data do
 
   def update({%Herbivore{} = herbivore, %Predator{} = predator}, position, data) do
     :ok =
-      Gatekeeper.update(data, position, nil, fn biotope ->
+      Gatekeeper.update(data, position, fn biotope ->
         biotope
         |> put_in([:herbivore, position], herbivore)
         |> put_in([:predator, position], predator)
