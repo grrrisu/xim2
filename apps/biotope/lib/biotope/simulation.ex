@@ -13,7 +13,7 @@ defmodule Biotope.Simulation do
       notify(:metric)
 
       stage(:vegetation, StageAdapter) do
-        notify_all(:metric)
+        notify_all(:event_metric)
         notify_entity(:metric, &Simulation.notify_filter/1)
         step(Vegetation, :sim, notify: {:metric, &Simulation.notify_filter/1})
       end
