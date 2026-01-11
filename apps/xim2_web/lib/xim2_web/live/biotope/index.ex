@@ -11,7 +11,7 @@ defmodule Xim2Web.BiotopeLive.Index do
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      PubSub.subscribe(Xim2.PubSub, "simulation:biotope")
+      PubSub.subscribe(Xim2.PubSub, "sim:pipeline:stage:vegetation")
       {:ok, prepare_queues(socket)}
     else
       {:ok, socket |> assign(:page_title, "Biotope")}
@@ -70,6 +70,20 @@ defmodule Xim2Web.BiotopeLive.Index do
   def handle_info({:simulation_biotope, topic, _payload}, socket) do
     Logger.info("received simulation biotop topic #{topic}")
     # dbg(payload)
+    {:noreply, socket}
+  end
+
+  def handle_info(
+        {:stage_completed, %{stage_name: :vegetation, result: %{ok: vegetation}}},
+        socket
+      ) do
+    {:noreply,
+     socket
+     |> stream(:vegetation, vegetation |> streamify())}
+  end
+
+  def handle_info(msg, socket) do
+    dbg(msg)
     {:noreply, socket}
   end
 
