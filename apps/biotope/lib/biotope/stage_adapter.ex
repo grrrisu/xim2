@@ -5,9 +5,11 @@ defmodule Biotope.StageAdapter do
   alias Biotope.Data
 
   @impl true
-  def run_stage(stage, %{data: data, opts: opts}) do
+  def run_stage(stage, %{data: _data, opts: opts}) do
     case stage.name do
-      :vegetation -> Pipeline.run_tasks(data, {__MODULE__, :sim_vegetation}, stage, opts)
+      :vegetation ->
+        Data.get_grid_positions(stage.gatekeeper)
+        |> Pipeline.run_tasks({__MODULE__, :sim_vegetation}, stage, opts)
     end
   end
 
