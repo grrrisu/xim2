@@ -26,10 +26,7 @@ defmodule Biotope.Simulation do
     end
 
     queue :normal, 200 do
-      run_pipeline(:biotop, supervisor: Biotope.Simulator.Task.Supervisor) do
-        [{0, 0}]
-        # Biotope.get_grid_positions()
-      end
+      run_pipeline(:biotop, supervisor: Biotope.Simulator.Task.Supervisor)
     end
   end
 

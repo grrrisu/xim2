@@ -42,6 +42,10 @@ defmodule Biotope.Data do
     |> List.flatten()
   end
 
+  def get_grid_positions(data) do
+    get_root!(data, fn biotope -> biotope |> Map.get(:vegetation) |> Grid.positions() end)
+  end
+
   def get_field({x, y}, layer, data) do
     get_root!(data, fn biotope -> field({x, y}, layer, biotope) end)
   end
