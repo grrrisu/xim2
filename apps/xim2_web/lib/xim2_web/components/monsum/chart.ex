@@ -45,10 +45,19 @@ defmodule Monsum.Chart do
     })
   end
 
+  def push_chart_data(socket, chart_id, index, result) do
+    socket
+    |> push_event("update-chart-" <> chart_id, %{
+      x_axis: DateTime.utc_now() |> DateTime.to_iso8601(),
+      index: index,
+      result: result
+    })
+  end
+
   def push_chart_data(socket, chart_id, results) do
     socket
     |> push_event("update-chart-" <> chart_id, %{
-      x_axis: DateTime.now!("Etc/UTC") |> DateTime.to_iso8601(),
+      x_axis: DateTime.utc_now() |> DateTime.to_iso8601(),
       results: results
     })
   end

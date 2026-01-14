@@ -22,13 +22,13 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import { hooks as colocatedHooks } from "phoenix-colocated/xim2_web";
 import MonsumHooks from "../vendor/monsum_hooks";
-import { MonitorHook, ChartHook } from "./monitor";
+import { ChartAsyncHook, ChartHook } from "./monitor";
 import topbar from "../vendor/topbar";
 
 Hooks = {
   ...colocatedHooks,
   ...MonsumHooks,
-  Monitor: MonitorHook,
+  ChartAsync: ChartAsyncHook,
   Chart: ChartHook
 };
 
