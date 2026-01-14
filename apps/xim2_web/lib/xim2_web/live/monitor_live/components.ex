@@ -6,10 +6,12 @@ defmodule Xim2Web.Monitor.Components do
 
   def duration_table(assigns) do
     ~H"""
-    <table class="table-auto w-full">
+    <table class="table-auto w-full border-spacing-2 border-separate">
       <thead class="text-sky-400">
+        <th>Key</th>
         <th>Time</th>
-        <th>Duration (µm)</th>
+        <th>Duration (ns)</th>
+        <th>Meta</th>
         <th :if={@items}>Overhead Queue (µm)</th>
       </thead>
       <tbody
@@ -18,11 +20,10 @@ defmodule Xim2Web.Monitor.Components do
         class="divide-y divide-sky-800 border-t border-sky-600 text-sm leading-6 text-sky-300"
       >
         <tr :for={{dom_id, item} <- @durations} id={dom_id}>
+          <td>{ item.key }</td>
           <td class="text-right">{Calendar.strftime(item.time, "%H:%M:%S:%f")}</td>
           <td class="text-right">{item.duration |> number_format()}</td>
-          <td :if={@items} class="text-right">
-            {(item.duration - @items * @timeout / @tasks) |> number_format()}
-          </td>
+          <td>{ inspect(item.meta) }</td>
         </tr>
       </tbody>
     </table>

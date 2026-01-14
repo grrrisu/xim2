@@ -59,7 +59,7 @@ defmodule Xim2Web.MonitorLive.Example do
         </:box>
       </.box_grid>
       <.box_grid>
-        <:box><.chart title="Duration" name="duration-chart" hook="Monitor" /></:box>
+        <:box><.chart title="Duration" name="duration-chart" hook="Chart" /></:box>
         <:box>
           <.duration_table
             durations={@streams.durations}
