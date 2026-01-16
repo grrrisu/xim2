@@ -27,6 +27,9 @@ defmodule Biotope.SimulationTest do
     })
 
     assert Biotope.get_field({0, 0}, :vegetation, gatekeeper) |> Map.get(:size) > 650
+
+    assert Biotope.get(:herbivore, gatekeeper) |> Map.values() |> List.first() |> Map.get(:size) >
+             50
   end
 
   test "build queue" do

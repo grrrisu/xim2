@@ -10,12 +10,24 @@ defmodule Biotope.StageAdapter do
       :vegetation ->
         Data.get_grid_positions(stage.gatekeeper)
         |> Pipeline.run_tasks({__MODULE__, :sim_vegetation}, stage, opts)
+
+      :herbivore ->
+        Data.get(:herbivore, stage.gatekeeper)
+        |> Map.keys()
+        |> Pipeline.run_tasks({__MODULE__, :sim_herbivore}, stage, opts)
     end
   end
 
   def sim_vegetation(key, %{gatekeeper: gatekeeper} = stage) do
     key
     |> Data.lock_field(:vegetation, gatekeeper)
+    |> Pipeline.execute_steps(stage)
+    |> Data.update(gatekeeper)
+  end
+
+  def sim_herbivore(key, %{gatekeeper: gatekeeper} = stage) do
+    key
+    |> Data.lock_herbivore(gatekeeper)
     |> Pipeline.execute_steps(stage)
     |> Data.update(gatekeeper)
   end
