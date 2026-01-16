@@ -111,7 +111,13 @@ defmodule Biotope.Data do
     vegetation
   end
 
-  def update({%Vegetation{} = vegetation, %Herbivore{} = herbivore}, position, data) do
+  def update(
+        %{
+          vegetation: %Vegetation{} = vegetation,
+          herbivore: %Herbivore{position: position} = herbivore
+        },
+        data
+      ) do
     :ok =
       Gatekeeper.update(data, position, fn %{vegetation: grid} = biotope ->
         biotope

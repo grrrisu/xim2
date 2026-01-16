@@ -2,6 +2,8 @@ defmodule Biotope.Sim.Animal do
   alias Biotope.Data
 
   defmodule Herbivore do
+    use Accessible
+
     defstruct position: {0, 0},
               birth_rate: 0.5,
               death_rate: 0.01,
@@ -10,38 +12,15 @@ defmodule Biotope.Sim.Animal do
               graze_rate: 0.05,
               size: 50
 
+    alias Ximula.Sim.Change
     alias Biotope.Sim.Animal
 
-    def sim(position, data: data) do
-      %{key: position, data: data}
-      |> Map.put_new(:origin, Data.lock_herbivore(position, data))
-      |> then(&Map.put_new(&1, :change, Animal.grow(&1.origin.vegetation, &1.origin.herbivore)))
-      |> Animal.set_position(position)
-      |> update_data()
-      |> result()
-    end
+    def sim(%Change{} = change) do
+      delta = Animal.grow(change.data.vegetation, change.data.herbivore)
 
-    def update_data(%{change: change, origin: origin, key: position, data: data} = changeset) do
-      Data.update(
-        {
-          Map.merge(origin.vegetation, change.producer),
-          Map.merge(origin.herbivore, change.consumer)
-        },
-        position,
-        data
-      )
-
-      changeset
-    end
-
-    def result(%{
-          change: %{producer: vegetation, consumer: herbivore},
-          origin: origin
-        }) do
-      %{
-        vegetation: %{change: vegetation, origin: origin.vegetation},
-        herbivore: %{change: herbivore, origin: origin.herbivore}
-      }
+      change
+      |> Change.set([:vegetation, :size], delta.producer.size)
+      |> Change.set([:herbivore, :size], delta.consumer.size)
     end
   end
 

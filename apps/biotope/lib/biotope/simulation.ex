@@ -3,7 +3,8 @@ defmodule Biotope.Simulation do
 
   alias Ximula.Sim.Change
   alias Biotope.Simulation
-  alias Biotope.Sim.{Vegetation}
+  alias Biotope.Sim.Vegetation
+  alias Biotope.Sim.Animal.Herbivore
   alias Biotope.StageAdapter
 
   simulation do
@@ -18,11 +19,11 @@ defmodule Biotope.Simulation do
         step(Vegetation, :sim, notify: {:metric, &Simulation.notify_filter/1})
       end
 
-      # stage(:herbivore, StageAdapter) do
-      #   notify_all(:metric)
-      #   notify_entity(:metric, &Simulation.notify_filter/1)
-      #   step(Herbivore, :sim, notify: {:metric, &Simulation.notify_filter/1})
-      # end
+      stage(:herbivore, StageAdapter) do
+        notify_all(:metric)
+        notify_entity(:metric, &Simulation.notify_filter/1)
+        step(Herbivore, :sim, notify: {:metric, &Simulation.notify_filter/1})
+      end
     end
 
     queue :normal, 200 do
@@ -34,7 +35,11 @@ defmodule Biotope.Simulation do
     Change.get(change, :position) == {0, 0}
   end
 
-  def notify_filter(field) do
-    field.position == {0, 0}
+  def notify_filter(%{position: position}) do
+    position == {0, 0}
+  end
+
+  def notify_filter(_entity) do
+    false
   end
 end
