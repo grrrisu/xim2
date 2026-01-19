@@ -115,7 +115,7 @@ defmodule Biotope.Data do
         %{
           vegetation: %Vegetation{} = vegetation,
           herbivore: %Herbivore{position: position} = herbivore
-        },
+        } = result,
         data
       ) do
     :ok =
@@ -124,6 +124,8 @@ defmodule Biotope.Data do
         |> Map.put(:vegetation, Grid.put(grid, position, vegetation))
         |> put_in([:herbivore, position], herbivore)
       end)
+
+    result
   end
 
   def update({%Herbivore{} = herbivore, %Predator{} = predator}, position, data) do

@@ -12,6 +12,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   def mount(_params, _session, socket) do
     if connected?(socket) do
       PubSub.subscribe(Xim2.PubSub, "sim:pipeline:stage:vegetation")
+      PubSub.subscribe(Xim2.PubSub, "sim:pipeline:stage:herbivore")
       {:ok, prepare_queues(socket)}
     else
       {:ok, socket |> assign(:page_title, "Biotope")}
@@ -82,6 +83,16 @@ defmodule Xim2Web.BiotopeLive.Index do
      |> stream(:vegetation, vegetation |> streamify())}
   end
 
+  def handle_info(
+        {:stage_completed, %{stage_name: :herbivore, result: %{ok: results}}},
+        socket
+      ) do
+    {:noreply,
+     socket
+     |> stream(:vegetation, Enum.map(results, & &1.vegetation) |> streamify())
+     |> stream(:herbivore, Enum.map(results, & &1.herbivore) |> streamify())}
+  end
+
   def handle_info(msg, socket) do
     dbg(msg)
     {:noreply, socket}
@@ -138,6 +149,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   def herbivore(assigns) do
     {x, y} = assigns.herbivore.position
     assigns = assign(assigns, x: x * assigns.step, y: y * assigns.step)
+    assigns = assign(assigns, size: assigns.herbivore.size |> round())
 
     ~H"""
     <div
@@ -146,7 +158,7 @@ defmodule Xim2Web.BiotopeLive.Index do
       style={"left: #{@x}px; top: #{@y}px; width: #{@step}px; height: #{@step}px"}
     >
       <span class="bg-sky-500 p-2">
-        {@herbivore.size}
+        {@size}
       </span>
     </div>
     """

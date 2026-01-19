@@ -16,9 +16,8 @@ defmodule Xim2Web.MonitorLive.Index do
      socket
      |> assign(:page_title, "Monitor #{data}")
      |> prepare_sim_stack_chart("duration-sim-stack-chart",
-       fill: true
-       # stacked: true
-       # begin_at_zero: true
+       fill: true,
+       begin_at_zero: true
      )
      |> prepare_biotope_chart("duration-summary-chart",
        fill: true,
@@ -202,7 +201,7 @@ defmodule Xim2Web.MonitorLive.Index do
     {:noreply, socket}
   end
 
-  defp insert_sim_stack_duration(socket, key, duration, meta \\ nil) do
+  defp insert_sim_stack_duration(socket, key, duration, meta) do
     socket
     |> stream_insert(
       :sim_stack_durations,

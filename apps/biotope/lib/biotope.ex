@@ -37,6 +37,9 @@ defmodule Biotope do
     queues = Simulation.build_queues()
 
     case Loop.add_queues(loop, queues) do
+      # no queues were added
+      [] -> :ok
+      # queues were added
       [_] -> :ok
       error -> error
     end
