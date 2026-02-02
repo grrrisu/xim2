@@ -47,67 +47,6 @@ const trimData = function (chart, maxDataPoints) {
   }
 }
 
-// const MonitorHook = {
-//   mounted() {
-//     const chart = new Chart(this.el, {
-//       type: 'line',
-//       data: {
-//         labels: [1, 2, 3],
-//         datasets: [{
-//           label: 'Duration',
-//           borderColor: "rgb(6, 182, 212, 0.8)",
-//           backgroundColor: "rgb(14, 116, 144, 0.8)",
-//           lineTension: 0,
-//           borderWidth: 2
-//         }]
-//       },
-//       options: {
-//         responsive: true,
-//         scales: {
-//           x: {
-//             display: true,
-//             type: 'time',
-//             time: {
-//               displayFormats: {
-//                 second: 'mm:ss',
-//                 minute: 'mm',
-//                 hour: 'HH:mm',
-//                 day: 'MMM dd'
-//               }
-//             },
-//             ticks: {
-//               color: "rgb(14, 165, 233, 0.8)",
-//             },
-
-//           },
-//           y: {
-//             display: true,
-//             beginAtZero: false,
-//             ticks: {
-//               color: "rgb(14, 165, 233, 0.8)",
-//             },
-//           }
-//         }
-//       }
-//     })
-
-//     this.handleEvent("update-duration-chart", (data) => {
-//       console.log("chart")
-//       console.log(data)
-//       chart.data.labels.push(new Date(data.time));
-//       chart.data.datasets[0].data.push(data.duration);
-
-//       // Limit the number of data points to prevent memory issues
-//       const maxDataPoints = 200;
-//       if (chart.data.labels.length > maxDataPoints) {
-//         chart.data.labels.shift();
-//         chart.data.datasets[0].data.shift();
-//       }
-//       chart.update();
-//     });
-//   }
-// }
-
 const ChartHook = {
   mounted() {
     const chart = new Chart(this.el, {
@@ -123,7 +62,6 @@ const ChartHook = {
     });
 
     this.handleEvent(`update-chart-${this.el.id}`, (data) => {
-      tmpData[data.index] = data.result;
       chart.data.labels.push(data.x_axis);
       data.results.forEach((result, index) => {
         chart.data.datasets[index].data.push(result);

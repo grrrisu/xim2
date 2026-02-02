@@ -6,7 +6,7 @@ defmodule Sim.Monitor.Data do
   alias Phoenix.PubSub
 
   alias Ximula.Gatekeeper.Agent, as: Gatekeeper
-  alias Ximula.Sim.TaskRunner, as: Simulator
+  alias Ximula.Sim.TaskRunner
 
   def create(server, size) do
     data = 0..(size - 1) |> Enum.reduce(%{}, &Map.put_new(&2, &1, %{value: 0}))
@@ -35,15 +35,15 @@ defmodule Sim.Monitor.Data do
 
   # def change(one, two), do: raise(inspect([one, two]))
 
-  def run_queue(queue,
+  def run_queue(
         timeout: timeout,
         tasks: tasks,
         gatekeeper: gatekeeper,
         supervisor: supervisor
       ) do
-    Simulator.benchmark(fn ->
+    TaskRunner.benchmark(fn ->
       get_items(gatekeeper)
-      |> Simulator.sim(
+      |> TaskRunner.sim(
         {__MODULE__, :change, gatekeeper: gatekeeper, timeout: timeout},
         supervisor,
         max_concurrency: tasks
@@ -54,24 +54,25 @@ defmodule Sim.Monitor.Data do
       # |> summarize(simulation)
       # |> notify()
     end)
-    |> aggregate_results(queue.name)
+    |> aggregate_results()
     |> notify_sum()
   end
 
   defp get_items(server) do
     size = Gatekeeper.get(server, &Enum.count(&1))
-    0..(size - 1)
+    0..(size - 1) |> Range.to_list()
   end
 
-  defp aggregate_results({duration, %{exit: error, ok: ok}}, queue) do
+  defp aggregate_results({duration, %{exit: error, ok: ok}}) do
     %{
-      queue: queue,
       results: %{
-        queue => %{
+        :one => %{
           ok: Enum.count(ok),
           error: Enum.count(error),
           time: DateTime.now!("Etc/UTC"),
-          duration: duration
+          duration: duration,
+          key: "some key",
+          meta: %{}
         }
       }
     }

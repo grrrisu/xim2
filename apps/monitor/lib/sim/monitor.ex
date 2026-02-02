@@ -24,10 +24,12 @@ defmodule Sim.Monitor do
       func:
         {Data, :run_queue,
          [
-           timeout: timeout,
-           tasks: tasks,
-           gatekeeper: @gatekeeper,
-           supervisor: @simulator_task_supervisor
+           [
+             timeout: timeout,
+             tasks: tasks,
+             gatekeeper: @gatekeeper,
+             supervisor: @simulator_task_supervisor
+           ]
          ]},
       interval: 1_000
     })
