@@ -20,10 +20,10 @@ defmodule Xim2Web.Monitor.Components do
         class="divide-y divide-sky-800 border-t border-sky-600 text-sm leading-6 text-sky-300"
       >
         <tr :for={{dom_id, item} <- @durations} id={dom_id}>
-          <td>{ item.key }</td>
+          <td>{item.key}</td>
           <td class="text-right">{Calendar.strftime(item.time, "%H:%M:%S:%f")}</td>
           <td class="text-right">{item.duration |> number_format()}</td>
-          <td>{ inspect(item.meta) }</td>
+          <td>{inspect(item.meta)}</td>
         </tr>
       </tbody>
     </table>
