@@ -58,7 +58,7 @@ defmodule Xim2Web.MonitorLive.Index do
         </:box>
       </.box_grid>
       <.box_grid>
-        <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
+        <:box><.chart title="Duration" name="duration-summary-chart" hook="ChartAsync" /></:box>
         <:box>
           <.duration_table durations={@streams.durations} items={nil} tasks={nil} timeout={nil} />
         </:box>
@@ -113,7 +113,10 @@ defmodule Xim2Web.MonitorLive.Index do
         {:noreply,
          socket
          |> push_chart_data("duration-sim-stack-chart", 2, measurements.duration)
-         |> insert_sim_stack_duration(:stage, measurements.duration, metadata)}
+         |> insert_sim_stack_duration(:stage, measurements.duration, metadata)
+         |> push_stage_chart_data(measurements.duration, metadata)
+         |> insert_stage_duration(measurements.duration, metadata)
+         |> insert_stage_items(metadata)}
 
       [:ximula, :sim, :pipeline, :stop] ->
         {:noreply,
@@ -132,68 +135,29 @@ defmodule Xim2Web.MonitorLive.Index do
     end
   end
 
-  # def handle_info({:monitor_data, :queue_summary, result}, socket) do
-  #   {:noreply,
-  #    socket
-  #    |> stream_insert(
-  #      :durations,
-  #      Map.put_new(result, :id, System.unique_integer([:positive])),
-  #      limit: -12
-  #    )
-  #    |> push_event("update-duration-chart", %{
-  #      x_axis: DateTime.to_iso8601(result.time),
-  #      duration: result.duration
-  #    })}
-  # end
-
-  def handle_info(
-        {namespace, :entities_changed, results},
-        %{assigns: %{pubsub_topic: namespace}} = socket
-      ) do
-    {:noreply,
-     socket
-     |> push_chart_data("changed-summary-chart", [
-       Enum.count(results.vegetation),
-       Enum.count(results.herbivore),
-       Enum.count(results.predator)
-     ])}
+  defp push_stage_chart_data(socket, duration, metadata) do
+    push_chart_data(
+      socket,
+      "duration-summary-chart",
+      simulation_index(metadata.stage_name),
+      duration
+    )
   end
 
-  def handle_info(
-        {namespace, :simulation_errors, results},
-        %{assigns: %{pubsub_topic: namespace}} = socket
-      ) do
-    {:noreply,
-     Enum.reduce(results, socket, fn {{x, y}, message}, socket ->
-       stream_insert(
-         socket,
-         :error_messages,
-         %{
-           id: System.unique_integer([:positive]),
-           time: DateTime.now!("Etc/UTC"),
-           entity: "{#{x}, #{y}}",
-           message: message
-         },
-         limit: -12
-       )
-     end)}
+  defp insert_stage_items(socket, metadata) do
+    push_chart_data(
+      socket,
+      "ok-summary-chart",
+      simulation_index(metadata.stage_name),
+      metadata.ok
+    )
   end
 
-  def handle_info(
-        {namespace, :queue_summary, %{results: results}},
-        %{assigns: %{pubsub_topic: namespace}} = socket
-      ) do
-    {:noreply,
-     socket
-     |> insert_total_duration(results)
-     |> push_chart_data("duration-summary-chart", biotope_results(results, :time))
-     |> push_chart_data("ok-summary-chart", biotope_results(results, :ok))
-     |> push_chart_data("errors-summary-chart", biotope_results(results, :error))}
-  end
-
-  def handle_info({namespace, topic, _payload}, %{assigns: %{pubsub_topic: namespace}} = socket) do
-    Logger.info("received simulation #{namespace} topic #{topic}")
-    {:noreply, socket}
+  defp simulation_index(simulation) do
+    case simulation do
+      :vegetation -> 0
+      :herbivore -> 1
+    end
   end
 
   def handle_info(msg, socket) do
@@ -216,14 +180,16 @@ defmodule Xim2Web.MonitorLive.Index do
     )
   end
 
-  defp insert_total_duration(socket, results) do
+  defp insert_stage_duration(socket, duration, meta) do
     socket
     |> stream_insert(
       :durations,
       %{
         id: System.unique_integer([:positive]),
+        key: meta.stage_name,
         time: DateTime.now!("Etc/UTC"),
-        duration: Enum.reduce(results, 0, fn {_, result}, sum -> sum + result.time end)
+        duration: duration,
+        meta: Map.take(meta, [:ok, :failed])
       },
       limit: -12
     )
@@ -312,12 +278,12 @@ defmodule Xim2Web.MonitorLive.Index do
           label: "Herbivore",
           borderColor: "rgb(249, 115, 22, 0.8)",
           backgroundColor: "rgb(194, 65, 12, 0.8)"
-        },
-        %{
-          label: "Predator",
-          borderColor: "rgb(241, 65, 94, 0.8)",
-          backgroundColor: "rgb(180, 14, 41, 0.8)"
         }
+        # %{
+        #   label: "Predator",
+        #   borderColor: "rgb(241, 65, 94, 0.8)",
+        #   backgroundColor: "rgb(180, 14, 41, 0.8)"
+        # }
       ],
       opts
     )
