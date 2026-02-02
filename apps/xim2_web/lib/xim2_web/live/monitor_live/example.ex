@@ -26,7 +26,7 @@ defmodule Xim2Web.MonitorLive.Example do
      )
      |> prepare_summary_chart("ok-summary-chart", fill: false, begin_at_zero: true)
      |> prepare_summary_chart("errors-summary-chart",
-       type: "bar",
+       # type: "bar",
        fill: false,
        begin_at_zero: true
      )
@@ -59,7 +59,7 @@ defmodule Xim2Web.MonitorLive.Example do
         </:box>
       </.box_grid>
       <.box_grid>
-        <:box><.chart title="Duration" name="duration-chart" hook="Chart" /></:box>
+        <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box>
           <.duration_table
             durations={@streams.durations}
@@ -70,7 +70,6 @@ defmodule Xim2Web.MonitorLive.Example do
         </:box>
       </.box_grid>
       <.box_grid>
-        <:box><.chart title="Duration" name="duration-summary-chart" hook="Chart" /></:box>
         <:box><.chart title="# Items" name="ok-summary-chart" hook="Chart" /></:box>
       </.box_grid>
       <.box_grid>
@@ -109,10 +108,10 @@ defmodule Xim2Web.MonitorLive.Example do
        Map.put_new(results.one, :id, System.unique_integer([:positive])),
        limit: -12
      )
-     |> push_event("update-duration-chart", %{
-       x_axis: results.one.time |> DateTime.to_iso8601(),
-       duration: results.one.duration
-     })
+     #  |> push_event("update-duration-chart", %{
+     #    x_axis: results.one.time |> DateTime.to_iso8601(),
+     #    duration: results.one.duration
+     #  })
      |> push_chart_data("duration-summary-chart", [results.one.duration])
      |> push_chart_data("ok-summary-chart", [results.one.ok])
      |> push_chart_data("errors-summary-chart", [results.one.error])}

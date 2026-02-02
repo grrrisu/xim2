@@ -25,7 +25,9 @@ defmodule Xim2Web.MonitorLive.IndexTest do
           time: DateTime.utc_now(),
           duration: 15_000,
           ok: 100,
-          error: 0
+          error: 0,
+          key: "test",
+          meta: %{}
         }
       }
     }

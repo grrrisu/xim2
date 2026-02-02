@@ -64,8 +64,8 @@ defmodule Xim2Web.MonitorLive.Index do
         </:box>
       </.box_grid>
       <.box_grid>
-        <:box><.chart title="Items calculated" name="ok-summary-chart" hook="Chart" /></:box>
-        <:box><.chart title="Items changed" name="changed-summary-chart" hook="Chart" /></:box>
+        <:box><.chart title="Items changed" name="ok-summary-chart" hook="ChartAsync" /></:box>
+        <:box><.chart title="Items ???" name="changed-summary-chart" hook="Chart" /></:box>
       </.box_grid>
       <.box_grid>
         <:box><.chart title="Errors" name="errors-summary-chart" hook="Chart" /></:box>
@@ -135,6 +135,11 @@ defmodule Xim2Web.MonitorLive.Index do
     end
   end
 
+  def handle_info(msg, socket) do
+    Logger.warning("unhandled message #{inspect(msg)}")
+    {:noreply, socket}
+  end
+
   defp push_stage_chart_data(socket, duration, metadata) do
     push_chart_data(
       socket,
@@ -158,11 +163,6 @@ defmodule Xim2Web.MonitorLive.Index do
       :vegetation -> 0
       :herbivore -> 1
     end
-  end
-
-  def handle_info(msg, socket) do
-    Logger.warning("unhandled message #{inspect(msg)}")
-    {:noreply, socket}
   end
 
   defp insert_sim_stack_duration(socket, key, duration, meta) do
@@ -193,14 +193,6 @@ defmodule Xim2Web.MonitorLive.Index do
       },
       limit: -12
     )
-  end
-
-  defp biotope_results(results, attribute) do
-    [
-      Map.get(results, :vegetation) |> Map.get(attribute),
-      Map.get(results, :herbivore) |> Map.get(attribute),
-      Map.get(results, :predator) |> Map.get(attribute)
-    ]
   end
 
   defp pubsub_topic(%{"topic" => topic, "data" => data}) do
