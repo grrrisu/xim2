@@ -1,4 +1,9 @@
 defmodule Biotope.StageAdapter do
+  @moduledoc """
+  Stage adapter for Biotope simulation stages.
+  Getting and updating Biotope data during simulation.
+  Marking no changes if below integer threshold.
+  """
   @behaviour Ximula.Sim.StageAdapter
   alias Ximula.Sim.{Change, Pipeline}
 

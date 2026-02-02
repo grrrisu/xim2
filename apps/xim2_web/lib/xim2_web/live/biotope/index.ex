@@ -94,7 +94,7 @@ defmodule Xim2Web.BiotopeLive.Index do
   end
 
   def handle_info(msg, socket) do
-    dbg(msg)
+    # dbg(msg)
     {:noreply, socket}
   end
 

@@ -52,9 +52,16 @@ defmodule Xim2Web.MonitorLive.Index do
     ~H"""
     <Layouts.app flash={@flash} title={@page_title} back={~p"/"}>
       <.box_grid>
-        <:box><.chart title="Sim Stack Duration" name="duration-sim-stack-chart" hook="ChartAsync" /></:box>
         <:box>
-          <.duration_table durations={@streams.sim_stack_durations} items={nil} tasks={nil} timeout={nil} />
+          <.chart title="Sim Stack Duration" name="duration-sim-stack-chart" hook="ChartAsync" />
+        </:box>
+        <:box>
+          <.duration_table
+            durations={@streams.sim_stack_durations}
+            items={nil}
+            tasks={nil}
+            timeout={nil}
+          />
         </:box>
       </.box_grid>
       <.box_grid>
